@@ -43,16 +43,22 @@ begin
 end;
 
 function TCardGameWeb.CreateNewSessionKey: String;
+var
+  lSessionID,
+  lError      : String;
 begin
-  Result := 'BAD-Session-ID';
+  Result := '{ERROR : "BAD-Session-ID"}';
   try
     // Create Key
-    // Save Key to DB
-
+    lSessionID := 'ass527Shjd';
+    // Save me to game stat
+    if fDataBase.CreateNewGame(Result,lError)
+     then Result := '{ID : "'+lSessionID+'"}'
+     else Result := '{ERROR : "'+lError+'"}';
   except
     On E : Exception do
       begin
-        Result := 'EXCEPTION:'+E.Message;
+        Result := '{ERROR : "EXCEPTION:'+E.Message+'"}';
       end;
   end;
 end;
