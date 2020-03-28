@@ -10,7 +10,7 @@ Type
   TCardGameWeb = Class(TInterfacedObject,ICardgame)
     strict private
       Function CreateNewSessionKey : String;
-      Function JoinSession(Const aSessionID : String) : String;
+      Function JoinSession(Const aSessionID,aUserName : String) : String;
     private
       fDataBase : IDataBase;
     public
@@ -20,7 +20,7 @@ Type
   TCardGameJSON = Class(TInterfacedObject,ICardgame)
     strict private
       Function CreateNewSessionKey : String;
-      Function JoinSession(Const aSessionID : String) : String;
+      Function JoinSession(Const aSessionID,aUserName : String) : String;
     private
       fDataBase : IDataBase;
     public
@@ -57,7 +57,7 @@ begin
   end;
 end;
 
-function TCardGameWeb.JoinSession(const aSessionID: String): String;
+Function TCardGameWeb.JoinSession(Const aSessionID,aUserName : String) : String;
 var
   lError      : String;
 begin
@@ -106,7 +106,7 @@ begin
   end;
 end;
 
-function TCardGameJSON.JoinSession(const aSessionID: String): String;
+Function TCardGameJSON.JoinSession(Const aSessionID,aUserName : String) : String;
 begin
   Result := '{ERROR : "Not-Joined"}';
 end;

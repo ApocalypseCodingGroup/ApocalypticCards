@@ -13,7 +13,7 @@ Type
    ICardgame = Interface
     ['{C11CFA85-FBB1-4620-BAC5-783AA64CF446}']
      Function CreateNewSessionKey : String;
-     Function JoinSession(Const aSessionID : String) : String;
+     Function JoinSession(Const aSessionID,aUserName : String) : String;
    end;
 
    IDataBase = Interface
