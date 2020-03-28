@@ -91,6 +91,9 @@
             <FormType>dfm</FormType>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="Dek.pas"/>
+        <DCCReference Include="GameService.pas"/>
+        <DCCReference Include="MariaDB.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

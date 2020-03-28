@@ -6,7 +6,10 @@ uses
   Web.WebReq,
   IdHTTPWebBrokerBridge,
   DebugForm in 'DebugForm.pas' {Form4},
-  WebMainModel in 'WebMainModel.pas' {WebModule4: TWebModule};
+  WebMainModel in 'WebMainModel.pas' {WebModule4: TWebModule},
+  Dek in 'Dek.pas',
+  GameService in 'GameService.pas',
+  MariaDB in 'MariaDB.pas';
 
 {$R *.res}
 

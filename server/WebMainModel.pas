@@ -9,6 +9,10 @@ type
   TWebModule4 = class(TWebModule)
     procedure WebModule4DefaultHandlerAction(Sender: TObject;
       Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModule4StartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModule4JoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModule4RESTStartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModule4RESTJoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   private
     { Private-Deklarationen }
   public
@@ -20,6 +24,12 @@ var
 
 implementation
 
+Uses
+  Dek
+, GameService
+, MariaDB
+;
+
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}
@@ -29,8 +39,57 @@ procedure TWebModule4.WebModule4DefaultHandlerAction(Sender: TObject;
 begin
   Response.Content :=
     '<html>' +
-    '<head><title>Webserver-Anwendung</title></head>' +
-    '<body>Webserver-Anwendung</body>' +
+    '<head><title>Apocalypse Card Game</title></head>' +
+    '<body>'+
+    '<h1><a href="'+BaseURL+'/startnew">Start Game</a></h1>'+
+    '<h1><a href="'+BaseURL+'/joingame">Join Game</a></h1>'+
+    '</body>'+
+    '</html>';
+end;
+
+procedure TWebModule4.WebModule4JoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  lWebCall : ICardgame;
+begin
+  lWebCall := TCardGameWeb.Create(TMariaDB.Construct);
+
+  Response.Content :=
+    '<html>' +
+    '<head><title>Apocalypse Card Game</title></head>' +
+    '<body>'+
+    '<h1>JOIN</h1>'+
+    '</body>'+
+    '</html>';
+end;
+
+procedure TWebModule4.WebModule4RESTJoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  lWebCall : ICardgame;
+begin
+  lWebCall := TCardGameJSON.Create(TMariaDB.Construct);
+  Response.Content := lWebCall.JoinSession('XX');//Request.Query)
+end;
+
+procedure TWebModule4.WebModule4RESTStartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  lWebCall : ICardgame;
+begin
+  lWebCall         := TCardGameJSON.Create(TMariaDB.Construct);
+  Response.Content := lWebCall.CreateNewSessionKey;
+end;
+
+procedure TWebModule4.WebModule4StartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+var
+  lWebCall : ICardgame;
+begin
+  lWebCall := TCardGameWeb.Create(TMariaDB.Construct);
+
+  Response.Content :=
+    '<html>' +
+    '<head><title>Apocalypse Card Game</title></head>' +
+    '<body>'+
+    '<h1>New Game : Your ID ('+lWebCall.CreateNewSessionKey+')!</h1>'+
+    '</body>'+
     '</html>';
 end;
 
