@@ -67,7 +67,7 @@ var
   lWebCall : ICardgame;
 begin
   lWebCall := TCardGameJSON.Create(TMariaDB.Construct);
-  Response.Content := lWebCall.JoinSession('XX');//Request.Query)
+  Response.Content := lWebCall.JoinSession(Request.QueryFields.Values['SessionID'],Request.QueryFields.Values['User']);
 end;
 
 procedure TWebModule4.WebModule4RESTStartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
