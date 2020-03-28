@@ -42,7 +42,11 @@ uses
 
 { TMariaDB }
 const
+  {$ifdef DEBUG}
+  cDatabaseIni = '';
+  {$else}
   cDatabaseIni = '/var/www/apocalypse/https/private/cardgame.ini';
+  {$endif}
 
 class function TMariaDB.Construct: IDataBase;
 begin
@@ -55,7 +59,7 @@ var
 begin
   inherited Create;
   fConn := TFDConnection.Create(nil);
-  fConn.Params.DriverID := 'MariaDB';
+  fConn.Params.DriverID := 'MySQL';
   fConn.Params.Add('Server=127.0.0.1');
   Credentials := TStringList.Create;
   try
@@ -95,6 +99,7 @@ begin
     Error := Error + fQry.FieldByName('int_test').AsString + ':';
     fQry.Next;
   end;
+  exit;
   Error := 'Not Implemented';
   Result := false;
 end;
