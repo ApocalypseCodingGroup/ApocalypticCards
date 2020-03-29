@@ -180,7 +180,6 @@ type
   ///  </summary>
   TRESTAPI = class(TComponent, IProducerDispatch)
   private
-    fOnBeforeRequest: TNotifyEvent;
     fPassthrough: TRESTPassthrough;
     fAuthenticator: TRESTAuthenticator;
     fCollections: TRESTCollections;
@@ -197,7 +196,6 @@ type
     ///  <exclude/>
     constructor Create( aOwner: TComponent ); override;
   published
-    property OnBeforeRequest: TNotifyEvent read fOnBeforeRequest write fOnBeforeRequest;
     ///  <summary>
     ///    Provides access to the REST collections which are exposed through
     ///    this API.
@@ -239,7 +237,6 @@ begin
       Exception.Create('TRESTManager component must be placed on a TWebModule.');
   end;
   //- Create collections
-  fOnBeforeRequest := nil;
   fCollections := TRESTCollections.Create(Self);
   fAuthenticator := nil;
   fPassthrough := nil;
@@ -328,9 +325,6 @@ var
   PathInfo: TPathInfo;
   Collection: TRESTCollection;
 begin
-  if assigned(fOnBeforeRequest) then begin
-    fOnBeforeRequest(Self);
-  end;
   if fCollections.Count>0 then begin
     //- Find the REST collection to handle the request.
     PathInfoStr := RemoveActionPath( Dispatcher.Request.PathInfo, ActionPathInfo );

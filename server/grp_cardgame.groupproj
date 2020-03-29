@@ -3,13 +3,13 @@
         <ProjectGuid>{830EBD1D-A540-4B00-AE2B-B648C6611906}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="dependencies\deREST\src\pkg_deREST.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="src\CardDebug.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="src\mod_cardgame.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="src\CardDebugLinux.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -20,15 +20,6 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="pkg_deREST">
-        <MSBuild Projects="dependencies\deREST\src\pkg_deREST.dproj"/>
-    </Target>
-    <Target Name="pkg_deREST:Clean">
-        <MSBuild Projects="dependencies\deREST\src\pkg_deREST.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="pkg_deREST:Make">
-        <MSBuild Projects="dependencies\deREST\src\pkg_deREST.dproj" Targets="Make"/>
-    </Target>
     <Target Name="CardDebug">
         <MSBuild Projects="src\CardDebug.dproj"/>
     </Target>
@@ -47,14 +38,23 @@
     <Target Name="mod_cardgame:Make">
         <MSBuild Projects="src\mod_cardgame.dproj" Targets="Make"/>
     </Target>
+    <Target Name="CardDebugLinux">
+        <MSBuild Projects="src\CardDebugLinux.dproj"/>
+    </Target>
+    <Target Name="CardDebugLinux:Clean">
+        <MSBuild Projects="src\CardDebugLinux.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CardDebugLinux:Make">
+        <MSBuild Projects="src\CardDebugLinux.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="pkg_deREST;CardDebug;mod_cardgame"/>
+        <CallTarget Targets="CardDebug;mod_cardgame;CardDebugLinux"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="pkg_deREST:Clean;CardDebug:Clean;mod_cardgame:Clean"/>
+        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;CardDebugLinux:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="pkg_deREST:Make;CardDebug:Make;mod_cardgame:Make"/>
+        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;CardDebugLinux:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

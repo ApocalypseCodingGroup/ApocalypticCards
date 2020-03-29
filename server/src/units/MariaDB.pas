@@ -20,11 +20,15 @@ Uses
 , FireDAC.Phys.MySQL
 ;
 
+
 Type
   TMariaDB = Class(TInterfacedObject,IDataBase)
     strict private
       Function CreateNewGame(Const aSessionID : String;out Error : String) : boolean;
       Function JoinGame(Const aSessionID,aUserName : String;out Token, Error : String) : boolean;
+      function ReadGames( out Response: string ): boolean;
+    private
+      class function QueryToJSON( const Qry: TFDQuery; const RequestedFields: TArrayOfString; out Response: string ): boolean; static;
     private
       fConn: TFDConnection;
       fQry: TFDQuery;
@@ -37,6 +41,7 @@ Type
 implementation
 uses
   SysUtils
+, StrUtils
 , Classes
 ;
 
@@ -63,6 +68,11 @@ begin
   fConn.Params.Add('Server=127.0.0.1');
   Credentials := TStringList.Create;
   try
+    {$ifdef DEBUG}
+    fConn.Params.Database := 'apocalypticcards';
+    fConn.Params.UserName := 'root';
+    fConn.Params.Password := 'TestingDatabase';
+    {$else}
     if not FileExists(cDatabaseIni) then begin
       raise
         Exception.Create('The credentials configuration is missing.');
@@ -71,6 +81,7 @@ begin
     fConn.Params.Database := Credentials.Values['database'];
     fConn.Params.UserName := Credentials.Values['username'];
     fConn.Params.Password := Credentials.Values['password'];
+    {$endif}
   finally
     Credentials.DisposeOf;
   end;
@@ -115,6 +126,54 @@ function TMariaDB.JoinGame(const aSessionID, aUserName: String; out Token, Error
 begin
   Error := 'Not Implemented';
   result := false;
+end;
+
+class function TMariaDB.QueryToJSON(const Qry: TFDQuery; const RequestedFields: TArrayOfString; out Response: string): boolean;
+var
+  Field: TField;
+  FieldIndex: integer;
+begin
+  Result := False;
+  Qry.First;
+  Response := '[';
+  while not Qry.EOF do begin
+    Response := Response + '{';
+    for FieldIndex := 0 to pred(Length(RequestedFields)) do begin
+      Field := Qry.FieldByName(RequestedFields[FieldIndex]);
+      if not assigned(Field) then begin
+        exit;
+      end;
+      Response := Response + '"' + RequestedFields[FieldIndex] + '"';
+      if Field.DataType in
+        [ ftSmallint, ftInteger, ftFloat,
+          ftCurrency, ftBCD, ftLargeint,
+          ftLongWord, ftShortint, ftByte, ftExtended,
+          ftSingle ] then begin
+        Response := Response + ': ' + Field.AsString;
+      end else begin
+        Response := Response + ': "' + Field.AsString + '"';
+      end;
+    end;
+    Response := Response + '},';
+    Qry.Next;
+  end;
+  Response := LeftStr( Response, pred(Length(Response)) ); //- remove trialing comma
+  Response := Response + ']';
+  Result := True;
+end;
+
+function TMariaDB.ReadGames(out Response: string): boolean;
+const
+  cSQL = 'SELECT * from tbl_questions';
+begin
+  Result := False;
+  Response := '';
+  fQry.SQL.Text := cSQL;
+  fQry.Active := True;
+  if not QueryToJSON( fQry, ['str_question'], Response ) then begin
+    exit;
+  end;
+  Result := True;
 end;
 
 end.

@@ -10,7 +10,8 @@ uses
   Dek in 'units\Dek.pas',
   GameService in 'units\GameService.pas',
   MariaDB in 'units\MariaDB.pas',
-  FireDAC.VCLUI.Wait in 'units\FireDAC.VCLUI.Wait.pas';
+  FireDAC.VCLUI.Wait in 'units\FireDAC.VCLUI.Wait.pas',
+  Requests in 'units\Requests.pas';
 
 {$R *.res}
 
