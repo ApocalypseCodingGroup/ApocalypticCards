@@ -3,10 +3,10 @@
         <ProjectGuid>{830EBD1D-A540-4B00-AE2B-B648C6611906}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="CardDebug.dproj">
+        <Projects Include="src\CardDebug.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="mod_cardgame.dproj">
+        <Projects Include="src\mod_cardgame.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -18,22 +18,22 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="CardDebug">
-        <MSBuild Projects="CardDebug.dproj"/>
+        <MSBuild Projects="src\CardDebug.dproj"/>
     </Target>
     <Target Name="CardDebug:Clean">
-        <MSBuild Projects="CardDebug.dproj" Targets="Clean"/>
+        <MSBuild Projects="src\CardDebug.dproj" Targets="Clean"/>
     </Target>
     <Target Name="CardDebug:Make">
-        <MSBuild Projects="CardDebug.dproj" Targets="Make"/>
+        <MSBuild Projects="src\CardDebug.dproj" Targets="Make"/>
     </Target>
     <Target Name="mod_cardgame">
-        <MSBuild Projects="mod_cardgame.dproj"/>
+        <MSBuild Projects="src\mod_cardgame.dproj"/>
     </Target>
     <Target Name="mod_cardgame:Clean">
-        <MSBuild Projects="mod_cardgame.dproj" Targets="Clean"/>
+        <MSBuild Projects="src\mod_cardgame.dproj" Targets="Clean"/>
     </Target>
     <Target Name="mod_cardgame:Make">
-        <MSBuild Projects="mod_cardgame.dproj" Targets="Make"/>
+        <MSBuild Projects="src\mod_cardgame.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="CardDebug;mod_cardgame"/>

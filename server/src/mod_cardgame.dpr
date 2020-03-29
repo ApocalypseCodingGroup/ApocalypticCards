@@ -7,7 +7,7 @@ uses
   Web.WebBroker,
   Web.ApacheApp,
   Web.HTTPD24Impl,
-  WebMainModel in 'WebMainModel.pas' {WebModule4: TWebModule};
+  WebMainModel in 'modules\WebMainModel.pas' {WebModule4: TWebModule};
 
 {$R *.res}
 
