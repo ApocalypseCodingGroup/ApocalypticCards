@@ -9,7 +9,8 @@ uses
   WebMainModel in 'modules\WebMainModel.pas' {WebModule4: TWebModule},
   Dek in 'units\Dek.pas',
   GameService in 'units\GameService.pas',
-  MariaDB in 'units\MariaDB.pas';
+  MariaDB in 'units\MariaDB.pas',
+  FireDAC.VCLUI.Wait in 'units\FireDAC.VCLUI.Wait.pas';
 
 {$R *.res}
 

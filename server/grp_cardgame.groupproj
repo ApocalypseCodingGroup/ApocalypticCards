@@ -3,6 +3,9 @@
         <ProjectGuid>{830EBD1D-A540-4B00-AE2B-B648C6611906}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
+        <Projects Include="dependencies\deREST\src\pkg_deREST.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="src\CardDebug.dproj">
             <Dependencies/>
         </Projects>
@@ -17,6 +20,15 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
+    <Target Name="pkg_deREST">
+        <MSBuild Projects="dependencies\deREST\src\pkg_deREST.dproj"/>
+    </Target>
+    <Target Name="pkg_deREST:Clean">
+        <MSBuild Projects="dependencies\deREST\src\pkg_deREST.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="pkg_deREST:Make">
+        <MSBuild Projects="dependencies\deREST\src\pkg_deREST.dproj" Targets="Make"/>
+    </Target>
     <Target Name="CardDebug">
         <MSBuild Projects="src\CardDebug.dproj"/>
     </Target>
@@ -36,13 +48,13 @@
         <MSBuild Projects="src\mod_cardgame.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="CardDebug;mod_cardgame"/>
+        <CallTarget Targets="pkg_deREST;CardDebug;mod_cardgame"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean"/>
+        <CallTarget Targets="pkg_deREST:Clean;CardDebug:Clean;mod_cardgame:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make"/>
+        <CallTarget Targets="pkg_deREST:Make;CardDebug:Make;mod_cardgame:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

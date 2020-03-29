@@ -1,0 +1,52 @@
+package pkg_deREST;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  inet,
+  dbrtl,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon;
+
+contains
+  deREST in 'units\deREST.pas',
+  deREST.filterparser in 'units\implementation\deREST.filterparser.pas',
+  deREST.restfilter.standard in 'units\implementation\deREST.restfilter.standard.pas',
+  deREST.restresponse.standard in 'units\implementation\deREST.restresponse.standard.pas',
+  deREST.restarray.standard in 'units\implementation\deREST.restarray.standard.pas',
+  deREST.restobject.standard in 'units\implementation\deREST.restobject.standard.pas',
+  deREST.pathinfo in 'units\implementation\deREST.pathinfo.pas',
+  deREST.types in 'units\deREST.types.pas',
+  deREST.api in 'units\deREST.api.pas',
+  deREST.producer in 'units\deREST.producer.pas',
+  deREST.authenticator in 'units\deREST.authenticator.pas',
+  deREST.passthrough in 'units\deREST.passthrough.pas';
+
+end.

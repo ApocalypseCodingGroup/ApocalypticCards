@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{EB50B9A0-F283-4643-A20F-EF6907F7EDEE}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="src\pkg_deREST.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="samples\WinWebBroker\WinWebBroker.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="samples\SampleClient\SampleClient.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="pkg_deREST">
+        <MSBuild Projects="src\pkg_deREST.dproj"/>
+    </Target>
+    <Target Name="pkg_deREST:Clean">
+        <MSBuild Projects="src\pkg_deREST.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="pkg_deREST:Make">
+        <MSBuild Projects="src\pkg_deREST.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="WinWebBroker">
+        <MSBuild Projects="samples\WinWebBroker\WinWebBroker.dproj"/>
+    </Target>
+    <Target Name="WinWebBroker:Clean">
+        <MSBuild Projects="samples\WinWebBroker\WinWebBroker.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="WinWebBroker:Make">
+        <MSBuild Projects="samples\WinWebBroker\WinWebBroker.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SampleClient">
+        <MSBuild Projects="samples\SampleClient\SampleClient.dproj"/>
+    </Target>
+    <Target Name="SampleClient:Clean">
+        <MSBuild Projects="samples\SampleClient\SampleClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SampleClient:Make">
+        <MSBuild Projects="samples\SampleClient\SampleClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="pkg_deREST;WinWebBroker;SampleClient"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="pkg_deREST:Clean;WinWebBroker:Clean;SampleClient:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="pkg_deREST:Make;WinWebBroker:Make;SampleClient:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
