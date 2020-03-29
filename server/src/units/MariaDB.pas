@@ -21,7 +21,7 @@ Uses
 ;
 
 
-Type
+type
   TMariaDB = Class(TInterfacedObject,IDataBase)
     strict private
       Function CreateNewGame(Const aSessionID : String;out Error : String) : boolean;
@@ -189,7 +189,7 @@ API/startjson?SessionID="hGASjsd6"&SessionName="Franks Game"&SessionPW=""&MinUse
 
 DROP TABLE IF EXISTS `developer`.`gamebase`;
 CREATE TABLE  `developer`.`gamebase` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `PKID` VARCHAR(10) unsigned NOT NULL AUTO_INCREMENT,
   `Running` tinyint(1) NOT NULL,
   `SessionID` varchar(8) NOT NULL,
   `SessionName` varchar(45) NOT NULL,

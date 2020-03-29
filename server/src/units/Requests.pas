@@ -14,7 +14,7 @@ type
   public
     class function PrepareResponse( var Response: TWebResponse ): boolean; static;
     class procedure PrepareException( var Response: TWebResponse; const Message: string ); static;
-    class procedure HandleRequest(Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const RequestHandler: THandleRequest ); static;
+    class procedure HandleRequest( Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const _Create, _Read, _Update, _Delete: THandleRequest ); static;
   end;
 
 implementation
@@ -27,20 +27,40 @@ uses
 
 { TGameRequest }
 
-class procedure TGameRequest.HandleRequest(Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const RequestHandler: THandleRequest);
+class procedure TGameRequest.HandleRequest( Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const _Create, _Read, _Update, _Delete: THandleRequest );
 var
   lWebCall : ICardgame;
   Str: string;
 begin
   PrepareResponse(Response);
   lWebCall := TCardGameJSON.Create(TMariaDB.Construct);
+
   try
-    RequestHandler(Response,Handled,lWebCall);
+
+    case Request.MethodType of
+
+      mtGet: begin
+        _Read(Response,Handled,lWebCall);
+      end; // read
+
+      mtPut: begin
+        _Update(Response,Handled,lWebCall);
+      end; // update
+
+      mtPost: begin
+        _Create(Response,Handled,lWebCall);
+      end;
+      mtDelete: begin
+        _Delete(Response,Handled,lWebCall);
+      end; // take a guess
+    end;
+
   except
     on E: Exception do begin
       PrepareException( Response, E.Message );
     end;
   end;
+
   Response.SendResponse;
 end;
 

@@ -12,6 +12,7 @@ Type
       Function CreateNewSessionKey : String;
       Function JoinSession(Const aSessionID,aUserName : String) : String;
       function Read_Games( out Response: string ): boolean;
+      function Create_Games(out Response: string; const RequestJSON: string ): boolean;
     private
       fDataBase : IDataBase;
     public
@@ -19,9 +20,10 @@ Type
   end;
 
 implementation
-
 Uses
   System.SysUtils
+, System.JSON
+, Rest.JSON
 ;
 
 constructor TCardGameJSON.Create(const aDataBase: IDataBase);
@@ -50,6 +52,17 @@ begin
         Result := '{ERROR : "EXCEPTION:'+E.Message+'"}';
       end;
   end;
+end;
+
+function TCardGameJSON.Create_Games(out Response: string; const RequestJSON: string): boolean;
+var
+  o: TJSONObject;
+  GO: TGameObject;
+begin
+  Result := False;
+  GO := TJSON.JSONToObject<TGameObject>( RequestJSON );
+  Response := GO.SessionName;
+  Result := True;
 end;
 
 Function TCardGameJSON.JoinSession(Const aSessionID,aUserName : String) : String;
