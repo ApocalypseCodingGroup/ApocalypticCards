@@ -9,6 +9,9 @@
         <Projects Include="mod_cardgame.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\..\..\..\Downloads\RamboSessionIDGen\VCL_RamboSessionIDGen.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="mod_cardgame:Make">
         <MSBuild Projects="mod_cardgame.dproj" Targets="Make"/>
     </Target>
+    <Target Name="VCL_RamboSessionIDGen">
+        <MSBuild Projects="..\..\..\..\..\Downloads\RamboSessionIDGen\VCL_RamboSessionIDGen.dproj"/>
+    </Target>
+    <Target Name="VCL_RamboSessionIDGen:Clean">
+        <MSBuild Projects="..\..\..\..\..\Downloads\RamboSessionIDGen\VCL_RamboSessionIDGen.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VCL_RamboSessionIDGen:Make">
+        <MSBuild Projects="..\..\..\..\..\Downloads\RamboSessionIDGen\VCL_RamboSessionIDGen.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="CardDebug;mod_cardgame"/>
+        <CallTarget Targets="CardDebug;mod_cardgame;VCL_RamboSessionIDGen"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean"/>
+        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;VCL_RamboSessionIDGen:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make"/>
+        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;VCL_RamboSessionIDGen:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

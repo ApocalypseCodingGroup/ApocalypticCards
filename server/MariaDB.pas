@@ -148,7 +148,7 @@ CREATE TABLE  `developer`.`gamebase` (
 API/Run?SessionID="hGASjsd6"
 // Question and Answer DESK is created with SessionID shuffled
 // Session set to Running
-// Assign 10 Cards to All Users
+// Assign 8 Cards to All Users
 // Result should be the First Quetion for Display. (Acc_QDeckID)
 
 DROP TABLE IF EXISTS `developer`.`questionbase`;
