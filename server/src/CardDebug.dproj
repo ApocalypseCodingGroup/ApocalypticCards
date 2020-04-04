@@ -96,14 +96,20 @@
             <FormType>dfm</FormType>
             <DesignClass>TWebModule</DesignClass>
         </DCCReference>
-        <DCCReference Include="units\implementation\datamodel.database.standard.pas"/>
         <DCCReference Include="units\FireDAC.VCLUI.Wait.pas"/>
         <DCCReference Include="units\Requests.pas"/>
         <DCCReference Include="units\api\datamodel.pas"/>
-        <DCCReference Include="units\api\gameviewmodel.pas"/>
-        <DCCReference Include="units\implementation\gameviewmodel.game.standard.pas"/>
-        <DCCReference Include="units\implementation\gameviewmodel.gameview.standard.pas"/>
-        <DCCReference Include="units\implementation\datamodel.game.standard.pas"/>
+        <DCCReference Include="units\api\viewmodel.pas"/>
+        <DCCReference Include="units\implementation\viewmodel.game.standard.pas"/>
+        <DCCReference Include="units\implementation\datamodel.gamedata.standard.pas"/>
+        <DCCReference Include="units\implementation\viewmodel.viewmodel.standard.pas"/>
+        <DCCReference Include="units\implementation\viewmodel.standard.pas"/>
+        <DCCReference Include="units\implementation\viewmodel.gameobject.custom.pas"/>
+        <DCCReference Include="units\implementation\datamodel.gamedataobject.custom.pas"/>
+        <DCCReference Include="units\implementation\datamodel.standard.pas"/>
+        <DCCReference Include="units\implementation\datamodel.datamodel.standard.pas"/>
+        <None Include="..\..\install\data.sql"/>
+        <None Include="..\..\install\database.sql"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -135,6 +141,18 @@
                 <DeployFile LocalName="..\out\bin\Win32\Debug\CardDebug.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>CardDebug.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\install\data.sql" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\..\install\database.sql" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

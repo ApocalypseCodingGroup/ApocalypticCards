@@ -3,7 +3,7 @@
         <ProjectGuid>{830EBD1D-A540-4B00-AE2B-B648C6611906}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="src\units\CardDebug.dproj">
+        <Projects Include="src\CardDebug.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="src\mod_cardgame.dproj">
@@ -21,13 +21,13 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="CardDebug">
-        <MSBuild Projects="src\units\CardDebug.dproj"/>
+        <MSBuild Projects="src\CardDebug.dproj"/>
     </Target>
     <Target Name="CardDebug:Clean">
-        <MSBuild Projects="src\units\CardDebug.dproj" Targets="Clean"/>
+        <MSBuild Projects="src\CardDebug.dproj" Targets="Clean"/>
     </Target>
     <Target Name="CardDebug:Make">
-        <MSBuild Projects="src\units\CardDebug.dproj" Targets="Make"/>
+        <MSBuild Projects="src\CardDebug.dproj" Targets="Make"/>
     </Target>
     <Target Name="mod_cardgame">
         <MSBuild Projects="src\mod_cardgame.dproj"/>

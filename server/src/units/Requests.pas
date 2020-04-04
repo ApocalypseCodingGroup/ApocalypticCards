@@ -2,12 +2,12 @@ unit Requests;
 
 interface
 uses
-  Dek
-, Web.HTTPApp
+  Web.HTTPApp
+, ViewModel
 ;
 
 type
-  THandleRequest = reference to procedure( Response: TWebResponse; var Handled: Boolean; const aWebCall: ICardgame );
+  THandleRequest = reference to procedure( Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel );
 
   TGameRequest = class
   public
@@ -20,36 +20,41 @@ implementation
 uses
   SysUtils
 , Classes
-, GameService
-, MariaDB
+, ViewModel.Standard
 ;
 
 { TGameRequest }
 
 class procedure TGameRequest.HandleRequest( Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const _Create, _Read, _Update, _Delete: THandleRequest );
 var
-  lWebCall : ICardgame;
   Str: string;
+  ViewModel: IViewModel;
 begin
   PrepareResponse(Response);
-  lWebCall := TCardGameJSON.Create(TMariaDB.Construct);
+
+  ViewModel := TViewModel.Create;
   try
+
+    if not assigned(ViewModel) then begin
+      raise
+        Exception.Create('Game failed to initialize.');
+    end;
 
     case Request.MethodType of
 
       mtGet: begin
-        _Read(Response,Handled,lWebCall);
+        _Read(Response,Handled,ViewModel);
       end; // read
 
       mtPut: begin
-        _Update(Response,Handled,lWebCall);
+        _Update(Response,Handled,ViewModel);
       end; // update
 
       mtPost: begin
-        _Create(Response,Handled,lWebCall);
+        _Create(Response,Handled,ViewModel);
       end;
       mtDelete: begin
-        _Delete(Response,Handled,lWebCall);
+        _Delete(Response,Handled,ViewModel);
       end; // take a guess
     end;
 
@@ -58,7 +63,6 @@ begin
       PrepareException( Response, E.Message );
     end;
   end;
-
   Response.SendResponse;
 end;
 

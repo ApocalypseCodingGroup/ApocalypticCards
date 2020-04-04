@@ -20,10 +20,9 @@ var
   WebModuleClass: TComponentClass = TWebModule4;
 
 implementation
-
 Uses
-  MariaDB
-, Requests
+  Requests
+, ViewModel
 ;
 const
   {$ifdef DEBUG}
@@ -36,59 +35,19 @@ const
 
 {$R *.dfm}
 
-procedure TWebModule4.WebModule4DefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-begin
-  Response.Content :=
-    '<html>' +
-    '<head><title>Apocalypse Card Game</title></head>' +
-    '<body>'+
-    '<h1><a href="'+BaseURL+'/startnew">Start Game</a></h1>'+
-    '<h1><a href="'+BaseURL+'/joingame">Join Game</a></h1>'+
-    '</body>'+
-    '</html>';
-end;
-
-procedure TWebModule4.WebModule4JoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-var
-  lWebCall : ICardgame;
-begin
-
-  Response.Content :=
-    '<html>' +
-    '<head><title>Apocalypse Card Game</title></head>' +
-    '<body>'+
-    '<h1>JOIN</h1>'+
-    '</body>'+
-    '</html>';
-end;
-
-//- Comment to see why is this not going into repo
 procedure TWebModule4.WebModule4wactGamesAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
   TGameRequest.HandleRequest( Request, Response, Handled,
 
     // Create
-    procedure(Response: TWebResponse; var Handled: Boolean; const aWebCall: ICardgame)
-    var
-      Str: string;
+    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
-      if aWebCall.Create_Games( Str, Request.Content ) then begin
-        Response.Content := Str;
-      end else begin
-        TGameRequest.PrepareException( Response, Str );
-      end;
     end,
 
     // Read
-    procedure(Response: TWebResponse; var Handled: Boolean; const aWebCall: ICardgame)
-    var
-      Str: string;
+    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
-      if aWebCall.Read_Games( Str ) then begin
-        Response.Content := Str;
-      end else begin
-        TGameRequest.PrepareException( Response, Str );
-      end;
+      Response.Content := ViewModel.getPublicGames;
     end,
 
     // Update

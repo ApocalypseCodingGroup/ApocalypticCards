@@ -7,14 +7,18 @@ uses
   IdHTTPWebBrokerBridge,
   DebugForm in 'forms\DebugForm.pas' {Form4},
   WebMainModel in 'modules\WebMainModel.pas' {WebModule4: TWebModule},
-  datamodel.database.standard in 'units\implementation\datamodel.database.standard.pas',
   FireDAC.VCLUI.Wait in 'units\FireDAC.VCLUI.Wait.pas',
   Requests in 'units\Requests.pas',
   datamodel in 'units\api\datamodel.pas',
-  gameviewmodel in 'units\api\gameviewmodel.pas',
-  gameviewmodel.game.standard in 'units\implementation\gameviewmodel.game.standard.pas',
-  gameviewmodel.gameview.standard in 'units\implementation\gameviewmodel.gameview.standard.pas',
-  datamodel.game.standard in 'units\implementation\datamodel.game.standard.pas';
+  viewmodel in 'units\api\viewmodel.pas',
+  viewmodel.game.standard in 'units\implementation\viewmodel.game.standard.pas',
+  datamodel.gamedata.standard in 'units\implementation\datamodel.gamedata.standard.pas',
+  viewmodel.viewmodel.standard in 'units\implementation\viewmodel.viewmodel.standard.pas',
+  viewmodel.standard in 'units\implementation\viewmodel.standard.pas',
+  viewmodel.gameobject.custom in 'units\implementation\viewmodel.gameobject.custom.pas',
+  datamodel.gamedataobject.custom in 'units\implementation\datamodel.gamedataobject.custom.pas',
+  datamodel.standard in 'units\implementation\datamodel.standard.pas',
+  datamodel.datamodel.standard in 'units\implementation\datamodel.datamodel.standard.pas';
 
 {$R *.res}
 

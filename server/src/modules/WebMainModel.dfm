@@ -8,7 +8,7 @@ object WebModule4: TWebModule4
     end
     item
       Name = 'wactGames'
-      PathInfo = '/games'
+      PathInfo = '/api/games'
       OnAction = WebModule4wactGamesAction
     end>
   Height = 487

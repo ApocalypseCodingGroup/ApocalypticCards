@@ -2,11 +2,15 @@ unit datamodel;
 
 interface
 uses
-  System.Generics.Collections
+  cwCollections
 ;
 
 type
-  IGameData = interface
+  IGameDataObject = interface
+    function AsObject: TObject;
+  end;
+
+  IGameData = interface( IGameDataObject )
     //- Getters
     function getSessionID: string;
     function getSessionName: string;
@@ -29,7 +33,8 @@ type
     property MaxUser: integer    read getMaxUser     write setMaxUser;
   end;
 
-  IDataBase = Interface
+
+  IDataModel = interface
   ['{0C23B564-0030-4895-BF7C-88F910EFD825}']
 
     function getGames: IList<IGameData>;
