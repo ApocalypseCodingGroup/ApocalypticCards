@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="pkg_cwRuntime"/>
+    <Type Value="RunTimeOnly"/>
+    <Author Value="Craig Chapman for ChapmanWorld LLC"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="..\main\api;..\main\implementation"/>
+        <UnitOutputDirectory Value="..\..\out\lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="A compiler agnostic collection of runtime libraries for Delphi and Freepascal."/>
+    <Files>
+      <Item>
+        <Filename Value="..\main\api\cwlog.console.pas"/>
+        <UnitName Value="cwlog.console"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwlog.dynamic.pas"/>
+        <UnitName Value="cwlog.dynamic"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwlog.pas"/>
+        <UnitName Value="cwLog"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwlog.static.pas"/>
+        <UnitName Value="cwlog.static"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwlog.targets.pas"/>
+        <UnitName Value="cwlog.targets"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwtest.pas"/>
+        <UnitName Value="cwTest"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwtest.standard.pas"/>
+        <UnitName Value="cwTest.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwtypes.pas"/>
+        <UnitName Value="cwTypes"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwunicode.pas"/>
+        <UnitName Value="cwUnicode"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwunicode.standard.pas"/>
+        <UnitName Value="cwUnicode.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwcollections.pas"/>
+        <UnitName Value="cwCollections"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwcollections.standard.pas"/>
+        <UnitName Value="cwCollections.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwdynlib.pas"/>
+        <UnitName Value="cwDynLib"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwdynlib.standard.pas"/>
+        <UnitName Value="cwDynLib.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwcollections.stack.standard.pas"/>
+        <UnitName Value="cwCollections.Stack.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwcollections.stringlist.standard.pas"/>
+        <UnitName Value="cwCollections.StringList.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwlog.log.binding.pas"/>
+        <UnitName Value="cwLog.Log.Binding"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwlog.log.dynamic.pas"/>
+        <UnitName Value="cwlog.log.dynamic"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwlog.log.static.pas"/>
+        <UnitName Value="cwlog.log.static"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwlog.logtarget.console.pas"/>
+        <UnitName Value="cwLog.LogTarget.Console"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwtest.testcase.console.pas"/>
+        <UnitName Value="cwTest.TestCase.Console"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwtest.testreport.console.pas"/>
+        <UnitName Value="cwtest.testreport.console"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwtest.testsuite.custom.pas"/>
+        <UnitName Value="cwtest.testsuite.custom"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwtest.testsuite.delphi.pas"/>
+        <UnitName Value="cwTest.TestSuite.Delphi"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwtest.testsuite.fpc.pas"/>
+        <UnitName Value="cwTest.TestSuite.Fpc"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwunicode.codec.standard.pas"/>
+        <UnitName Value="cwUnicode.Codec.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwcollections.dictionary.standard.pas"/>
+        <UnitName Value="cwCollections.Dictionary.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwcollections.list.standard.pas"/>
+        <UnitName Value="cwCollections.List.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwcollections.ringbuffer.standard.pas"/>
+        <UnitName Value="cwCollections.RingBuffer.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwio.filestream.standard.pas"/>
+        <UnitName Value="cwIO.FileStream.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwio.memorystream.standard.pas"/>
+        <UnitName Value="cwIO.MemoryStream.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwio.stream.custom.pas"/>
+        <UnitName Value="cwIO.Stream.Custom"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwio.unicodestream.custom.pas"/>
+        <UnitName Value="cwIO.UnicodeStream.Custom"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwio.buffer.standard.pas"/>
+        <UnitName Value="cwIO.Buffer.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwio.cyclicbuffer.standard.pas"/>
+        <UnitName Value="cwIO.CyclicBuffer.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwio.pas"/>
+        <UnitName Value="cwIO"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwio.standard.pas"/>
+        <UnitName Value="cwIO.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwlog.standard.pas"/>
+        <UnitName Value="cwLog.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwruntime.logentries.pas"/>
+        <UnitName Value="cwRuntime.LogEntries"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwthreading.standard.pas"/>
+        <UnitName Value="cwThreading.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\api\cwthreading.pas"/>
+        <UnitName Value="cwThreading"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.signaledcriticalsection.windows.pas"/>
+        <UnitName Value="cwThreading.SignaledCriticalSection.Windows"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.threadedloop.executor.pas"/>
+        <UnitName Value="cwThreading.ThreadedLoop.Executor"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.threadedloop.standard.pas"/>
+        <UnitName Value="cwThreading.ThreadedLoop.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.threadmethod.posix.pas"/>
+        <UnitName Value="cwThreading.threadmethod.posix"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.threadmethod.windows.pas"/>
+        <UnitName Value="cwThreading.ThreadMethod.Windows"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.threadpool.standard.pas"/>
+        <UnitName Value="cwThreading.ThreadPool.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.threadsystem.standard.pas"/>
+        <UnitName Value="cwThreading.ThreadSystem.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.messaging.internal.pas"/>
+        <UnitName Value="cwthreading.messaging.internal"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.criticalsection.posix.pas"/>
+        <UnitName Value="cwThreading.CriticalSection.posix"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.criticalsection.windows.pas"/>
+        <UnitName Value="cwThreading.criticalsection.windows"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.messagebus.standard.pas"/>
+        <UnitName Value="cwThreading.MessageBus.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.messagechannel.standard.pas"/>
+        <UnitName Value="cwThreading.messagechannel.standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.messagepipe.standard.pas"/>
+        <UnitName Value="cwThreading.MessagePipe.Standard"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwthreading.signaledcriticalsection.posix.pas"/>
+        <UnitName Value="cwThreading.SignaledCriticalSection.Posix"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwwin32.advapi32.pas"/>
+        <UnitName Value="cwwin32.advapi32"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwwin32.constants.pas"/>
+        <UnitName Value="cwwin32.constants"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwwin32.gdi32.pas"/>
+        <UnitName Value="cwwin32.gdi32"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwwin32.kernel32.pas"/>
+        <UnitName Value="cwwin32.kernel32"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwwin32.types.pas"/>
+        <UnitName Value="cwwin32.types"/>
+      </Item>
+      <Item>
+        <Filename Value="..\main\implementation\cwwin32.user32.pas"/>
+        <UnitName Value="cwwin32.user32"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

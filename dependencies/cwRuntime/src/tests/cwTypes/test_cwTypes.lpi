@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="test_cwTypes"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <Units>
+      <Unit>
+        <Filename Value="test_cwTypes.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.int8helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Int8Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.int16helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Int16Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.int32helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Int32Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.int64helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Int64Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.nativeuinthelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.NativeUintHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.pointerhelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.PointerHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.singlehelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.SingleHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.stringhelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.StringHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.uint8helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Uint8Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.uint16helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Uint16Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.uint32helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Uint32Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.uint64helper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.Uint64Helper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.booleanhelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.BooleanHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.charhelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.CharHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.datetimehelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.DateTimeHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.doublehelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.DoubleHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="testcases\test_cwtypes.extendedhelper.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="test_cwTypes.ExtendedHelper"/>
+      </Unit>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="..\..\..\out\bin\$(TargetCPU)-$(TargetOS)\test_cwTypes"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="testcases;..\..\main\api;..\..\main\implementation"/>
+      <UnitOutputDirectory Value="..\..\..\out\lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions>
+      <Item>
+        <Name Value="EAbort"/>
+      </Item>
+      <Item>
+        <Name Value="ECodetoolError"/>
+      </Item>
+      <Item>
+        <Name Value="EFOpenError"/>
+      </Item>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

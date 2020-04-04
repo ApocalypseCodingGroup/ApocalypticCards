@@ -1,9 +1,9 @@
-unit MariaDB;
+unit datamodel.database.standard;
 
 interface
 
 Uses
-  Dek
+  datamodel
 , FireDAC.Stan.Intf
 , FireDAC.Stan.Option
 , FireDAC.Stan.Error

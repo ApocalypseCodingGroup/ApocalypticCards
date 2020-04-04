@@ -7,7 +7,6 @@ uses
 ;
 
 type
-
   THandleRequest = reference to procedure( Response: TWebResponse; var Handled: Boolean; const aWebCall: ICardgame );
 
   TGameRequest = class
@@ -34,7 +33,6 @@ var
 begin
   PrepareResponse(Response);
   lWebCall := TCardGameJSON.Create(TMariaDB.Construct);
-
   try
 
     case Request.MethodType of

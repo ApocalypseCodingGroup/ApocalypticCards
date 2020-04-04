@@ -13,11 +13,6 @@ uses
 type
   TWebModule4 = class(TWebModule)
     conn: TFDConnection;
-    procedure WebModule4DefaultHandlerAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-    procedure WebModule4StartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-    procedure WebModule4JoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-    procedure WebModule4RESTStartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-    procedure WebModule4RESTJoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure WebModule4wactGamesAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   end;
 
@@ -27,9 +22,7 @@ var
 implementation
 
 Uses
-  Dek
-, GameService
-, MariaDB
+  MariaDB
 , Requests
 ;
 const
@@ -69,32 +62,10 @@ begin
     '</html>';
 end;
 
-procedure TWebModule4.WebModule4RESTJoinGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-var
-  lWebCall : ICardgame;
-begin
-  lWebCall := TCardGameJSON.Create(TMariaDB.Construct);
-  Response.Content := lWebCall.JoinSession(Request.QueryFields.Values['SessionID'],Request.QueryFields.Values['User']);
-end;
-
-procedure TWebModule4.WebModule4RESTStartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-var
-  lWebCall : ICardgame;
-begin
-  lWebCall         := TCardGameJSON.Create(TMariaDB.Construct);
-end;
-
-procedure TWebModule4.WebModule4StartGameAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-var
-  lWebCall : ICardgame;
-begin
-
-end;
-
 //- Comment to see why is this not going into repo
 procedure TWebModule4.WebModule4wactGamesAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
 begin
-  TGameRequest.HandleRequest(Request,Response,Handled,
+  TGameRequest.HandleRequest( Request, Response, Handled,
 
     // Create
     procedure(Response: TWebResponse; var Handled: Boolean; const aWebCall: ICardgame)
