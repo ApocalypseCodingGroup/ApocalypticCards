@@ -13,7 +13,7 @@ object Form13: TForm13
   object Edit1: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     TabOrder = 0
-    Text = 'https://media.giphy.com/media/xNBcChLQt7s9a/giphy.gif'
+    Text = 'https://media.giphy.com/media/J1IWjlgFU1f3O/giphy.gif'
     Position.X = 40.000000000000000000
     Position.Y = 16.000000000000000000
     Size.Width = 529.000000000000000000
