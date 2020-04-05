@@ -33,8 +33,6 @@ constructor TGame.Create(const GameData: IGameData);
 begin
   inherited Create;
   fGameData := GameData;
-  fGameData := TGameData.Create;
-  fGameData.SessionName := 'My Fun Session.';
 end;
 
 function TGame.getGameData: IGameData;
