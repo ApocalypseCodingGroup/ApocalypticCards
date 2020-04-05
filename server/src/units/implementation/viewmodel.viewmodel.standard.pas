@@ -12,7 +12,8 @@ type
   private
     fDataModel: IDataModel;
   strict private
-     function getPublicGames: string;
+    function getPublicGames: string;
+    function CreateGame( const json: string ): string;
   private
     function ListToJSON( const value: IList<IGameObject> ): string;
   public
@@ -22,8 +23,12 @@ type
 implementation
 uses
   StrUtils
+, SysUtils
 , cwCollections.Standard
 , ViewModel.Game.Standard
+, DataModel.GameData.Standard
+, System.JSON
+, REST.JSON
 ;
 
 { TViewModel }
@@ -32,6 +37,24 @@ constructor TViewModel.Create(DataModel: IDataModel);
 begin
   inherited Create;
   fDataModel := DataModel;
+end;
+
+function TViewModel.CreateGame(const json: string): string;
+var
+  Request: TJSONObject;
+  SessionName: string;
+  LangID: string;
+  IsPrivate: boolean;
+  NewGameData: IGameData;
+  NewGame: IGame;
+begin
+  Request := TJSONObject.ParseJSONValue(TEncoding.ASCII.GetBytes(json),0) as TJSONObject;
+  SessionName := Request.GetValue('SessionName').Value;
+  LangId := Request.GetValue('LangID').Value;
+  IsPrivate := Uppercase(Request.GetValue('IsPrivate').Value) = 'TRUE';
+  NewGameData := TGameData.Create(SessionName,LangID,IsPrivate);
+  NewGame := TGame.Create(NewGameData);
+  Result := NewGame.ToJSON;
 end;
 
 function TViewModel.getPublicGames: string;

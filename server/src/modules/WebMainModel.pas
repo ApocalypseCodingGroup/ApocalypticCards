@@ -42,6 +42,7 @@ begin
     // Create
     procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
+      Response.Content := ViewModel.CreateGame( Request.Content );
     end,
 
     // Read

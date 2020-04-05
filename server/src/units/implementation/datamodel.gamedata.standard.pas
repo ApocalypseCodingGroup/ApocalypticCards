@@ -9,6 +9,7 @@ uses
 type
   TGameData = class(  TGameDataObject, IGameData )
   private
+    fSessionPassword: string;
     fSessionName: string;
     fLangID: string;
     fMinUser: integer;
@@ -26,16 +27,46 @@ type
     procedure setMinUser( const value: integer );
     procedure setMaxUser( const value: integer );
   public
-    property SessionID: string read fSessionID write fSessionID;
-    property SessionName: string read fSessionName write fSessionName;
-    property LangID: string read fLangID write fLangID;
-    property MinUser: integer read fMinUser write fMinUser;
-    property MaxUser: integer read fMaxUser write fMaxUser;
+    property SessionPassword: string read fSessionPassword;
+    property SessionID: string       read fSessionID    write fSessionID;
+    property SessionName: string     read fSessionName write fSessionName;
+    property LangID: string          read fLangID      write fLangID;
+    property MinUser: integer        read fMinUser     write fMinUser;
+    property MaxUser: integer        read fMaxUser     write fMaxUser;
+  public
+    constructor Create; reintroduce; overload;
+    constructor Create( const SessionName: string; const LangID: string; const IsPrivate: boolean ); overload;
   end;
 
 implementation
+uses
+  SysUtils
+;
+const
+  cPasswordLen = 9;
 
 { TGameData }
+
+constructor TGameData.Create(const SessionName, LangID: string; const IsPrivate: boolean);
+var
+  idx: nativeuint;
+  aGUID: TGUID;
+begin
+  Create;
+  CreateGUID(aGUID);
+  fSessionID := GuidToString( aGUID );
+  fSessionName := SessionName;
+  fLangID := LangId;
+  for idx := 0 to cPasswordLen do begin
+    fSessionPassword := fSessionPassword + (Chr(Random(42)+60));
+  end;
+end;
+
+constructor TGameData.Create;
+begin
+  inherited Create;
+  fMinUser := 2;
+end;
 
 function TGameData.getLangID: string;
 begin

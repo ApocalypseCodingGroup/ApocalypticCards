@@ -55,6 +55,13 @@ type
      /// </summary>
      function getPublicGames: string;
 
+     /// <summary>
+     ///   Creates a new game based on the JSON provided. Required JSON values:
+     ///   <br />{ <br />"SessionName": "&lt;some game&gt;", <br />"LangID":
+     ///   "&lt;ID&gt;", <br />"MaxUsers": 200 <br />}
+     /// </summary>
+     function CreateGame( const json: string ): string;
+
    end;
 
 

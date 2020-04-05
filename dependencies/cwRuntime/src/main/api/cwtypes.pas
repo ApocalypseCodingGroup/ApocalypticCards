@@ -98,7 +98,7 @@ type
     ///    Returns the string as an ansistring.
     ///    Getter for AsAnsiString property.
     ///  <summary>
-    function getAsAnsiString: ansiString;
+    function getAsAnsiString: AnsiString;
 
     ///  <summary>
     ///    Sets the string as an ansistring.
