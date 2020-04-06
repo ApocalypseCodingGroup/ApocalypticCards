@@ -4,7 +4,7 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   GifMain in 'GifMain.pas' {Form13},
-  FMX.GifUtils in 'FMX.GifUtils.pas';
+  FMX.GifUtils in '..\FMX.GifUtils.pas';
 
 {$R *.res}
 
