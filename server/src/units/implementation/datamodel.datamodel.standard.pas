@@ -41,7 +41,7 @@ uses
 
 const
   {$ifdef DEBUG}
-  cDatabaseIni = '';
+  cDatabaseIni = '.\cardgame.ini';
   {$else}
   cDatabaseIni = '/var/www/apocalypse/https/private/cardgame.ini';
   {$endif}
@@ -56,11 +56,6 @@ begin
   fConn.Params.Add('Server=127.0.0.1');
   Credentials := Classes.TStringList.Create;
   try
-    {$ifdef DEBUG}
-    fConn.Params.Database := 'apocalypticcards';
-    fConn.Params.UserName := 'root';
-    fConn.Params.Password := 'TestingDatabase';
-    {$else}
     if not FileExists(cDatabaseIni) then begin
       raise
         Exception.Create('The credentials configuration is missing.');
@@ -69,7 +64,6 @@ begin
     fConn.Params.Database := Credentials.Values['database'];
     fConn.Params.UserName := Credentials.Values['username'];
     fConn.Params.Password := Credentials.Values['password'];
-  {$endif}
   finally
     Credentials.DisposeOf;
   end;

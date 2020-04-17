@@ -24,13 +24,6 @@ Uses
   Requests
 , ViewModel
 ;
-const
-  {$ifdef DEBUG}
-  cDatabaseIni = '';
-  {$else}
-  cDatabaseIni = '/var/www/apocalypse/https/private/cardgame.ini';
-  {$endif}
-
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
 {$R *.dfm}

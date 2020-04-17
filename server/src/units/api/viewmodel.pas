@@ -6,13 +6,6 @@ uses
 , DataModel
 ;
 
-Const
-  {$IFDEF DEBUG}
-  BaseURL = 'http://localhost:8080';
-  {$ELSE}
-  BaseURL = 'https://apocalypse.chapmanworld.com/api/';
-  {$ENDIF}
-
 type
 
   /// <summary>
