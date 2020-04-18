@@ -19,21 +19,21 @@ API/startjson?SessionID="hGASjsd6"&SessionName="Franks Game"&SessionPW=""&MinUse
 DROP TABLE IF EXISTS `tbl_gamebase`;
 CREATE TABLE  `tbl_gamebase` (
   `PKID` VARCHAR(40) NOT NULL,
-  `Running` tinyint(1) NOT NULL,  
+  `Running` tinyint(1) NOT NULL,
   `SessionName` varchar(45) NOT NULL,
-  `SessionPW` varchar(45) NOT NULL,
-  `LangID` varchar(2) NOT NULL,
-  `MinUser` int(10) unsigned NOT NULL,
-  `MaxUser` int(10) unsigned NOT NULL,
-  `Position_In_QDeck` int(10) unsigned NOT NULL,
-  `Position_In_ADeck` int(10) unsigned NOT NULL,
-  `Act_Master` varchar(45) NOT NULL,
-  `Acc_QDeckID` int(10) unsigned NOT NULL,
+  `SessionPW` varchar(45) NULL,
+  `LangID` varchar(2) NOT NULL DEFAULT 'US',
+  `MinUser` int(10) unsigned NOT NULL DEFAULT 2,
+  `MaxUser` int(10) unsigned NOT NULL DEFAULT 8,
+//  `Position_In_QDeck` int(10) unsigned NOT NULL,
+//  `Position_In_ADeck` int(10) unsigned NOT NULL,
+//  `Act_Master` varchar(45) NOT NULL,
+//  `Acc_QDeckID` int(10) unsigned NOT NULL,
   PRIMARY KEY (`PKID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-/* 
+/*
 API/Run?SessionID="hGASjsd6"
 // Question and Answer DESK is created with SessionID shuffled
 // Session set to Running

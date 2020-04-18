@@ -17,6 +17,7 @@ type
     function getLangID: string;
     function getMinUser: integer;
     function getMaxUser: integer;
+    function getRunning: boolean;
 
     //- Setters
     procedure setSessionID( const value: string );
@@ -24,6 +25,7 @@ type
     procedure setLangID( const value: string );
     procedure setMinUser( const value: integer );
     procedure setMaxUser( const value: integer );
+    procedure setRunning( const value: boolean );
 
     //- Properties
     property SessionID: string   read getSessionID   write setSessionID;
@@ -31,6 +33,7 @@ type
     property LangID: string      read getLangID      write setLangID;
     property MinUser: integer    read getMinUser     write setMinUser;
     property MaxUser: integer    read getMaxUser     write setMaxUser;
+    property Running: boolean    read getRunning     write setRunning;
   end;
 
 
@@ -38,8 +41,8 @@ type
   ['{0C23B564-0030-4895-BF7C-88F910EFD825}']
 
     function getGames: IList<IGameData>;
+    function CreateGame(const GameData: IGameData) : boolean;
 
-//    Function CreateNewGame(Const aSessionID : String;out Error : String) : boolean;
 //    Function JoinGame(Const aSessionID,aUserName : String;out Token, Error : String) : boolean;
 //    function ReadGames( out Response: string ): boolean;
   end;

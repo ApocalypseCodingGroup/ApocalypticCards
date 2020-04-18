@@ -49,11 +49,12 @@ var
   NewGame: IGame;
 begin
   Request := TJSONObject.ParseJSONValue(TEncoding.ASCII.GetBytes(json),0) as TJSONObject;
-  SessionName := Request.GetValue('SessionName').Value;
-  LangId := Request.GetValue('LangID').Value;
-  IsPrivate := Uppercase(Request.GetValue('IsPrivate').Value) = 'TRUE';
+  SessionName := Request.GetValue('sessionName').Value;
+  LangId := Request.GetValue('langID').Value;
+  IsPrivate := Uppercase(Request.GetValue('isPrivate').Value) = 'TRUE';
   NewGameData := TGameData.Create(SessionName,LangID,IsPrivate);
   NewGame := TGame.Create(NewGameData);
+  fDataModel.CreateGame(NewGameData);
   Result := NewGame.ToJSON;
 end;
 

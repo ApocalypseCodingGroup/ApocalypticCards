@@ -15,17 +15,20 @@ type
     fMinUser: integer;
     fMaxUser: integer;
     fSessionID: string;
+    fRunning: boolean;
   strict private
     function getSessionID: string;
     function getSessionName: string;
     function getLangID: string;
     function getMinUser: integer;
     function getMaxUser: integer;
+    function getRunning: boolean;
     procedure setSessionID( const value: string );
     procedure setSessionName( const value: string );
     procedure setLangID( const value: string );
     procedure setMinUser( const value: integer );
     procedure setMaxUser( const value: integer );
+    procedure setRunning( const value: boolean );
   public
     property SessionPassword: string read fSessionPassword;
     property SessionID: string       read fSessionID    write fSessionID;
@@ -57,8 +60,12 @@ begin
   fSessionID := GuidToString( aGUID );
   fSessionName := SessionName;
   fLangID := LangId;
-  for idx := 0 to cPasswordLen do begin
-    fSessionPassword := fSessionPassword + (Chr(Random(42)+60));
+  fRunning := False;
+  fSessionPassword := '';
+  if IsPrivate then begin
+    for idx := 0 to cPasswordLen do begin
+      fSessionPassword := fSessionPassword + (Chr(Random(42)+60));
+    end;
   end;
 end;
 
@@ -81,6 +88,11 @@ end;
 function TGameData.getMinUser: integer;
 begin
   Result := fMinUser;
+end;
+
+function TGameData.getRunning: boolean;
+begin
+  Result := fRunning;
 end;
 
 function TGameData.getSessionID: string;
@@ -106,6 +118,11 @@ end;
 procedure TGameData.setMinUser(const value: integer);
 begin
   fMinUser := value;
+end;
+
+procedure TGameData.setRunning(const value: boolean);
+begin
+  fRunning := Value;
 end;
 
 procedure TGameData.setSessionID(const value: string);

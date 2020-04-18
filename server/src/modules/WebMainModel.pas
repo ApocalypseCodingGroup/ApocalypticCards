@@ -7,12 +7,10 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.Phys.MySQL, FireDAC.Phys.MySQLDef, FireDAC.ConsoleUI.Wait, Data.DB,
-  FireDAC.Comp.Client, Web.HTTPProd,
-  FireDAC.VCLUI.Wait;
+  FireDAC.Comp.Client, Web.HTTPProd;
 
 type
   TWebModule4 = class(TWebModule)
-    conn: TFDConnection;
     procedure WebModule4wactGamesAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   end;
 

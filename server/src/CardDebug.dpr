@@ -7,7 +7,6 @@ uses
   IdHTTPWebBrokerBridge,
   DebugForm in 'forms\DebugForm.pas' {Form4},
   WebMainModel in 'modules\WebMainModel.pas' {WebModule4: TWebModule},
-  FireDAC.VCLUI.Wait in 'units\FireDAC.VCLUI.Wait.pas',
   Requests in 'units\Requests.pas',
   datamodel in 'units\api\datamodel.pas',
   viewmodel in 'units\api\viewmodel.pas',
