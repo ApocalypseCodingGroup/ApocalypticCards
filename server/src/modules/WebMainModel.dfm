@@ -10,6 +10,11 @@ object WebModule4: TWebModule4
       Name = 'wactGames'
       PathInfo = '/games'
       OnAction = WebModule4wactGamesAction
+    end
+    item
+      Name = 'wactUsers'
+      PathInfo = '/users'
+      OnAction = WebModule4wactUsersAction
     end>
   Height = 487
   Width = 656

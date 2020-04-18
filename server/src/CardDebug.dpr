@@ -16,7 +16,8 @@ uses
   viewmodel.standard in 'units\api\viewmodel.standard.pas',
   datamodel.gamedataobject.custom in 'units\implementation\datamodel.gamedataobject.custom.pas',
   datamodel.standard in 'units\api\datamodel.standard.pas',
-  datamodel.datamodel.standard in 'units\implementation\datamodel.datamodel.standard.pas';
+  datamodel.datamodel.standard in 'units\implementation\datamodel.datamodel.standard.pas',
+  datamodel.userdata.standard in 'units\implementation\datamodel.userdata.standard.pas';
 
 {$R *.res}
 

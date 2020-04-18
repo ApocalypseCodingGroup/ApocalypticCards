@@ -3,6 +3,7 @@ unit datamodel.userdata.standard;
 interface
 uses
   datamodel
+, datamodel.gamedataobject.custom
 ;
 
 type
@@ -12,16 +13,12 @@ type
     fName: string;
     fGameID: string;
   strict private //- IUserData -//
-    //- Getters
     function getUserID: string;
     function getName: string;
     function getGameID: string;
-    //- Setters
     procedure setUserID( const value: string );
     procedure setName( const value: string );
     procedure setGameID( const value: string );
-  public
-
   end;
 
 implementation

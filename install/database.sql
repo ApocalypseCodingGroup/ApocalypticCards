@@ -13,18 +13,19 @@ API/startjson?SessionID="hGASjsd6"&SessionName="Franks Game"&SessionPW=""&MinUse
 //  `Acc_QDeckID` int(10) unsigned NOT NULL,
 
 
-DROP TABLE IF EXISTS `tbl_gamebase`;
-CREATE TABLE  `tbl_gamebase` (
+DROP TABLE IF EXISTS `tbl_games`;
+CREATE TABLE  `tbl_games` (
   `PKID` VARCHAR(40) NOT NULL,
   `Running` tinyint(1) NOT NULL,
   `SessionName` varchar(45) NOT NULL,
-  `SessionPW` varchar(45) NOT NULL,
-  `LangID` varchar(2) NOT NULL,
-  `MinUser` int(10) unsigned NOT NULL,
-  `MaxUser` int(10) unsigned NOT NULL,
+  `SessionPW` varchar(45) NOT NULL DEFAULT '',
+  `LangID` varchar(2) NOT NULL DEFAULT 'US',
+  `MinUser` int(10) unsigned NOT NULL DEFAULT 3,
+  `MaxUser` int(10) unsigned NOT NULL DEFAULT 8,
   PRIMARY KEY (`PKID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+DROP TABLE IF EXISTS `tbl_users`;
 CREATE TABLE `apocalypticcards`.`tbl_users` (
   `PKID` VARCHAR(40) NOT NULL,
   `FKGameID` VARCHAR(40) NOT NULL,

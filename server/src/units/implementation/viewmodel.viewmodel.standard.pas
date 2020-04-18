@@ -14,6 +14,7 @@ type
   strict private
     function getPublicGames: string;
     function CreateGame( const json: string ): string;
+    function JoinGame( const json: string ): string;
   private
     function ListToJSON( const value: IList<IGameDataObject> ): string;
     procedure ValidateUserCount(const GameData: IGameData);
@@ -26,7 +27,7 @@ uses
   StrUtils
 , SysUtils
 , cwCollections.Standard
-, DataModel.GameData.Standard
+, DataModel.Standard
 , System.JSON
 , REST.JSON
 ;
@@ -59,25 +60,25 @@ end;
 
 function TViewModel.CreateGame(const json: string): string;
 var
-  NewGameData: IGameData;
+  NewGame: IGameData;
   NewSessionID: TGUID;
   idx: nativeuint;
 begin
-  NewGameData := TJSON.JsonToObject<TGameData>(json);
+  NewGame := TJSON.JsonToObject<TGameData>(json);
   CreateGUID(NewSessionID);
-  NewGameData.SessionID := GUIDToString(NewSessionID);
-  if NewGameData.SessionPassword=cGeneratePasswordFlag then begin
-    NewGameData.SessionPassword := cNullString;
+  NewGame.SessionID := GUIDToString(NewSessionID);
+  if NewGame.SessionPassword=cGeneratePasswordFlag then begin
+    NewGame.SessionPassword := cNullString;
     for idx := 0 to pred(cPasswordLen) do begin
-      NewGameData.SessionPassword := NewGameData.SessionPassword + chr( cStartPasswordChar+Random(cPasswordCharRange) );
+      NewGame.SessionPassword := NewGame.SessionPassword + chr( cStartPasswordChar+Random(cPasswordCharRange) );
     end;
   end;
-  NewGameData.Running := False;
+  NewGame.Running := False;
   //- Load and validate min/max user
-  ValidateUserCount(NewGameData);
+  ValidateUserCount(NewGame);
   //- Return game
-  fDataModel.CreateGame(NewGameData);
-  Result := NewGameData.ToJSON;
+  fDataModel.CreateGame(NewGame);
+  Result := NewGame.ToJSON;
 end;
 
 function TViewModel.getPublicGames: string;
@@ -86,6 +87,26 @@ var
 begin
   PublicGames := fDataModel.getGames;
   Result := ListToJSON(PublicGames as IList<IGameDataObject>);
+end;
+
+function TViewModel.JoinGame(const json: string): string;
+var
+  NewUser: IUserData;
+  NewUserID: TGUID;
+  SelectedGame: IGameData;
+begin
+  NewUser := TJSON.JsonToObject<TUserData>(json);
+  CreateGUID(NewUserID);
+  NewUser.UserID := GuidToString(NewUserID);
+  //- Look up the requested game
+  SelectedGame := fDataModel.FindGameByID(NewUser.GameID);
+  if not assigned(SelectedGame) then begin
+    raise
+      Exception.Create('Requested game not found.');
+  end;
+  NewUser.GameID := SelectedGame.SessionID;
+  fDataModel.CreateUSer( NewUser );
+  Result := NewUser.ToJSON;
 end;
 
 function TViewModel.ListToJSON(const value: IList<IGameDataObject>): string;

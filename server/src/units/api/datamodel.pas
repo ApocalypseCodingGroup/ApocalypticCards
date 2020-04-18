@@ -5,6 +5,17 @@ uses
   cwCollections
 ;
 
+const
+  cPasswordLen       = 9;
+  cMinUserCount      = 3;
+  cMaxUserCount      = 10;
+  cStartPasswordChar = 48;
+  cPasswordCharRange = 42;
+
+const
+  cNullString = '';
+  cGeneratePasswordFlag = 'Generate';
+
 type
   IGameDataObject = interface
     function AsObject: TObject;
@@ -63,18 +74,12 @@ type
 
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
+    function FindGameByID(const GameID: string): IGameData;
+    function FindGameByPassword(const Password: string): IGameData;
+    procedure CreateUser(const NewUser: IUserData);
 
-//    Function JoinGame(Const aSessionID,aUserName : String;out Token, Error : String) : boolean;
-//    function ReadGames( out Response: string ): boolean;
   end;
 
-//
-//  ICardgame = Interface
-//  ['{C11CFA85-FBB1-4620-BAC5-783AA64CF446}']
-//    Function JoinSession(Const aSessionID,aUserName : String) : String;
-//    function Read_Games(out Response: string): boolean;
-//    function Create_Games(out Response: string; const RequestJSON: string ): boolean;
-//  end;
 
 implementation
 
