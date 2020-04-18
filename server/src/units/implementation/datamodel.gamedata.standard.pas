@@ -48,18 +48,15 @@ const
 { TGameData }
 
 constructor TGameData.Create(const SessionName, LangID: string; const IsPrivate: boolean);
-var
-  idx: nativeuint;
-  aGUID: TGUID;
 begin
   Create;
-  CreateGUID(aGUID);
-  fSessionID := GuidToString( aGUID );
+  fSessionID := '';
   fSessionName := SessionName;
   fLangID := LangId;
-  for idx := 0 to cPasswordLen do begin
-    fSessionPassword := fSessionPassword + (Chr(Random(42)+60));
-  end;
+  if IsPrivate then
+    fSessionPassword := 'Generate'
+  else
+    fSessionPassword := '';
 end;
 
 constructor TGameData.Create;

@@ -3,9 +3,12 @@ unit datamodel.standard;
 interface
 uses
   DataModel
+, datamodel.gamedata.standard
 ;
 
 type
+  TGameData = datamodel.gamedata.standard.TGameData;
+
   TDataModel = record
     class function Create: IDataModel; static;
   end;
