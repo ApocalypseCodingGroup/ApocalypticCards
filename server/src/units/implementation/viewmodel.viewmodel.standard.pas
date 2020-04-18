@@ -45,6 +45,8 @@ var
   SessionName: string;
   LangID: string;
   IsPrivate: boolean;
+  MinUser: integer;
+  MaxUser: integer;
   NewGameData: IGameData;
   NewGame: IGame;
 begin
@@ -53,6 +55,13 @@ begin
   LangId := Request.GetValue('langID').Value;
   IsPrivate := Uppercase(Request.GetValue('isPrivate').Value) = 'TRUE';
   NewGameData := TGameData.Create(SessionName,LangID,IsPrivate);
+  //- Load and validate min/max user
+  if assigned(Request.GetValue('minUser')) then begin
+    NewGameData.MinUser := (Request.GetValue('minUser') as TJSONNumber).AsInt;
+  end;
+  if assigned(Request.GetValue('maxUser')) then begin
+    NewGameData.MaxUser := (Request.GetValue('maxUser') as TJSONNumber).AsInt;
+  end;
   NewGame := TGame.Create(NewGameData);
   fDataModel.CreateGame(NewGameData);
   Result := NewGame.ToJSON;
