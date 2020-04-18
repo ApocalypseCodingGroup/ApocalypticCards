@@ -11,11 +11,9 @@ uses
   Requests in 'units\Requests.pas',
   datamodel in 'units\api\datamodel.pas',
   viewmodel in 'units\api\viewmodel.pas',
-  viewmodel.game.standard in 'units\implementation\viewmodel.game.standard.pas',
   datamodel.gamedata.standard in 'units\implementation\datamodel.gamedata.standard.pas',
   viewmodel.viewmodel.standard in 'units\implementation\viewmodel.viewmodel.standard.pas',
   viewmodel.standard in 'units\api\viewmodel.standard.pas',
-  viewmodel.gameobject.custom in 'units\implementation\viewmodel.gameobject.custom.pas',
   datamodel.gamedataobject.custom in 'units\implementation\datamodel.gamedataobject.custom.pas',
   datamodel.standard in 'units\api\datamodel.standard.pas',
   datamodel.datamodel.standard in 'units\implementation\datamodel.datamodel.standard.pas';

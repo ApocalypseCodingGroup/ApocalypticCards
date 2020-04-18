@@ -15,7 +15,7 @@ type
     function getPublicGames: string;
     function CreateGame( const json: string ): string;
   private
-    function ListToJSON( const value: IList<IGameObject> ): string;
+    function ListToJSON( const value: IList<IGameDataObject> ): string;
     procedure ValidateUserCount(const GameData: IGameData);
   public
     constructor Create( DataModel: IDataModel ); reintroduce;
@@ -26,7 +26,6 @@ uses
   StrUtils
 , SysUtils
 , cwCollections.Standard
-, ViewModel.Game.Standard
 , DataModel.GameData.Standard
 , System.JSON
 , REST.JSON
@@ -60,7 +59,6 @@ end;
 
 function TViewModel.CreateGame(const json: string): string;
 var
-  NewGame: IGame;
   NewGameData: IGameData;
   NewSessionID: TGUID;
   idx: nativeuint;
@@ -78,30 +76,19 @@ begin
   //- Load and validate min/max user
   ValidateUserCount(NewGameData);
   //- Return game
-  NewGame := TGame.Create(NewGameData);
   fDataModel.CreateGame(NewGameData);
-  Result := NewGame.ToJSON;
+  Result := NewGameData.ToJSON;
 end;
 
 function TViewModel.getPublicGames: string;
 var
-  GameData: IList<IGameData>;
-  PublicGames: IList<IGameObject>;
+  PublicGames: IList<IGameData>;
 begin
-  PublicGames := TList<IGameObject>.Create;
-  GameData := fDataModel.getGames;
-  if GameData.Count>0 then begin
-    GameData.ForEach(
-      procedure ( const Item: IGameData )
-      begin
-        PublicGames.Add( TGame.Create(Item) );
-      end
-    );
-  end;
-  Result := ListToJSON(PublicGames);
+  PublicGames := fDataModel.getGames;
+  Result := ListToJSON(PublicGames as IList<IGameDataObject>);
 end;
 
-function TViewModel.ListToJSON(const value: IList<IGameObject>): string;
+function TViewModel.ListToJSON(const value: IList<IGameDataObject>): string;
 var
   _Result: string;
 begin
@@ -113,7 +100,7 @@ begin
   try
     _Result := '[';
     Value.ForEach(
-      procedure( const item: IGameObject )
+      procedure( const item: IGameDataObject )
       begin
         _Result := _Result + Item.ToJSON;
         _Result := _Result + ',';

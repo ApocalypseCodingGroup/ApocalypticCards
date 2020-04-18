@@ -131,11 +131,9 @@
         <DCCReference Include="units\Requests.pas"/>
         <DCCReference Include="units\api\datamodel.pas"/>
         <DCCReference Include="units\api\viewmodel.pas"/>
-        <DCCReference Include="units\implementation\viewmodel.game.standard.pas"/>
         <DCCReference Include="units\implementation\datamodel.gamedata.standard.pas"/>
         <DCCReference Include="units\implementation\viewmodel.viewmodel.standard.pas"/>
         <DCCReference Include="units\api\viewmodel.standard.pas"/>
-        <DCCReference Include="units\implementation\viewmodel.gameobject.custom.pas"/>
         <DCCReference Include="units\implementation\datamodel.gamedataobject.custom.pas"/>
         <DCCReference Include="units\api\datamodel.standard.pas"/>
         <DCCReference Include="units\implementation\datamodel.datamodel.standard.pas"/>

@@ -8,6 +8,7 @@ uses
 type
   IGameDataObject = interface
     function AsObject: TObject;
+    function ToJSON: string;
   end;
 
   IGameData = interface( IGameDataObject )
@@ -37,6 +38,23 @@ type
     property MinUser: integer         read getMinUser     write setMinUser;
     property MaxUser: integer         read getMaxUser     write setMaxUser;
     property Running: boolean         read getRunning     write setRunning;
+  end;
+  
+  IUserData = interface( IGameDataObject )
+    //- Getters
+    function getUserID: string;
+    function getName: string;
+    function getGameID: string;
+
+    //- Setters
+    procedure setUserID( const value: string );
+    procedure setName( const value: string );
+    procedure setGameID( const value: string );
+
+    //- Properties
+    property UserID: string      read getUserID      write setUserID;
+    property Name: string        read getName        write setName;
+    property GameID: string      read getGameID      write setGameID; //<- Which game am I joined to?
   end;
 
 
