@@ -45,15 +45,25 @@ var
   SessionName: string;
   LangID: string;
   IsPrivate: boolean;
+  MinUser: integer;
+  MaxUser: integer;
   NewGameData: IGameData;
   NewGame: IGame;
 begin
   Request := TJSONObject.ParseJSONValue(TEncoding.ASCII.GetBytes(json),0) as TJSONObject;
-  SessionName := Request.GetValue('SessionName').Value;
-  LangId := Request.GetValue('LangID').Value;
-  IsPrivate := Uppercase(Request.GetValue('IsPrivate').Value) = 'TRUE';
+  SessionName := Request.GetValue('sessionName').Value;
+  LangId := Request.GetValue('langID').Value;
+  IsPrivate := Uppercase(Request.GetValue('isPrivate').Value) = 'TRUE';
   NewGameData := TGameData.Create(SessionName,LangID,IsPrivate);
+  //- Load and validate min/max user
+  if assigned(Request.GetValue('minUser')) then begin
+    NewGameData.MinUser := (Request.GetValue('minUser') as TJSONNumber).AsInt;
+  end;
+  if assigned(Request.GetValue('maxUser')) then begin
+    NewGameData.MaxUser := (Request.GetValue('maxUser') as TJSONNumber).AsInt;
+  end;
   NewGame := TGame.Create(NewGameData);
+  fDataModel.CreateGame(NewGameData);
   Result := NewGame.ToJSON;
 end;
 

@@ -27,6 +27,7 @@ type
     fQry: TFDQuery;
   strict private
     function getGames: IList<IGameData>;
+    function CreateGame(const GameData: IGameData) : boolean;
   public
     constructor Create; reintroduce;
   end;
@@ -77,6 +78,25 @@ begin
   fQry.Connection := fConn;
 end;
 
+function TDataModel.CreateGame(const GameData: IGameData): boolean;
+const
+  cSQL = 'insert into tbl_gamebase (PkId,Running,SessionName,LangId,MinUser,MaxUser) values ( :PkId, :Running, :SessionName, :LangId, :MinUser, :MaxUser );';
+begin
+  fQry.SQL.Text := cSQL;
+  fQry.Params.ParamByName('PkId').AsString := GameData.SessionID;
+  if GameData.Running then begin
+    fQry.Params.ParamByName('Running').AsInteger := 1;
+  end else begin
+    fQry.Params.ParamByName('Running').AsInteger := 0;
+  end;
+  fQry.Params.ParamByName('SessionName').AsString := GameData.SessionName;
+  fQry.Params.ParamByName('LangId').AsString := GameData.LangID;
+  fQry.Params.ParamByName('MinUser').AsInteger := GameData.MinUser;
+  fQry.Params.ParamByName('MaxUser').AsInteger := GameData.MaxUser;
+  fQry.ExecSQL;
+  Result := fQry.RowsAffected=1;
+end;
+
 function TDataModel.getGames: IList<IGameData>;
 const
   cSQL = 'SELECT * from tbl_gamebase;';
@@ -90,14 +110,16 @@ begin
   fQry.First;
   while not fQry.EOF do begin
     NewGameData := TGameData.Create();
-    NewGameData.SessionID   := fqry.FieldByName('PKID').AsString;
-    NewGameData.SessionName := fqry.FieldByName('SessionName').AsString;
-    NewGameData.LangID      := fqry.FieldByName('LangID').AsString;
-    NewGameData.MinUser     := fqry.FieldByName('MinUser').AsInteger;
-    NewGameData.MaxUser     := fqry.FieldByName('MaxUser').AsInteger;
+    NewGameData.SessionID   := fQry.FieldByName('PkId').AsString;
+    NewGameData.SessionName := fQry.FieldByName('SessionName').AsString;
+    NewGameData.LangID      := fQry.FieldByName('LangID').AsString;
+    NewGameData.MinUser     := fQry.FieldByName('MinUser').AsInteger;
+    NewGameData.MaxUser     := fQry.FieldByName('MaxUser').AsInteger;
+    NewGameData.Running     := fQry.FieldByName('Running').AsBoolean;
     Result.Add( NewGameData );
     fQry.Next;
   end;
 end;
+
 
 end.
