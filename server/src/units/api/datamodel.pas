@@ -18,6 +18,7 @@ type
     function getMinUser: integer;
     function getMaxUser: integer;
     function getRunning: boolean;
+    function getPassword: string;
 
     //- Setters
     procedure setSessionID( const value: string );
@@ -26,14 +27,16 @@ type
     procedure setMinUser( const value: integer );
     procedure setMaxUser( const value: integer );
     procedure setRunning( const value: boolean );
+    procedure setPassword( const value: string );
 
     //- Properties
-    property SessionID: string   read getSessionID   write setSessionID;
-    property SessionName: string read getSessionName write setSessionName;
-    property LangID: string      read getLangID      write setLangID;
-    property MinUser: integer    read getMinUser     write setMinUser;
-    property MaxUser: integer    read getMaxUser     write setMaxUser;
-    property Running: boolean    read getRunning     write setRunning;
+    property SessionPassword: string  read getPassword    write setPassword;
+    property SessionID: string        read getSessionID   write setSessionID;
+    property SessionName: string      read getSessionName write setSessionName;
+    property LangID: string           read getLangID      write setLangID;
+    property MinUser: integer         read getMinUser     write setMinUser;
+    property MaxUser: integer         read getMaxUser     write setMaxUser;
+    property Running: boolean         read getRunning     write setRunning;
   end;
 
 

@@ -6,6 +6,17 @@ uses
 , DataModel
 ;
 
+const
+  cPasswordLen       = 9;
+  cMinUserCount      = 3;
+  cMaxUserCount      = 10;
+  cStartPasswordChar = 48;
+  cPasswordCharRange = 42;
+
+const
+  cNullString = '';
+  cGeneratePasswordFlag = 'Generate';
+
 type
 
   /// <summary>

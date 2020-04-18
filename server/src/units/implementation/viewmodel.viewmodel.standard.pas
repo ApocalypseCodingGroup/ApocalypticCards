@@ -16,6 +16,7 @@ type
     function CreateGame( const json: string ): string;
   private
     function ListToJSON( const value: IList<IGameObject> ): string;
+    procedure ValidateUserCount(const GameData: IGameData);
   public
     constructor Create( DataModel: IDataModel ); reintroduce;
   end;
@@ -39,29 +40,44 @@ begin
   fDataModel := DataModel;
 end;
 
+procedure TViewModel.ValidateUserCount( const GameData: IGameData );
+begin
+  if GameData.MaxUser<GameData.MinUser then begin
+    GameData.MinUser := GameData.MaxUser;
+  end;
+  if GameData.MinUser>GameData.MaxUser then begin
+    GameData.MaxUser := GameData.MinUser;
+  end;
+  if GameData.MinUser<cMinUserCount then begin
+    raise
+      Exception.Create('Minimum users required is '+IntToStr(cMinUserCount)+' or greater.');
+  end;
+  if GameData.MaxUser>cMaxUserCount then begin
+    raise
+      Exception.Create('The maximum number of users permitted in a game is '+IntToStr(cMaxUserCount)+'.');
+  end;
+end;
+
 function TViewModel.CreateGame(const json: string): string;
 var
-  Request: TJSONObject;
-  SessionName: string;
-  LangID: string;
-  IsPrivate: boolean;
-  MinUser: integer;
-  MaxUser: integer;
-  NewGameData: IGameData;
   NewGame: IGame;
+  NewGameData: IGameData;
+  NewSessionID: TGUID;
+  idx: nativeuint;
 begin
-  Request := TJSONObject.ParseJSONValue(TEncoding.ASCII.GetBytes(json),0) as TJSONObject;
-  SessionName := Request.GetValue('sessionName').Value;
-  LangId := Request.GetValue('langID').Value;
-  IsPrivate := Uppercase(Request.GetValue('isPrivate').Value) = 'TRUE';
-  NewGameData := TGameData.Create(SessionName,LangID,IsPrivate);
+  NewGameData := TJSON.JsonToObject<TGameData>(json);
+  CreateGUID(NewSessionID);
+  NewGameData.SessionID := GUIDToString(NewSessionID);
+  if NewGameData.SessionPassword=cGeneratePasswordFlag then begin
+    NewGameData.SessionPassword := cNullString;
+    for idx := 0 to pred(cPasswordLen) do begin
+      NewGameData.SessionPassword := NewGameData.SessionPassword + chr( cStartPasswordChar+Random(cPasswordCharRange) );
+    end;
+  end;
+  NewGameData.Running := False;
   //- Load and validate min/max user
-  if assigned(Request.GetValue('minUser')) then begin
-    NewGameData.MinUser := (Request.GetValue('minUser') as TJSONNumber).AsInt;
-  end;
-  if assigned(Request.GetValue('maxUser')) then begin
-    NewGameData.MaxUser := (Request.GetValue('maxUser') as TJSONNumber).AsInt;
-  end;
+  ValidateUserCount(NewGameData);
+  //- Return game
   NewGame := TGame.Create(NewGameData);
   fDataModel.CreateGame(NewGameData);
   Result := NewGame.ToJSON;

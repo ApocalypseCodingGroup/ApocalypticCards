@@ -23,12 +23,14 @@ type
     function getMinUser: integer;
     function getMaxUser: integer;
     function getRunning: boolean;
+    function getPassword: string;
     procedure setSessionID( const value: string );
     procedure setSessionName( const value: string );
     procedure setLangID( const value: string );
     procedure setMinUser( const value: integer );
     procedure setMaxUser( const value: integer );
     procedure setRunning( const value: boolean );
+    procedure setPassword( const value: string );
   public
     property SessionPassword: string read fSessionPassword;
     property SessionID: string       read fSessionID    write fSessionID;
@@ -36,37 +38,13 @@ type
     property LangID: string          read fLangID       write fLangID;
     property MinUser: integer        read fMinUser      write setMinUser;
     property MaxUser: integer        read fMaxUser      write setMaxUser;
-  public
-    constructor Create; reintroduce; overload;
-    constructor Create( const SessionName: string; const LangID: string; const IsPrivate: boolean ); overload;
   end;
 
 implementation
 uses
   SysUtils
 ;
-const
-  cPasswordLen = 9;
 
-{ TGameData }
-
-constructor TGameData.Create(const SessionName, LangID: string; const IsPrivate: boolean);
-begin
-  Create;
-  fSessionID := '';
-  fSessionName := SessionName;
-  fLangID := LangId;
-  if IsPrivate then
-    fSessionPassword := 'Generate'
-  else
-    fSessionPassword := '';
-end;
-
-constructor TGameData.Create;
-begin
-  inherited Create;
-  fMinUser := 2;
-end;
 
 function TGameData.getLangID: string;
 begin
@@ -81,6 +59,11 @@ end;
 function TGameData.getMinUser: integer;
 begin
   Result := fMinUser;
+end;
+
+function TGameData.getPassword: string;
+begin
+  Result := fSessionPassword;
 end;
 
 function TGameData.getRunning: boolean;
@@ -106,21 +89,16 @@ end;
 procedure TGameData.setMaxUser(const value: integer);
 begin
   fMaxUser := value;
-  if fMaxUser<fMinUser then begin
-    fMinUser := fMaxUser;
-  end;
-  if fMinUser<3 then begin
-    raise
-      Exception.Create('Minimum number of users should be >=3');
-  end;
 end;
 
 procedure TGameData.setMinUser(const value: integer);
 begin
   fMinUser := value;
-  if fMinUser>fMaxUser then begin
-    fMaxUser := fMinUser;
-  end;
+end;
+
+procedure TGameData.setPassword(const value: string);
+begin
+  fSessionPassword := Value;
 end;
 
 procedure TGameData.setRunning(const value: boolean);
