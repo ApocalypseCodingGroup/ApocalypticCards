@@ -15,12 +15,14 @@ type
     RESTClient1: TRESTClient;
     GameRequest: TRESTRequest;
     GameResponse: TRESTResponse;
+    UsersRequest: TRESTRequest;
+    UsersResponse: TRESTResponse;
   private
-    { Private declarations }
   public
-    { Public declarations }
     procedure CreateGame(const AGameData: IGameData; const AOnSuccess: TProc<string>;
       const AOnError: TErrorProc);
+
+    procedure JoinGame(const AUserName: string; const ASessionID: string);
   end;
 
 var
@@ -34,7 +36,8 @@ implementation
 
 uses
   System.JSON, REST.JSON
-,  datamodel.standard
+, datamodel.standard
+, Data.Main
 ;
 
 { TRemoteData }
@@ -42,16 +45,16 @@ uses
 procedure TRemoteData.CreateGame(const AGameData: IGameData;
   const AOnSuccess: TProc<string>; const AOnError: TErrorProc);
 var
-  LJSON: string;
+  LGameJSON: string;
 begin
-  LJSON := TJson.ObjectToJsonString(AGameData.AsObject);
+  LGameJSON := TJson.ObjectToJsonString(AGameData.AsObject);
 
-//  GameRequest.Method := rmPOST;
-  GameRequest.Body.Add(LJSON, ctAPPLICATION_JSON); // actual body of the request, application/json
-//  GameRequest.Params.ParameterByName('body').Value := LJSON; // application/x-www-form-urlencoded
+  GameRequest.Body.Add(LGameJSON, ctAPPLICATION_JSON);
   GameRequest.ExecuteAsync(
     procedure
     begin
+      MainData.CurrentGame := TJson.JsonToObject<TGameData>(GameResponse.Content);
+
       if Assigned(AOnSuccess) then
         AOnSuccess(GameResponse.Content);
     end
@@ -63,6 +66,28 @@ begin
      end
   );
 
+end;
+
+procedure TRemoteData.JoinGame(const AUserName, ASessionID: string);
+var
+  LUserData: IUserData;
+begin
+  LUserData := TUserData.Create;
+  LUserData.Name := AUserName;
+  LUserData.GameID := ASessionID;
+
+  UsersRequest.Body.Add(LUserData.ToJSON, ctAPPLICATION_JSON);
+  UsersRequest.ExecuteAsync(
+    procedure
+    begin
+
+    end
+  , True, True
+  , procedure(AObj: TObject)
+    begin
+      raise Exception.Create(AObj.ToString);
+    end
+  );
 end;
 
 end.

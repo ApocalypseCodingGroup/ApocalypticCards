@@ -32,12 +32,6 @@ type
     procedure setRunning( const value: boolean );
     procedure setPassword( const value: string );
   public
-    property SessionPassword: string read fSessionPassword;
-    property SessionID: string       read fSessionID    write fSessionID;
-    property SessionName: string     read fSessionName  write fSessionName;
-    property LangID: string          read fLangID       write fLangID;
-    property MinUser: integer        read fMinUser      write setMinUser;
-    property MaxUser: integer        read fMaxUser      write setMaxUser;
   end;
 
 implementation
@@ -83,7 +77,7 @@ end;
 
 procedure TGameData.setLangID(const value: string);
 begin
-  fSessionID := value;
+  fLangID := value;
 end;
 
 procedure TGameData.setMaxUser(const value: integer);

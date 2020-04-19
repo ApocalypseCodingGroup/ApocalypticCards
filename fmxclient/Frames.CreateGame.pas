@@ -48,7 +48,7 @@ implementation
 {$R *.fmx}
 
 uses
-  datamodel.standard, Data.Remote;
+  datamodel.standard, Data.Remote, Data.Main;
 
 
 procedure TCreateGameFrame.CreateGameActionExecute(Sender: TObject);
@@ -66,10 +66,14 @@ begin
 
   // start wait
   RemoteData.CreateGame(LGameData
-  , procedure(AResponse: string)
+  , procedure
     begin
-      ShowMessage('Done!' + AResponse);
-      // Done!
+      // game created
+      ShowMessage('Done! ' + MainData.CurrentGame.SessionID);
+
+      // add user to the newly created game
+      RemoteData.JoinGame(YourNameEdit.Text, MainData.CurrentGame.SessionID);
+
       // stop wait
     end
   , procedure(const AErrorMessage: string)

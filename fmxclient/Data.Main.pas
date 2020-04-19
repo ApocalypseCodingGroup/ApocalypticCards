@@ -3,14 +3,17 @@ unit Data.Main;
 interface
 
 uses
-  System.SysUtils, System.Classes;
+  System.SysUtils, System.Classes
+, datamodel
+;
 
 type
   TMainData = class(TDataModule)
   private
-    { Private declarations }
+    FCurrentGame: IGameData;
   public
-    { Public declarations }
+
+    property CurrentGame: IGameData read FCurrentGame write FCurrentGame;
   end;
 
 var

@@ -6,10 +6,9 @@ object RemoteData: TRemoteData
     Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
     AcceptCharset = 'utf-8, *;q=0.8'
     BaseURL = 'https://apocalypse.chapmanworld.com/api'
-    ContentType = 'application/json'
     Params = <>
-    Left = 152
-    Top = 48
+    Left = 24
+    Top = 16
   end
   object GameRequest: TRESTRequest
     Client = RESTClient1
@@ -18,12 +17,26 @@ object RemoteData: TRemoteData
     Resource = 'games'
     Response = GameResponse
     SynchronizedEvents = False
-    Left = 144
-    Top = 112
+    Left = 120
+    Top = 24
   end
   object GameResponse: TRESTResponse
-    ContentType = 'application/json'
-    Left = 144
-    Top = 168
+    Left = 120
+    Top = 80
+  end
+  object UsersRequest: TRESTRequest
+    Client = RESTClient1
+    Method = rmPOST
+    Params = <>
+    Resource = 'users'
+    Response = UsersResponse
+    SynchronizedEvents = False
+    Left = 216
+    Top = 24
+  end
+  object UsersResponse: TRESTResponse
+    ContentType = 'text/html'
+    Left = 216
+    Top = 80
   end
 end
