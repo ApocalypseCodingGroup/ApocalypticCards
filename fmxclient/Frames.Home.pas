@@ -18,17 +18,17 @@ type
     { Private declarations }
   public
     { Public declarations }
-    OnCreateGameClick: TProc;
   end;
 
 implementation
 
 {$R *.fmx}
 
+uses Data.Main, Utils.Messages;
+
 procedure THomeFrame.CreateGameButtonClick(Sender: TObject);
 begin
-  if Assigned(OnCreateGameClick) then
-    OnCreateGameClick();
+  MainData.CurrentView := CreateGame;
 end;
 
 end.

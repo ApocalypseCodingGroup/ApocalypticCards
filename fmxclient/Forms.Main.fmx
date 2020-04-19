@@ -23,6 +23,15 @@ object MainForm: TMainForm
       Text = 'Apocalypse Coding'
       TabOrder = 0
     end
+    object CurrentViewLabel: TLabel
+      Align = Right
+      Position.X = 332.000000000000000000
+      Size.Width = 120.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'CurrentViewLabel'
+      TabOrder = 1
+    end
   end
   object MainContentLayout: TLayout
     Align = Client
@@ -30,18 +39,6 @@ object MainForm: TMainForm
     Size.Height = 429.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
-  end
-  object FrameStand1: TFrameStand
-    AnimationShow = 'OnShow*'
-    AnimationHide = 'OnHide*'
-    CommonActionPrefix = 'ca_'
-    DefaultHideAndCloseDeferTimeMS = 100
-    DefaultStyleName = 'framestand'
-    DefaultStandName = 'framestand'
-    StyleBook = Stands
-    StandBook = Stands
-    Left = 112
-    Top = 136
   end
   object Stands: TStyleBook
     Styles = <
@@ -26192,5 +26189,17 @@ object MainForm: TMainForm
       end>
     Left = 112
     Top = 192
+  end
+  object FrameStand1: TFrameStand
+    AnimationShow = 'OnShow*'
+    AnimationHide = 'OnHide*'
+    CommonActionPrefix = 'ca_'
+    DefaultHideAndCloseDeferTimeMS = 100
+    DefaultStyleName = 'framestand'
+    DefaultStandName = 'framestand'
+    StyleBook = Stands
+    StandBook = Stands
+    Left = 112
+    Top = 136
   end
 end
