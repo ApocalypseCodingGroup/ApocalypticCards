@@ -5,8 +5,10 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
-  FMX.Controls.Presentation, FMX.Layouts, SubjectStand, FrameStand,
-  Frames.CreateGame, Frames.Home, Utils.Messages;
+  FMX.Controls.Presentation, FMX.Layouts, SubjectStand, FrameStand
+, Frames.CreateGame, Frames.Home, Frames.GreenRoom
+, Utils.Messages
+;
 
 type
   TMainForm = class(TForm)
@@ -49,6 +51,10 @@ begin
         CreateGame : begin
           FrameStand1.New<TCreateGameFrame>(MainContentLayout, 'solidBackground').Show;
         end;
+        GreenRoom : begin
+          FrameStand1.New<TGreenRoomFrame>(MainContentLayout, 'solidBackground').Show;
+        end;
+
       end;
 
       CurrentViewLabel.Text := TRttiEnumerationType.GetName<TAppView>(LCurrentView);

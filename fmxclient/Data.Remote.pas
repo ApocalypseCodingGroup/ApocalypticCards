@@ -82,6 +82,8 @@ begin
   UsersRequest.ExecuteAsync(
     procedure
     begin
+      MainData.UserData := TJson.JsonToObject<TUserData>(UsersResponse.Content);
+
       if Assigned(AOnSuccess) then
         AOnSuccess();
     end

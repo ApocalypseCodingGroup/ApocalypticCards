@@ -87,6 +87,8 @@ begin
       , procedure
         begin
           ShowMessage('User joined game!');
+
+          MainData.CurrentView := GreenRoom;
         end
       , procedure(const AErrorMessage: string)
         begin

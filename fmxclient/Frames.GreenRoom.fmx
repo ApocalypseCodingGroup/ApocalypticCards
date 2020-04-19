@@ -1,0 +1,41 @@
+object GreenRoomFrame: TGreenRoomFrame
+  Align = Client
+  Size.Width = 362.000000000000000000
+  Size.Height = 342.000000000000000000
+  Size.PlatformDefault = False
+  object WaitLayout: TLayout
+    Align = Top
+    Size.Width = 362.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object WaitMessageLabel: TLabel
+      Align = Client
+      AutoSize = True
+      Size.Width = 362.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'Waiting for players to join...'
+      TabOrder = 0
+    end
+  end
+  object CodeOrHostLayout: TLayout
+    Align = Top
+    Position.Y = 50.000000000000000000
+    Size.Width = 362.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object CodeOrHostLabel: TLabel
+      Align = Client
+      AutoSize = True
+      Size.Width = 362.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'Waiting for players to join...'
+      TabOrder = 0
+    end
+  end
+end

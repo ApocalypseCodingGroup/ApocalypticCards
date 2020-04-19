@@ -13,12 +13,14 @@ type
   private
     FCurrentGame: IGameData;
     FCurrentView: TAppView;
+    FUserData: IUserData;
     procedure SetCurrentView(const Value: TAppView);
   protected
     procedure CurrentViewChanged;
   public
     constructor Create(AOwner: TComponent); override;
 
+    property UserData: IUserData read FUserData write FUserData;
     property CurrentGame: IGameData read FCurrentGame write FCurrentGame;
     property CurrentView: TAppView read FCurrentView write SetCurrentView;
   end;
