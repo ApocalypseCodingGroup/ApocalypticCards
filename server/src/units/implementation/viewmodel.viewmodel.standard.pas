@@ -104,8 +104,7 @@ begin
     raise
       Exception.Create('Requested game not found.');
   end;
-  NewUser.GameID := SelectedGame.SessionID;
-  fDataModel.CreateUSer( NewUser );
+  fDataModel.CreateUser( NewUser );
   Result := NewUser.ToJSON;
 end;
 

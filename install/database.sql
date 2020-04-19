@@ -33,7 +33,7 @@ CREATE TABLE `tbl_users` (
   PRIMARY KEY (`PKID`),
   CONSTRAINT `keyGames`
     FOREIGN KEY (`FKGameID`)
-    REFERENCES `tbl_gamebase` (`PKID`)
+    REFERENCES `tbl_games` (`PKID`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
