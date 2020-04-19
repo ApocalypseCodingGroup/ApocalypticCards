@@ -48,16 +48,37 @@ implementation
 {$R *.fmx}
 
 uses
-  datamodel.standard;
+  datamodel.standard, Data.Remote;
 
 
 procedure TCreateGameFrame.CreateGameActionExecute(Sender: TObject);
 var
   LGameData: IGameData;
 begin
-  LGameData := TGameData.Create(NameEdit.Text, LangComboBox.Selected.Text, IsPrivateCheckBox.IsChecked);
+  LGameData := TGameData.Create();
+
+  LGameData.SessionName := NameEdit.Text;
+  LGameData.LangID := LangComboBox.Selected.Text;
+  if IsPrivateCheckBox.IsChecked then
+    LGameData.SessionPassword := 'Generate'; // use constant here
   LGameData.MinUser := MinUsers;
   LGameData.MaxUser := MaxUsers;
+
+  // start wait
+  RemoteData.CreateGame(LGameData
+  , procedure(AResponse: string)
+    begin
+      ShowMessage('Done!' + AResponse);
+      // Done!
+      // stop wait
+    end
+  , procedure(const AErrorMessage: string)
+    begin
+      ShowMessage(AErrorMessage);
+      // Error!
+      // stop wait
+    end
+  );
 end;
 
 procedure TCreateGameFrame.CreateGameActionUpdate(Sender: TObject);
