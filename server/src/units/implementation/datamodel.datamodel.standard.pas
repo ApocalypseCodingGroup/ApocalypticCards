@@ -59,11 +59,11 @@ end;
 constructor TDataModel.Create;
 var
   Credentials: Classes.TStringList;
+  lIndex     : Integer;
 begin
   inherited Create;
   fConn := TFDConnection.Create(nil);
   fConn.Params.DriverID := 'MySQL';
-  fConn.Params.Add('Server=127.0.0.1');
   Credentials := Classes.TStringList.Create;
   try
     if not FileExists(cDatabaseIni) then begin
@@ -71,6 +71,12 @@ begin
         Exception.Create('The credentials configuration is missing.');
     end;
     Credentials.LoadFromFile(cDatabaseIni);
+    lIndex := Credentials.IndexOfName('server');
+
+    if lIndex >= 0
+      then fConn.Params.Add('Server='+Credentials.ValueFromIndex[lIndex])
+      else fConn.Params.Add('Server=127.0.0.1');
+
     fConn.Params.Database := Credentials.Values['database'];
     fConn.Params.UserName := Credentials.Values['username'];
     fConn.Params.Password := Credentials.Values['password'];
