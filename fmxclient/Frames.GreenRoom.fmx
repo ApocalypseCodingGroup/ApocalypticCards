@@ -38,4 +38,39 @@ object GreenRoomFrame: TGreenRoomFrame
       TabOrder = 0
     end
   end
+  object UsersListView: TListView
+    ItemAppearanceClassName = 'TListItemAppearance'
+    ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+    HeaderAppearanceClassName = 'TListHeaderObjects'
+    FooterAppearanceClassName = 'TListHeaderObjects'
+    Align = Client
+    Size.Width = 362.000000000000000000
+    Size.Height = 192.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+  end
+  object Layout1: TLayout
+    Align = Bottom
+    Position.Y = 292.000000000000000000
+    Size.Width = 362.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    object StartGameButton: TButton
+      Action = StartGameAction
+      Align = Center
+      Enabled = True
+      ImageIndex = -1
+      TabOrder = 0
+    end
+  end
+  object ActionList1: TActionList
+    Left = 48
+    Top = 260
+    object StartGameAction: TAction
+      AutoCheck = True
+      Text = 'Start now!'
+      OnUpdate = StartGameActionUpdate
+    end
+  end
 end

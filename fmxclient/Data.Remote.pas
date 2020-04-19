@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Classes, REST.Types, REST.Client,
   Data.Bind.Components, Data.Bind.ObjectScope
-, datamodel
+, datamodel, FMX.Types
 ;
 
 type
@@ -17,13 +17,26 @@ type
     GameResponse: TRESTResponse;
     UsersRequest: TRESTRequest;
     UsersResponse: TRESTResponse;
+    PollingForUsersRequest: TRESTRequest;
+    PollingForUsersResponse: TRESTResponse;
+    PollingForUsersTimer: TTimer;
+    procedure PollingForUsersTimerTimer(Sender: TObject);
   private
+    FPollingForUsers: Boolean;
+  protected
+    procedure PollForUsers();
+
   public
     procedure CreateGame(const AGameData: IGameData; const AOnSuccess: TProc;
       const AOnError: TErrorProc);
 
     procedure JoinGame(const AUserName: string; const ASessionID: string;
       const AOnSuccess: TProc; const AOnError: TErrorProc);
+
+    procedure StartPollingForUsers();
+    procedure StopPollingForUsers();
+
+    property PollingForUsers: Boolean read FPollingForUsers;
   end;
 
 var
@@ -96,6 +109,47 @@ begin
         raise Exception.Create(AObj.ToString);
     end
   );
+end;
+
+procedure TRemoteData.PollForUsers;
+begin
+  PollingForUsersRequest.Params.ParameterByName('GameID').Value := MainData.CurrentGame.SessionID;
+  PollingForUsersRequest.ExecuteAsync(
+    procedure
+    begin
+      LResponse := PollingForUsersResponse.Content;
+
+
+    end
+  , True, True
+  , procedure (AObj: TObject)
+    begin
+      // do nothing on error
+    end
+  );
+end;
+
+procedure TRemoteData.PollingForUsersTimerTimer(Sender: TObject);
+begin
+  PollingForUsersTimer.Enabled := False;
+  try
+    PollForUsers();
+  finally
+    PollingForUsersTimer.Enabled := FPollingForUsers;
+  end;
+end;
+
+procedure TRemoteData.StartPollingForUsers;
+begin
+  FPollingForUsers := True;
+
+  PollForUsers(); // 1st attempt immediately
+  PollingForUsersTimer.Enabled := True;
+end;
+
+procedure TRemoteData.StopPollingForUsers;
+begin
+  FPollingForUsers := False;
 end;
 
 end.
