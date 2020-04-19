@@ -52,8 +52,14 @@ const
   {$endif}
 
 procedure TDataModel.CreateUser(const NewUser: IUserData);
+const
+  cSQL = 'insert into tbl_users (PKID, FKGameID, Name) values (:PKID, :FKGameID, :Name );';
 begin
-
+  fQry.SQL.Text := cSQL;
+  fQry.Params.ParamByName('PKID').AsString := NewUser.UserID;
+  fQry.Params.ParamByName('FKGameID').AsString := NewUser.GameID;
+  fQry.Params.ParamByName('Name').AsString := NewUser.Name;
+  fQry.ExecSQL;
 end;
 
 constructor TDataModel.Create;
