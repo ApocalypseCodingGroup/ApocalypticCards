@@ -13,7 +13,9 @@ API/startjson?SessionID="hGASjsd6"&SessionName="Franks Game"&SessionPW=""&MinUse
 //  `Acc_QDeckID` int(10) unsigned NOT NULL,
 
 
+DROP TABLE IF EXISTS `tbl_users`;
 DROP TABLE IF EXISTS `tbl_games`;
+
 CREATE TABLE  `tbl_games` (
   `PKID` VARCHAR(40) NOT NULL,
   `Running` tinyint(1) NOT NULL,
@@ -22,10 +24,12 @@ CREATE TABLE  `tbl_games` (
   `LangID` varchar(2) NOT NULL DEFAULT 'US',
   `MinUser` int(10) unsigned NOT NULL DEFAULT 3,
   `MaxUser` int(10) unsigned NOT NULL DEFAULT 8,
+  `CurrentUser` VARCHAR(40),
+  `LastUpdate` TIMESTAMP,
   PRIMARY KEY (`PKID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `tbl_users`;
+
 CREATE TABLE `tbl_users` (
   `PKID` VARCHAR(40) NOT NULL,
   `FKGameID` VARCHAR(40) NOT NULL,

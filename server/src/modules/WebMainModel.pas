@@ -59,7 +59,28 @@ begin
     end,
 
     // Read
-    nil,
+    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    var
+      index: integer;
+      utFieldName: string;
+      Found: boolean;
+      SearchKey: string;
+    begin
+      Found := False;
+      for index := 0 to pred( Request.QueryFields.Count ) do begin
+        utFieldName := Uppercase(Trim(Request.QueryFields.Names[index]));
+        if (utFieldName='GAMEID') or (utFieldName='USERID') then begin
+          SearchKey := Request.QueryFields.Values[Request.QueryFields.Names[index]];
+          Found := True;
+          break;
+        end;
+      end;
+      if not Found then begin
+        raise
+          Exception.Create('Missing parameter: Require at least GameID or UserID');
+      end;
+      Response.Content := ViewModel.getUsersByGameIDOrUserID(SearchKey);
+    end,
 
     // Update
     nil,

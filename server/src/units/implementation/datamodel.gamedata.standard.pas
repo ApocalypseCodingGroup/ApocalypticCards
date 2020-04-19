@@ -39,7 +39,6 @@ uses
   SysUtils
 ;
 
-
 function TGameData.getLangID: string;
 begin
   Result := fLangID;

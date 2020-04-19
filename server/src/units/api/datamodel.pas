@@ -50,22 +50,25 @@ type
     property MaxUser: integer         read getMaxUser     write setMaxUser;
     property Running: boolean         read getRunning     write setRunning;
   end;
-  
+
   IUserData = interface( IGameDataObject )
     //- Getters
+    function getIsCurrentUser: boolean;
     function getUserID: string;
     function getName: string;
     function getGameID: string;
 
     //- Setters
+    procedure setIsCurrentUser( const value: boolean );
     procedure setUserID( const value: string );
     procedure setName( const value: string );
     procedure setGameID( const value: string );
 
     //- Properties
-    property UserID: string      read getUserID      write setUserID;
-    property Name: string        read getName        write setName;
-    property GameID: string      read getGameID      write setGameID; //<- Which game am I joined to?
+    property IsCurrentUser: boolean read getIsCurrentUser write setIsCurrentUser;
+    property UserID: string         read getUserID        write setUserID;
+    property Name: string           read getName          write setName;
+    property GameID: string         read getGameID        write setGameID; //<- Which game am I joined to?
   end;
 
 
@@ -77,6 +80,7 @@ type
     function FindGameByID(const GameID: string): IGameData;
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
+    function getUsersByGameIDOrUserID(const Key: string): IList<IUserData>;
 
   end;
 

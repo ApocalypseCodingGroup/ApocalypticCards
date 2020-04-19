@@ -25,13 +25,17 @@ type
   private
     fConn: TFDConnection;
     fQry: TFDQuery;
-    procedure QueryToGameData(const Qry: TFDQuery; var GameData: IGameData);
+    procedure QueryToGameData(const Qry: TFDQuery; const GameData: IGameData);
+    procedure QueryToUserData(const Qry: TFDQuery; const UserData: IUserData; const IncludeUID: boolean = FALSE);
+    function AddFirstUserToGame(const GameID, UserID: string): boolean;
+    function IsCurrentUser(const UserID, GameID: string): boolean;
   strict private
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
     function FindGameByID(const GameID: string): IGameData;
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
+    function getUsersByGameIDOrUserID(const Key: string): IList<IUserData>;
   public
     constructor Create; reintroduce;
   end;
@@ -41,7 +45,7 @@ uses
   Classes
 , SysUtils
 , cwCollections.Standard
-, DataModel.GameData.Standard
+, DataModel.Standard
 ;
 
 const
@@ -51,15 +55,32 @@ const
   cDatabaseIni = '/var/www/apocalypse/https/private/cardgame.ini';
   {$endif}
 
-procedure TDataModel.CreateUser(const NewUser: IUserData);
+function TDataModel.AddFirstUserToGame(const GameID: string; const UserID: string): boolean;
 const
-  cSQL = 'insert into tbl_users (PKID, FKGameID, Name) values (:PKID, :FKGameID, :Name );';
+  cSQL = 'UPDATE tbl_games SET CurrentUser=:UserID, LastUpdate=:LastUpdate WHERE (PKID=:GameID) and (CurrentUser is NULL)';
 begin
   fQry.SQL.Text := cSQL;
-  fQry.Params.ParamByName('PKID').AsString := NewUser.UserID;
-  fQry.Params.ParamByName('FKGameID').AsString := NewUser.GameID;
-  fQry.Params.ParamByName('Name').AsString := NewUser.Name;
+  fQry.ParamByName('LastUpdate').AsDateTime := Now;
+  fQry.ParamByName('UserID').AsString := UserID;
+  fQry.ParamByName('GameID').AsString := GameID;
   fQry.ExecSQL;
+  Result := fQry.RowsAffected=1;
+  if fQry.RowsAffected>1 then begin
+    raise
+      Exception.Create('Ooops, It looks as though the database has become corrupt. Blame the developers');
+  end;
+end;
+
+procedure TDataModel.CreateUser(const NewUser: IUserData);
+const
+  cSQL = 'INSERT into tbl_users (PKID, FKGameID, Name) values (:PKID, :FKGameID, :Name);';
+begin
+  fQry.SQL.Text := cSQL;
+  fQry.ParamByName('PKID').AsString := NewUser.UserID;
+  fQry.ParamByName('FKGameID').AsString := NewUser.GameID;
+  fQry.ParamByName('Name').AsString := NewUser.Name;
+  fQry.ExecSQL;
+  NewUser.IsCurrentUser := AddFirstUserToGame(NewUser.GameID,NewUser.UserID);
 end;
 
 constructor TDataModel.Create;
@@ -101,7 +122,7 @@ end;
 
 function TDataModel.CreateGame(const GameData: IGameData): boolean;
 const
-  cSQL = 'insert into tbl_games (PkId,Running,SessionName,LangId,MinUser,MaxUser) values ( :PkId, :Running, :SessionName, :LangId, :MinUser, :MaxUser );';
+  cSQL = 'insert into tbl_games (PkId,Running,SessionName,LangId,MinUser,MaxUser,LastUpdate) values ( :PkId, :Running, :SessionName, :LangId, :MinUser, :MaxUser, :LastUpdate );';
 begin
   fQry.SQL.Text := cSQL;
   fQry.Params.ParamByName('PkId').AsString := GameData.SessionID;
@@ -114,6 +135,7 @@ begin
   fQry.Params.ParamByName('LangId').AsString := GameData.LangID;
   fQry.Params.ParamByName('MinUser').AsInteger := GameData.MinUser;
   fQry.Params.ParamByName('MaxUser').AsInteger := GameData.MaxUser;
+  fQry.Params.ParamByName('LastUpdate').AsDateTime := Now;
   fQry.ExecSQL;
   Result := fQry.RowsAffected=1;
 end;
@@ -152,7 +174,7 @@ begin
   QueryToGamedata( fQry, Result );
 end;
 
-procedure TDataModel.QueryToGameData( const Qry: TFDQuery; var GameData: IGameData );
+procedure TDataModel.QueryToGameData( const Qry: TFDQuery; const GameData: IGameData );
 begin
   { TODO : Need to correct fields included in this method. }
   GameData.SessionID   := Qry.FieldByName('PkId').AsString;
@@ -177,6 +199,56 @@ begin
     NewGameData := TGameData.Create();
     QueryToGameData( fQry, NewGameData );
     Result.Add( NewGameData );
+    fQry.Next;
+  end;
+end;
+
+function TDataModel.IsCurrentUser( const UserID: string; const GameID: string ): boolean;
+const
+  cSQL = 'select CurrentUser FROM tbl_games WHERE PKID=:FKGameID';
+var
+  tmpQry: TFDQuery;
+begin
+  tmpQry := TFDQuery.Create(nil);
+  try
+    tmpQry.Connection := fConn;
+    tmpQry.SQL.Text := cSQL;
+    tmpQry.ParamByName('FKGameID').AsString := GameID;
+    tmpQry.Active := True;
+    tmpQry.First;
+    Result := tmpQry.FieldByName('CurrentUser').AsString = UserID;
+    tmpQry.Active := False;
+  finally
+    tmpQry.Free;
+  end;
+end;
+
+procedure TDataModel.QueryToUserData( const Qry: TFDQuery; const UserData: IUserData; const IncludeUID: boolean = FALSE );
+begin
+  UserData.GameID := Qry.FieldByName('FKGameID').AsString;
+  UserData.Name   := Qry.FieldByName('Name').AsString;
+  UserData.UserID := Qry.FieldByName('PKID').AsString;
+  UserData.IsCurrentUser := IsCurrentUser( UserData.UserID, UserData.GameID );
+  if not IncludeUID then begin
+    UserData.UserID := '';
+  end;
+end;
+
+function TDataModel.getUsersByGameIDOrUserID(const Key: string): IList<IUserData>;
+const
+  cSQL = 'SELECT * from tbl_users where ((PKID=:Key) or (FKGameID=:Key));';
+var
+  NewUserData: IUserData;
+begin
+  Result := TList<IUserData>.Create;
+  fQry.SQL.Text := cSQL;
+  fQry.ParamByName('Key').AsString := Key;
+  fQry.Active := true;
+  fQry.First;
+  while not fQry.EOF do begin
+    NewUserData := TUserData.Create();
+    QueryToUserData( fQry, NewUserData, FALSE );
+    Result.Add( NewUserData );
     fQry.Next;
   end;
 end;
