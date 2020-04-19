@@ -7,14 +7,15 @@ uses
   Data.Remote in 'Data.Remote.pas' {RemoteData: TDataModule},
   Frames.CreateGame in 'Frames.CreateGame.pas' {CreateGameFrame: TFrame},
   Frames.Home in 'Frames.Home.pas' {HomeFrame: TFrame},
-  Data.Main in 'Data.Main.pas' {MainData: TDataModule};
+  Data.Main in 'Data.Main.pas' {MainData: TDataModule},
+  Utils.Messages in 'Utils.Messages.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
+  Application.CreateForm(TMainData, MainData);
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TRemoteData, RemoteData);
-  Application.CreateForm(TMainData, MainData);
   Application.Run;
 end.

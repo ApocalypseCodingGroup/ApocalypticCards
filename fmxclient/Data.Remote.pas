@@ -19,10 +19,11 @@ type
     UsersResponse: TRESTResponse;
   private
   public
-    procedure CreateGame(const AGameData: IGameData; const AOnSuccess: TProc<string>;
+    procedure CreateGame(const AGameData: IGameData; const AOnSuccess: TProc;
       const AOnError: TErrorProc);
 
-    procedure JoinGame(const AUserName: string; const ASessionID: string);
+    procedure JoinGame(const AUserName: string; const ASessionID: string;
+      const AOnSuccess: TProc; const AOnError: TErrorProc);
   end;
 
 var
@@ -43,7 +44,7 @@ uses
 { TRemoteData }
 
 procedure TRemoteData.CreateGame(const AGameData: IGameData;
-  const AOnSuccess: TProc<string>; const AOnError: TErrorProc);
+  const AOnSuccess: TProc; const AOnError: TErrorProc);
 var
   LGameJSON: string;
 begin
@@ -56,7 +57,7 @@ begin
       MainData.CurrentGame := TJson.JsonToObject<TGameData>(GameResponse.Content);
 
       if Assigned(AOnSuccess) then
-        AOnSuccess(GameResponse.Content);
+        AOnSuccess();
     end
    , True, True
    , procedure(AObj: TObject)
@@ -68,7 +69,8 @@ begin
 
 end;
 
-procedure TRemoteData.JoinGame(const AUserName, ASessionID: string);
+procedure TRemoteData.JoinGame(const AUserName, ASessionID: string;
+  const AOnSuccess: TProc; const AOnError: TErrorProc);
 var
   LUserData: IUserData;
 begin
@@ -80,12 +82,16 @@ begin
   UsersRequest.ExecuteAsync(
     procedure
     begin
-
+      if Assigned(AOnSuccess) then
+        AOnSuccess();
     end
   , True, True
   , procedure(AObj: TObject)
     begin
-      raise Exception.Create(AObj.ToString);
+      if Assigned(AOnError) then
+        AOnError(AObj.ToString)
+      else
+        raise Exception.Create(AObj.ToString);
     end
   );
 end;

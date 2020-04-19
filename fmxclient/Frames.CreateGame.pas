@@ -3,10 +3,12 @@ unit Frames.CreateGame;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants, 
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Edit, FMX.ListBox, FMX.EditBox, FMX.SpinBox
-, DataModel, System.Actions, FMX.ActnList;
+, DataModel, System.Actions, FMX.ActnList
+, FrameStand, SubjectStand
+;
 
 type
   TCreateGameFrame = class(TFrame)
@@ -30,6 +32,7 @@ type
     procedure CreateGameActionUpdate(Sender: TObject);
     procedure MinUsersSpinBoxChange(Sender: TObject);
     procedure MaxUsersSpinBoxChange(Sender: TObject);
+    procedure CancelButtonClick(Sender: TObject);
   private
     function GetMaxUsers: Integer;
     function GetMinUsers: Integer;
@@ -39,6 +42,8 @@ type
 
     property MinUsers: Integer read GetMinUsers write SetMinUsers;
     property MaxUsers: Integer read GetMaxUsers write SetMaxUsers;
+  protected
+    [FrameInfo] FI: TFrameInfo<TCreateGameFrame>;
   public
     { Public declarations }
   end;
@@ -48,8 +53,14 @@ implementation
 {$R *.fmx}
 
 uses
-  datamodel.standard, Data.Remote, Data.Main;
+  datamodel.standard, Data.Remote, Data.Main, Utils.Messages;
 
+
+procedure TCreateGameFrame.CancelButtonClick(Sender: TObject);
+begin
+  FI.HideAndClose();
+  MainData.CurrentView := Home;
+end;
 
 procedure TCreateGameFrame.CreateGameActionExecute(Sender: TObject);
 var
@@ -72,7 +83,16 @@ begin
       ShowMessage('Done! ' + MainData.CurrentGame.SessionID);
 
       // add user to the newly created game
-      RemoteData.JoinGame(YourNameEdit.Text, MainData.CurrentGame.SessionID);
+      RemoteData.JoinGame(YourNameEdit.Text, MainData.CurrentGame.SessionID
+      , procedure
+        begin
+          ShowMessage('User joined game!');
+        end
+      , procedure(const AErrorMessage: string)
+        begin
+          ShowMessage(AErrorMessage);
+        end
+      );
 
       // stop wait
     end

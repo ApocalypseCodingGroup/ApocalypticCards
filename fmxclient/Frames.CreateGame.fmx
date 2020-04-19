@@ -124,6 +124,7 @@ object CreateGameFrame: TCreateGameFrame
     Position.Y = 272.000000000000000000
     TabOrder = 13
     Text = 'Cancel'
+    OnClick = CancelButtonClick
   end
   object ActionList1: TActionList
     Left = 40
