@@ -9,9 +9,6 @@
         <Projects Include="src\mod_cardgame.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="src\CardDebugLinux.dproj">
-            <Dependencies/>
-        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -38,23 +35,14 @@
     <Target Name="mod_cardgame:Make">
         <MSBuild Projects="src\mod_cardgame.dproj" Targets="Make"/>
     </Target>
-    <Target Name="CardDebugLinux">
-        <MSBuild Projects="src\CardDebugLinux.dproj"/>
-    </Target>
-    <Target Name="CardDebugLinux:Clean">
-        <MSBuild Projects="src\CardDebugLinux.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="CardDebugLinux:Make">
-        <MSBuild Projects="src\CardDebugLinux.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="CardDebug;mod_cardgame;CardDebugLinux"/>
+        <CallTarget Targets="CardDebug;mod_cardgame"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;CardDebugLinux:Clean"/>
+        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;CardDebugLinux:Make"/>
+        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -10,18 +10,12 @@ object WebModule4: TWebModule4
       Name = 'wactGames'
       PathInfo = '/games'
       OnAction = WebModule4wactGamesAction
+    end
+    item
+      Name = 'wactUsers'
+      PathInfo = '/users'
+      OnAction = WebModule4wactUsersAction
     end>
   Height = 487
   Width = 656
-  object conn: TFDConnection
-    Params.Strings = (
-      'Database=apocalypticcards'
-      'User_Name=root'
-      'Password=TestingDatabase'
-      'Server=127.0.0.1'
-      'DriverID=MySQL')
-    LoginPrompt = False
-    Left = 40
-    Top = 16
-  end
 end

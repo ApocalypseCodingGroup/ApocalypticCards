@@ -5,9 +5,21 @@ uses
   cwCollections
 ;
 
+const
+  cPasswordLen       = 9;
+  cMinUserCount      = 3;
+  cMaxUserCount      = 10;
+  cStartPasswordChar = 48;
+  cPasswordCharRange = 42;
+
+const
+  cNullString = '';
+  cGeneratePasswordFlag = 'Generate';
+
 type
   IGameDataObject = interface
     function AsObject: TObject;
+    function ToJSON: string;
   end;
 
   IGameData = interface( IGameDataObject )
@@ -38,6 +50,23 @@ type
     property MaxUser: integer         read getMaxUser     write setMaxUser;
     property Running: boolean         read getRunning     write setRunning;
   end;
+  
+  IUserData = interface( IGameDataObject )
+    //- Getters
+    function getUserID: string;
+    function getName: string;
+    function getGameID: string;
+
+    //- Setters
+    procedure setUserID( const value: string );
+    procedure setName( const value: string );
+    procedure setGameID( const value: string );
+
+    //- Properties
+    property UserID: string      read getUserID      write setUserID;
+    property Name: string        read getName        write setName;
+    property GameID: string      read getGameID      write setGameID; //<- Which game am I joined to?
+  end;
 
 
   IDataModel = interface
@@ -45,18 +74,12 @@ type
 
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
+    function FindGameByID(const GameID: string): IGameData;
+    function FindGameByPassword(const Password: string): IGameData;
+    procedure CreateUser(const NewUser: IUserData);
 
-//    Function JoinGame(Const aSessionID,aUserName : String;out Token, Error : String) : boolean;
-//    function ReadGames( out Response: string ): boolean;
   end;
 
-//
-//  ICardgame = Interface
-//  ['{C11CFA85-FBB1-4620-BAC5-783AA64CF446}']
-//    Function JoinSession(Const aSessionID,aUserName : String) : String;
-//    function Read_Games(out Response: string): boolean;
-//    function Create_Games(out Response: string; const RequestJSON: string ): boolean;
-//  end;
 
 implementation
 

@@ -4,10 +4,12 @@ interface
 uses
   DataModel
 , datamodel.gamedata.standard
+, datamodel.userdata.standard
 ;
 
 type
   TGameData = datamodel.gamedata.standard.TGameData;
+  TUserData = datamodel.userdata.standard.TUserData;
 
   TDataModel = record
     class function Create: IDataModel; static;
