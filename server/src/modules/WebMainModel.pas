@@ -8,8 +8,7 @@ uses
 type
   TWebModule4 = class(TWebModule)
     procedure WebModule4wactGamesAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
-    procedure WebModule4wactUsersAction(Sender: TObject; Request: TWebRequest;
-      Response: TWebResponse; var Handled: Boolean);
+    procedure WebModule4wactUsersAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
   end;
 
 var
