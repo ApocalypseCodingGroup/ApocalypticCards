@@ -15,7 +15,7 @@ type
     function getPublicGames: string;
     function CreateGame( const json: string ): string;
     function JoinGame( const json: string ): string;
-    function getUsersByGameIDOrUserID( const Key: string ): string;
+    function getUsers( const AuthToken: string ): string;
   private
     function ListToJSON( const value: IList<IGameDataObject> ): string;
     procedure ValidateUserCount(const GameData: IGameData);
@@ -90,11 +90,11 @@ begin
   Result := ListToJSON(PublicGames as IList<IGameDataObject>);
 end;
 
-function TViewModel.getUsersByGameIDOrUserID(const Key: string): string;
+function TViewModel.getUsers(const AuthToken: string): string;
 var
   UserList: IList<IUserData>;
 begin
-  UserList := fDataModel.getUsersByGameIDOrUserID( Key );
+  UserList := fDataModel.getUsers( AuthToken );
   Result := ListToJSON(UserList as IList<IGameDataObject>);
 end;
 

@@ -7,9 +7,11 @@ uses
 ;
 
 type
-  THandleRequest = reference to procedure( Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel );
+  THandleRequest = reference to procedure( const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel );
 
   TGameRequest = class
+  private
+    class function ExtractAuthToken(Request: TWebRequest): string; static;
   public
     class function PrepareResponse( var Response: TWebResponse ): boolean; static;
     class procedure PrepareException( var Response: TWebResponse; const Message: string ); static;
@@ -20,17 +22,27 @@ implementation
 uses
   SysUtils
 , Classes
+, NetEncoding
 , ViewModel.Standard
 ;
 
 { TGameRequest }
+class function TGameRequest.ExtractAuthToken( Request: TWebRequest ): string;
+var
+  AuthToken: string;
+begin
+  AuthToken := TNetEncoding.URL.Decode(Request.GetFieldByName('authentication-string'));
+  Result := AuthToken;
+end;
 
 class procedure TGameRequest.HandleRequest( Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const _Create, _Read, _Update, _Delete: THandleRequest );
 var
   Str: string;
   ViewModel: IViewModel;
+  AuthToken: string;
 begin
   PrepareResponse(Response);
+  AuthToken := ExtractAuthToken( Request );
 
   ViewModel := TViewModel.Create;
   try
@@ -43,18 +55,18 @@ begin
     case Request.MethodType of
 
       mtGet: begin
-        _Read(Response,Handled,ViewModel);
+        _Read(AuthToken, Response,Handled,ViewModel);
       end; // read
 
       mtPut: begin
-        _Update(Response,Handled,ViewModel);
+        _Update(AuthToken, Response,Handled,ViewModel);
       end; // update
 
       mtPost: begin
-        _Create(Response,Handled,ViewModel);
+        _Create(AuthToken, Response,Handled,ViewModel);
       end;
       mtDelete: begin
-        _Delete(Response,Handled,ViewModel);
+        _Delete(AuthToken, Response,Handled,ViewModel);
       end; // take a guess
     end;
 

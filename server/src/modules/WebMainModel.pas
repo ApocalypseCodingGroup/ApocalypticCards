@@ -29,13 +29,13 @@ begin
   TGameRequest.HandleRequest( Request, Response, Handled,
 
     // Create
-    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
       Response.Content := ViewModel.CreateGame( Request.Content );
     end,
 
     // Read
-    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
       Response.Content := ViewModel.getPublicGames;
     end,
@@ -53,33 +53,15 @@ begin
   TGameRequest.HandleRequest( Request, Response, Handled,
 
     // Create
-    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
       Response.Content := ViewModel.JoinGame( Request.Content );
     end,
 
     // Read
-    procedure(Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
-    var
-      index: integer;
-      utFieldName: string;
-      Found: boolean;
-      SearchKey: string;
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
     begin
-      Found := False;
-      for index := 0 to pred( Request.QueryFields.Count ) do begin
-        utFieldName := Uppercase(Trim(Request.QueryFields.Names[index]));
-        if (utFieldName='GAMEID') or (utFieldName='USERID') then begin
-          SearchKey := Request.QueryFields.Values[Request.QueryFields.Names[index]];
-          Found := True;
-          break;
-        end;
-      end;
-      if not Found then begin
-        raise
-          Exception.Create('Missing parameter: Require at least GameID or UserID');
-      end;
-      Response.Content := ViewModel.getUsersByGameIDOrUserID(SearchKey);
+      Response.Content := ViewModel.getUsers(AuthToken);
     end,
 
     // Update

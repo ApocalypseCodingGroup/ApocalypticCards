@@ -30,13 +30,14 @@ type
     procedure QueryToUserData(const Qry: TFDQuery; const UserData: IUserData; const IncludeUID: boolean = FALSE);
     function AddFirstUserToGame(const GameID, UserID: string): boolean;
     function IsCurrentUser(const UserID, GameID: string): boolean;
+    function getGameIDByUserID(const Key: string): string;
   strict private
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
     function FindGameByID(const GameID: string): IGameData;
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
-    function getUsersByGameIDOrUserID(const Key: string): IList<IUserData>;
+    function getUsers(const Key: string): IList<IUserData>;
   public
     constructor Create; reintroduce;
   end;
@@ -235,15 +236,33 @@ begin
   end;
 end;
 
-function TDataModel.getUsersByGameIDOrUserID(const Key: string): IList<IUserData>;
+function TDataModel.getGameIDByUserID(const Key: string): string;
 const
-  cSQL = 'SELECT * from tbl_users where ((PKID=:Key) or (FKGameID=:Key));';
-var
-  NewUserData: IUserData;
+  cSQL = 'SELECT FKGameID from tbl_users where (PKID=:Key);';
 begin
-  Result := TList<IUserData>.Create;
   fQry.SQL.Text := cSQL;
   fQry.ParamByName('Key').AsString := Key;
+  fQry.Active := True;
+  if fQry.RowsAffected<1 then begin
+    raise
+      Exception.Create('Failed to locate game by provided user ID');
+  end;
+  fQry.First;
+  Result := fQry.FieldByName('FKGameID').AsString;
+  fQry.Active := False;
+end;
+
+function TDataModel.getUsers(const Key: string): IList<IUserData>;
+const
+  cSQL = 'SELECT * FROM tbl_users WHERE FKGameID=:GameID;';
+var
+  NewUserData: IUserData;
+  GameID: string;
+begin
+  GameID := getGameIDByUserID(Key);
+  Result := TList<IUserData>.Create;
+  fQry.SQL.Text := cSQL;
+  fQry.ParamByName('GameID').AsString := GameID;
   fQry.Active := true;
   fQry.First;
   while not fQry.EOF do begin

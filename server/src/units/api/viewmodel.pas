@@ -46,7 +46,10 @@ type
      /// </summary>
      function JoinGame( const json: string ): string;
 
-     function getUsersByGameIDOrUserID( const Key: string ): string;
+     /// <summary>
+     ///
+     /// </summary>
+     function getUsers( const AuthToken: string ): string;
 
    end;
 

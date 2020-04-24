@@ -80,7 +80,7 @@ type
     function FindGameByID(const GameID: string): IGameData;
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
-    function getUsersByGameIDOrUserID(const Key: string): IList<IUserData>;
+    function getUsers(const AuthToken: string): IList<IUserData>;
 
   end;
 
