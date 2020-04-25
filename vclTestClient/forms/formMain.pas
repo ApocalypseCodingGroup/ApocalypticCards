@@ -32,7 +32,7 @@ type
     resp: TRESTResponse;
     client: TRESTClient;
     pgGreenRoom: TTabSheet;
-    Label4: TLabel;
+    lblWaitingToStart: TLabel;
     Label5: TLabel;
     lstPlayers: TListBox;
     tmrPollUsers: TTimer;
@@ -162,6 +162,9 @@ begin
   end;
   for idx := 0 to pred(Users.Count) do begin
     lstPlayers.Items.Add(Users[idx].Name);
+    if Users[idx].IsCurrentUser then begin
+      lblWaitingToStart.Caption := 'Waiting for sufficient players and for '+Users[idx].Name+' to start the game...';
+    end;
   end;
 end;
 

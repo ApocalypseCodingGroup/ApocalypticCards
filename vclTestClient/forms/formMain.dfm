@@ -158,7 +158,7 @@ object frmMain: TfrmMain
     object pgGreenRoom: TTabSheet
       Caption = 'pgGreenRoom'
       ImageIndex = 2
-      object Label4: TLabel
+      object lblWaitingToStart: TLabel
         Left = 24
         Top = 16
         Width = 176
@@ -175,7 +175,7 @@ object frmMain: TfrmMain
       object lstPlayers: TListBox
         Left = 136
         Top = 78
-        Width = 289
+        Width = 273
         Height = 241
         ItemHeight = 13
         TabOrder = 0
