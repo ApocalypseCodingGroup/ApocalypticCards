@@ -32,14 +32,12 @@ implementation
 
 {$R *.fmx}
 
-uses System.Messaging, Data.Main, System.Rtti;
+uses Data.Main, System.Rtti, System.Messaging;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
-  // subscribe to changes to CurrentView
-  TMessageManager.DefaultManager.SubscribeToMessage(
-    TCurrentViewChanged
-  , procedure(const Sender: TObject; const M: TMessage)
+  TCurrentViewChanged.Subscribe(
+    procedure(const Sender: TObject; const M: TMessage)
     var
       LCurrentView: TAppView;
     begin

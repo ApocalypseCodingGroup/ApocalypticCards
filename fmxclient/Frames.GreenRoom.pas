@@ -20,20 +20,40 @@ type
     StartGameButton: TButton;
     ActionList1: TActionList;
     StartGameAction: TAction;
+    LastCheckLabel: TLabel;
     procedure StartGameActionUpdate(Sender: TObject);
   private
+  protected
+    procedure RenderUsers;
   public
     [BeforeShow]
     procedure FrameOnShow;
+    procedure AfterConstruction; override;
   end;
 
 implementation
 
 {$R *.fmx}
 
-uses Data.Main, Data.Remote;
+uses
+  System.Messaging
+, datamodel
+, Data.Main, Data.Remote, Utils.Messages;
 
 { TGreenRoomFrame }
+
+procedure TGreenRoomFrame.AfterConstruction;
+begin
+  inherited;
+  TGameUsersChanged.Subscribe(
+    procedure (const Sender: TObject; const M: TMessage)
+    begin
+      RenderUsers;
+
+      LastCheckLabel.Text := TimeToStr(Now);
+    end
+  );
+end;
 
 procedure TGreenRoomFrame.FrameOnShow;
 var
@@ -54,6 +74,26 @@ begin
   end;
 
   RemoteData.StartPollingForUsers();
+end;
+
+procedure TGreenRoomFrame.RenderUsers;
+begin
+  UsersListView.BeginUpdate;
+  try
+    UsersListView.Items.Clear;
+
+    MainData.GameUsers.ForEach(
+      procedure (const user: IUserData)
+      var
+        LItem: TListViewItem;
+      begin
+        LItem := UsersListView.Items.Add;
+        LItem.Text := user.Name;
+      end
+    );
+  finally
+    UsersListView.EndUpdate;
+  end;
 end;
 
 procedure TGreenRoomFrame.StartGameActionUpdate(Sender: TObject);

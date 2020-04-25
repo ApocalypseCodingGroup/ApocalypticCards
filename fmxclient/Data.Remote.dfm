@@ -43,7 +43,8 @@ object RemoteData: TRemoteData
     Client = RESTClient1
     Params = <
       item
-        Name = 'GameID'
+        Kind = pkHTTPHEADER
+        Name = 'authentication-string'
       end>
     Resource = 'users'
     Response = PollingForUsersResponse
@@ -58,7 +59,7 @@ object RemoteData: TRemoteData
   end
   object PollingForUsersTimer: TTimer
     Enabled = False
-    Interval = 3000
+    Interval = 6000
     OnTimer = PollingForUsersTimerTimer
     Left = 432
     Top = 48

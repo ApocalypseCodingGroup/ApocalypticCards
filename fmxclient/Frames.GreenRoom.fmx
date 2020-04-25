@@ -19,6 +19,18 @@ object GreenRoomFrame: TGreenRoomFrame
       Text = 'Waiting for players to join...'
       TabOrder = 0
     end
+    object LastCheckLabel: TLabel
+      Anchors = [akTop, akRight]
+      StyledSettings = [Family, Size, Style]
+      Position.X = 72.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 288.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claDarkgray
+      TextSettings.HorzAlign = Trailing
+      TabOrder = 1
+    end
   end
   object CodeOrHostLayout: TLayout
     Align = Top

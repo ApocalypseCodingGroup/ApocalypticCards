@@ -80,13 +80,13 @@ begin
   , procedure
     begin
       // game created
-      ShowMessage('Done! ' + MainData.CurrentGame.SessionID);
+//      ShowMessage('Done! ' + MainData.CurrentGame.SessionID);
 
       // add user to the newly created game
       RemoteData.JoinGame(YourNameEdit.Text, MainData.CurrentGame.SessionID
       , procedure
         begin
-          ShowMessage('User joined game!');
+//          ShowMessage('User joined game!');
 
           MainData.CurrentView := GreenRoom;
         end

@@ -4,8 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, REST.Types, REST.Client,
-  Data.Bind.Components, Data.Bind.ObjectScope
-, datamodel, FMX.Types
+  Data.Bind.Components, Data.Bind.ObjectScope, FMX.Types
+, datamodel, cwCollections
 ;
 
 type
@@ -25,6 +25,7 @@ type
     FPollingForUsers: Boolean;
   protected
     procedure PollForUsers();
+    function ParseGreenRoomUsers(const AJSONResponse: string): IList<IUserData>;
 
   public
     procedure CreateGame(const AGameData: IGameData; const AOnSuccess: TProc;
@@ -49,12 +50,28 @@ implementation
 {$R *.dfm}
 
 uses
-  System.JSON, REST.JSON
-, datamodel.standard
-, Data.Main
+  Generics.Collections, System.JSON, REST.JSON
+, datamodel.standard, cwCollections.standard
+, Data.Main, Utils.Messages
 ;
 
 { TRemoteData }
+
+function TRemoteData.ParseGreenRoomUsers(const AJSONResponse: string): IList<IUserData>;
+var
+  idx: integer;
+  JSONArray: TJSONArray;
+begin
+  Result := TList<IUserData>.Create;
+  JSONArray := TJSONObject.ParseJSONValue(
+    TEncoding.ASCII.GetBytes(AJSONResponse),0) as TJSONArray;
+  if JSONArray.Size=0 then begin
+    exit;
+  end;
+  for idx := 0 to pred(JSONArray.Count) do begin
+    Result.Add(TJSON.JsonToObject<TUserData>(JSONArray.Get(idx).ToJSON));
+  end;
+end;
 
 procedure TRemoteData.CreateGame(const AGameData: IGameData;
   const AOnSuccess: TProc; const AOnError: TErrorProc);
@@ -113,13 +130,12 @@ end;
 
 procedure TRemoteData.PollForUsers;
 begin
-  PollingForUsersRequest.Params.ParameterByName('GameID').Value := MainData.CurrentGame.SessionID;
+  PollingForUsersRequest.Params.ParameterByName('authentication-string').Value :=
+    MainData.UserData.UserID;
   PollingForUsersRequest.ExecuteAsync(
     procedure
     begin
-      LResponse := PollingForUsersResponse.Content;
-
-
+      MainData.GameUsers := ParseGreenRoomUsers(PollingForUsersResponse.Content);
     end
   , True, True
   , procedure (AObj: TObject)
@@ -150,6 +166,8 @@ end;
 procedure TRemoteData.StopPollingForUsers;
 begin
   FPollingForUsers := False;
+
+  TPollingStopped.CreateAndSend(Self);
 end;
 
 end.
