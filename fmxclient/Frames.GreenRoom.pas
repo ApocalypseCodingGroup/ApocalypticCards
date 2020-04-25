@@ -77,11 +77,14 @@ begin
 end;
 
 procedure TGreenRoomFrame.RenderUsers;
+var
+  LCurrentUser: string;
 begin
   UsersListView.BeginUpdate;
   try
     UsersListView.Items.Clear;
 
+    LCurrentUser := '';
     MainData.GameUsers.ForEach(
       procedure (const user: IUserData)
       var
@@ -89,8 +92,23 @@ begin
       begin
         LItem := UsersListView.Items.Add;
         LItem.Text := user.Name;
+        if user.IsCurrentUser then
+          LCurrentUser := user.Name;
       end
     );
+
+    if MainData.GameUsers.Count >= MainData.CurrentGame.MinUser then
+      WaitMessageLabel.Text :=
+          'Waiting for ' + LCurrentUser
+        + ' to start ' + MainData.CurrentGame.SessionName.QuotedString
+        + ', ' + (MainData.CurrentGame.MaxUser - MainData.GameUsers.Count).ToString
+        + ' open slots remaining'
+    else // waiting users to join
+      WaitMessageLabel.Text :=
+          'Waiting for ' + MainData.CurrentGame.MinUser.ToString
+        + ' players to join ' + MainData.CurrentGame.SessionName.QuotedString;
+
+
   finally
     UsersListView.EndUpdate;
   end;

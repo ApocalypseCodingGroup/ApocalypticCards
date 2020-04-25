@@ -12,8 +12,8 @@ type
     CreateGameButton: TButton;
     JoinGameButton: TButton;
     Layout1: TLayout;
-    BackgroundImage: TImage;
     procedure CreateGameButtonClick(Sender: TObject);
+    procedure JoinGameButtonClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -29,6 +29,11 @@ uses Data.Main, Utils.Messages;
 procedure THomeFrame.CreateGameButtonClick(Sender: TObject);
 begin
   MainData.CurrentView := CreateGame;
+end;
+
+procedure THomeFrame.JoinGameButtonClick(Sender: TObject);
+begin
+  MainData.CurrentView := JoinGame;
 end;
 
 end.

@@ -9,7 +9,8 @@ uses
   Frames.Home in 'Frames.Home.pas' {HomeFrame: TFrame},
   Data.Main in 'Data.Main.pas' {MainData: TDataModule},
   Utils.Messages in 'Utils.Messages.pas',
-  Frames.GreenRoom in 'Frames.GreenRoom.pas' {GreenRoomFrame: TFrame};
+  Frames.GreenRoom in 'Frames.GreenRoom.pas' {GreenRoomFrame: TFrame},
+  Frames.JoinGame in 'Frames.JoinGame.pas' {JoinFrame: TFrame};
 
 {$R *.res}
 

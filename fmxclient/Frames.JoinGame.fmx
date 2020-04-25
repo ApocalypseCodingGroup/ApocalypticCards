@@ -1,0 +1,124 @@
+object JoinFrame: TJoinFrame
+  Align = Client
+  Size.Width = 368.000000000000000000
+  Size.Height = 356.000000000000000000
+  Size.PlatformDefault = False
+  object Layout1: TLayout
+    Align = Top
+    Size.Width = 368.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    object YourNameEdit: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 0
+      Position.X = 16.000000000000000000
+      Position.Y = 28.000000000000000000
+      Size.Width = 329.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object Label6: TLabel
+      Position.X = 16.000000000000000000
+      Position.Y = 8.000000000000000000
+      Text = 'Your Name'
+      TabOrder = 6
+    end
+  end
+  object Layout2: TLayout
+    Align = Client
+    Size.Width = 368.000000000000000000
+    Size.Height = 241.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    object Label1: TLabel
+      Position.X = 16.000000000000000000
+      Position.Y = 8.000000000000000000
+      Text = 'Select a game'
+      TabOrder = 7
+    end
+    object GamesListView: TListView
+      ItemAppearanceClassName = 'TListItemAppearance'
+      ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+      HeaderAppearanceClassName = 'TListHeaderObjects'
+      FooterAppearanceClassName = 'TListHeaderObjects'
+      Anchors = [akLeft, akTop, akRight, akBottom]
+      Position.X = 16.000000000000000000
+      Position.Y = 32.000000000000000000
+      Size.Width = 329.000000000000000000
+      Size.Height = 124.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 8
+    end
+    object GameKeyEdit: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akRight, akBottom]
+      TabOrder = 0
+      Position.X = 16.000000000000000000
+      Position.Y = 198.000000000000000000
+      Size.Width = 329.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      OnChangeTracking = GameKeyEditChangeTracking
+      object ClearGameKeyButton: TButton
+        Align = Right
+        Position.X = 304.000000000000000000
+        Size.Width = 25.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        StyleLookup = 'cleareditbutton'
+        TabOrder = 0
+        Text = 'ClearGameKeyButton'
+        OnClick = ClearGameKeyButtonClick
+      end
+    end
+    object Label2: TLabel
+      Anchors = [akLeft, akRight, akBottom]
+      Position.X = 16.000000000000000000
+      Position.Y = 178.000000000000000000
+      Size.Width = 169.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Or specify a game key'
+      TabOrder = 6
+    end
+    object LastCheckLabel: TLabel
+      Anchors = [akRight, akBottom]
+      StyledSettings = [Family, Size, Style]
+      Position.X = 104.000000000000000000
+      Position.Y = 164.000000000000000000
+      Size.Width = 240.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claDarkgray
+      TextSettings.HorzAlign = Trailing
+      Text = 'X'
+      TabOrder = 1
+    end
+  end
+  object Layout3: TLayout
+    Align = Bottom
+    Position.Y = 306.000000000000000000
+    Size.Width = 368.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    object JoinGameButton: TButton
+      Action = JoinGameAction
+      Align = Center
+      Enabled = True
+      ImageIndex = -1
+      TabOrder = 0
+    end
+  end
+  object ActionList1: TActionList
+    Left = 40
+    Top = 296
+    object JoinGameAction: TAction
+      Text = 'Join'
+      OnExecute = JoinGameActionExecute
+      OnUpdate = JoinGameActionUpdate
+    end
+  end
+end

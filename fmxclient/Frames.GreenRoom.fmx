@@ -1,7 +1,7 @@
 object GreenRoomFrame: TGreenRoomFrame
   Align = Client
   Size.Width = 362.000000000000000000
-  Size.Height = 342.000000000000000000
+  Size.Height = 359.000000000000000000
   Size.PlatformDefault = False
   object WaitLayout: TLayout
     Align = Top
@@ -57,15 +57,15 @@ object GreenRoomFrame: TGreenRoomFrame
     FooterAppearanceClassName = 'TListHeaderObjects'
     Align = Client
     Size.Width = 362.000000000000000000
-    Size.Height = 192.000000000000000000
+    Size.Height = 204.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
   end
   object Layout1: TLayout
     Align = Bottom
-    Position.Y = 292.000000000000000000
+    Position.Y = 304.000000000000000000
     Size.Width = 362.000000000000000000
-    Size.Height = 50.000000000000000000
+    Size.Height = 55.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
     object StartGameButton: TButton

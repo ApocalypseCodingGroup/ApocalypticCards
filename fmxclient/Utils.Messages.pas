@@ -12,8 +12,10 @@ type
 
   TCurrentViewChanged = class(TMessage<TAppView>);
   TGameUsersChanged = class(TMessage);
+  TGamesChanged = class(TMessage);
 
-  TPollingStopped = class(TMessage);
+  TUsersPollingStopped = class(TMessage);
+  TGamesPollingStopped = class(TMessage);
 
   TMessageHelper = class helper for TMessageBase
     procedure Send(const ASender: TObject);
