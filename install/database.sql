@@ -15,6 +15,8 @@ API/startjson?SessionID="hGASjsd6"&SessionName="Franks Game"&SessionPW=""&MinUse
 
 DROP TABLE IF EXISTS `tbl_users`;
 DROP TABLE IF EXISTS `tbl_games`;
+DROP TABLE IF EXISTS `tbl_answers`;
+DROP TABLE IF EXISTS `tbl_questions`;
 
 CREATE TABLE  `tbl_games` (
   `PKID` VARCHAR(40) NOT NULL,
@@ -43,12 +45,20 @@ CREATE TABLE `tbl_users` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
-DROP TABLE IF EXISTS tbl_questions;
+CREATE TABLE `tbl_answers` (
+  `PKID` VARCHAR(40) NOT NULL,
+  `str_type` VARCHAR(12) NOT NULL,
+  `str_answer` VARCHAR(200) NOT NULL,
+  PRIMARY KEY (`PKID`),
+  UNIQUE INDEX `PKID_UNIQUE` (`PKID` ASC) VISIBLE,
+  UNIQUE INDEX `str_answer_UNIQUE` (`str_answer` ASC) VISIBLE);
+
 CREATE TABLE tbl_questions (
-  str_pkid VARCHAR(40) NOT NULL,
+  PKID VARCHAR(40) NOT NULL,
   str_question TEXT NOT NULL,
   PRIMARY KEY (str_pkid)
 );
+
 
 /*
 API/Run?SessionID="hGASjsd6"
