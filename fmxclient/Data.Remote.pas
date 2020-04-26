@@ -25,6 +25,7 @@ type
     PollingForGamesTimer: TTimer;
     procedure PollingForUsersTimerTimer(Sender: TObject);
     procedure PollingForGamesTimerTimer(Sender: TObject);
+    procedure DataModuleCreate(Sender: TObject);
   private
     FPollingForUsers: Boolean;
     FPollingForGames: Boolean;
@@ -108,6 +109,7 @@ var
 begin
   LGameJSON := TJson.ObjectToJsonString(AGameData.AsObject);
 
+  GameRequest.Body.ClearBody;
   GameRequest.Body.Add(LGameJSON, ctAPPLICATION_JSON);
   GameRequest.ExecuteAsync(
     procedure
@@ -125,6 +127,13 @@ begin
      end
   );
 
+end;
+
+procedure TRemoteData.DataModuleCreate(Sender: TObject);
+begin
+  if paramstr(1)='debug' then begin
+    RESTClient1.BaseURL := 'http://localhost:8080';
+  end;
 end;
 
 procedure TRemoteData.JoinGame(const AUserName, ASessionID: string;

@@ -12,6 +12,9 @@
         <Projects Include="..\vclTestClient\vclTestClient.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\fmxclient\FMXClientProject.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +50,23 @@
     <Target Name="vclTestClient:Make">
         <MSBuild Projects="..\vclTestClient\vclTestClient.dproj" Targets="Make"/>
     </Target>
+    <Target Name="FMXClientProject">
+        <MSBuild Projects="..\fmxclient\FMXClientProject.dproj"/>
+    </Target>
+    <Target Name="FMXClientProject:Clean">
+        <MSBuild Projects="..\fmxclient\FMXClientProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FMXClientProject:Make">
+        <MSBuild Projects="..\fmxclient\FMXClientProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="CardDebug;mod_cardgame;vclTestClient"/>
+        <CallTarget Targets="CardDebug;mod_cardgame;vclTestClient;FMXClientProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;vclTestClient:Clean"/>
+        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;vclTestClient:Clean;FMXClientProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;vclTestClient:Make"/>
+        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;vclTestClient:Make;FMXClientProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
