@@ -1,3 +1,7 @@
 [submodule "dependencies/cwRuntime"]
 	path = dependencies/cwRuntime
 	url = https://github.com/chapmanworld/cwRuntime.git
+[submodule "dependencies/TFrameStand"]
+	path = dependencies/TFrameStand
+	url = https://github.com/andrea-magni/TFrameStand.git
+	branch = master
