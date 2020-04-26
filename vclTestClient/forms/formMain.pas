@@ -61,7 +61,8 @@ var
 
 implementation
 uses
-  cwCollections.Standard
+  System.Generics.Collections
+, cwCollections.Standard
 , datamodel.standard
 , System.Json
 , REST.JSON

@@ -24,6 +24,8 @@ object frmMain: TfrmMain
     TabOrder = 0
     object pgWelcome: TTabSheet
       Caption = 'pgWelcome'
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 281
       ExplicitHeight = 165
       object btnStartGame: TButton
@@ -158,6 +160,10 @@ object frmMain: TfrmMain
     object pgGreenRoom: TTabSheet
       Caption = 'pgGreenRoom'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object lblWaitingToStart: TLabel
         Left = 24
         Top = 16
