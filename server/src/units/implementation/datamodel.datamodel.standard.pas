@@ -192,11 +192,12 @@ begin
   GameData.MinUser     := Qry.FieldByName('MinUser').AsInteger;
   GameData.MaxUser     := Qry.FieldByName('MaxUser').AsInteger;
   GameData.Running     := Qry.FieldByName('Running').AsBoolean;
+  GameData.UserCount   := Qry.FieldByName('CurrentUsers').AsBoolean;
 end;
 
 function TDataModel.getGames: IList<IGameData>;
 const
-  cSQL = 'SELECT * from tbl_games WHERE LENGTH(SessionPW)<1 AND Running=0;';
+  cSQL = 'SELECT g.*,l.usercount FROM tbl_games g JOIN vw_LiveGames l ON g.pkid=l.pkid WHERE LENGTH(SessionPW)<1 AND Running=0;';
 var
   NewGameData: IGameData;
 begin

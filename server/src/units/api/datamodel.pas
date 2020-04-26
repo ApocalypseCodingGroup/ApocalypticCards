@@ -31,6 +31,7 @@ type
     function getMaxUser: integer;
     function getRunning: boolean;
     function getPassword: string;
+    function getUserCount: integer;
 
     //- Setters
     procedure setSessionID( const value: string );
@@ -40,6 +41,7 @@ type
     procedure setMaxUser( const value: integer );
     procedure setRunning( const value: boolean );
     procedure setPassword( const value: string );
+    procedure setUserCount( const value: integer );
 
     //- Properties
     property SessionPassword: string  read getPassword    write setPassword;
@@ -49,6 +51,7 @@ type
     property MinUser: integer         read getMinUser     write setMinUser;
     property MaxUser: integer         read getMaxUser     write setMaxUser;
     property Running: boolean         read getRunning     write setRunning;
+    property UserCount: integer       read getUserCount   write setUserCount;
   end;
 
   IUserData = interface( IGameDataObject )

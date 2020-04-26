@@ -16,7 +16,9 @@ type
     fMaxUser: integer;
     fSessionID: string;
     fRunning: boolean;
+    fUserCount: integer;
   strict private
+    function getUserCount: integer;
     function getSessionID: string;
     function getSessionName: string;
     function getLangID: string;
@@ -24,6 +26,7 @@ type
     function getMaxUser: integer;
     function getRunning: boolean;
     function getPassword: string;
+
     procedure setSessionID( const value: string );
     procedure setSessionName( const value: string );
     procedure setLangID( const value: string );
@@ -31,6 +34,7 @@ type
     procedure setMaxUser( const value: integer );
     procedure setRunning( const value: boolean );
     procedure setPassword( const value: string );
+    procedure setUserCount( const value: integer );
   public
   end;
 
@@ -74,6 +78,11 @@ begin
   Result := fSessionName;
 end;
 
+function TGameData.getUserCount: integer;
+begin
+  Result := fUserCount;
+end;
+
 procedure TGameData.setLangID(const value: string);
 begin
   fLangID := value;
@@ -107,6 +116,11 @@ end;
 procedure TGameData.setSessionName(const value: string);
 begin
   fSessionName := value;
+end;
+
+procedure TGameData.setUserCount(const value: integer);
+begin
+  fUserCount := Value;
 end;
 
 end.
