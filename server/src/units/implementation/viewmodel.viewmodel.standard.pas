@@ -12,6 +12,8 @@ type
   private
     fDataModel: IDataModel;
   strict private
+    procedure CleanUp;
+    procedure UpdateUserPing( const UserID: string );
     function getPublicGames: string;
     function CreateGame( const json: string ): string;
     function JoinGame( const json: string ): string;
@@ -34,6 +36,11 @@ uses
 ;
 
 { TViewModel }
+
+procedure TViewModel.CleanUp;
+begin
+  fDataModel.CleanUp;
+end;
 
 constructor TViewModel.Create(DataModel: IDataModel);
 begin
@@ -140,6 +147,11 @@ begin
   finally
     Result := _Result;
   end;
+end;
+
+procedure TViewModel.UpdateUserPing(const UserID: string);
+begin
+  fDataModel.UpdateUserPing(UserID);
 end;
 
 end.

@@ -46,30 +46,34 @@ begin
 
   ViewModel := TViewModel.Create;
   try
+    try
+      ViewModel.UpdateUserPing(AuthToken);
 
-    if not assigned(ViewModel) then begin
-      raise
-        Exception.Create('Game failed to initialize.');
-    end;
-
-    case Request.MethodType of
-
-      mtGet: begin
-        _Read(AuthToken, Response,Handled,ViewModel);
-      end; // read
-
-      mtPut: begin
-        _Update(AuthToken, Response,Handled,ViewModel);
-      end; // update
-
-      mtPost: begin
-        _Create(AuthToken, Response,Handled,ViewModel);
+      if not assigned(ViewModel) then begin
+        raise
+          Exception.Create('Game failed to initialize.');
       end;
-      mtDelete: begin
-        _Delete(AuthToken, Response,Handled,ViewModel);
-      end; // take a guess
-    end;
 
+      case Request.MethodType of
+
+        mtGet: begin
+          _Read(AuthToken, Response,Handled,ViewModel);
+        end; // read
+
+        mtPut: begin
+          _Update(AuthToken, Response,Handled,ViewModel);
+        end; // update
+
+        mtPost: begin
+          _Create(AuthToken, Response,Handled,ViewModel);
+        end;
+        mtDelete: begin
+          _Delete(AuthToken, Response,Handled,ViewModel);
+        end; // take a guess
+      end;
+    finally
+      ViewModel.CleanUp;
+    end;
   except
     on E: Exception do begin
       PrepareException( Response, E.Message );

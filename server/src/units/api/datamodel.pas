@@ -57,14 +57,17 @@ type
     function getUserID: string;
     function getName: string;
     function getGameID: string;
+    function getDeleted: boolean;
 
     //- Setters
     procedure setIsCurrentUser( const value: boolean );
     procedure setUserID( const value: string );
     procedure setName( const value: string );
     procedure setGameID( const value: string );
+    procedure setDeleted( const value: boolean );
 
     //- Properties
+    property Deleted: boolean       read getDeleted       write setDeleted;
     property IsCurrentUser: boolean read getIsCurrentUser write setIsCurrentUser;
     property UserID: string         read getUserID        write setUserID;
     property Name: string           read getName          write setName;
@@ -75,6 +78,8 @@ type
   IDataModel = interface
   ['{0C23B564-0030-4895-BF7C-88F910EFD825}']
 
+    procedure CleanUp;
+    procedure UpdateUserPing( const UserID: string );
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
     function FindGameByID(const GameID: string): IGameData;

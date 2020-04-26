@@ -14,6 +14,10 @@ type
    IViewModel = interface
      ['{B3C6E9B2-EDE2-4FD6-A99A-E987F06A3538}']
 
+     procedure CleanUp;
+
+     procedure UpdateUserPing( const UserID: string );
+
      /// <summary>
      ///   Returns a collection of public games waiting for users to join.
      /// </summary>

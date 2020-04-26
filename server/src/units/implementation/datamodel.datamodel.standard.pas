@@ -32,6 +32,8 @@ type
     function IsCurrentUser(const UserID, GameID: string): boolean;
     function getGameIDByUserID(const Key: string): string;
   strict private
+    procedure CleanUp;
+    procedure UpdateUserPing( const UserID: string );
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
     function FindGameByID(const GameID: string): IGameData;
@@ -75,7 +77,7 @@ end;
 
 procedure TDataModel.CreateUser(const NewUser: IUserData);
 const
-  cSQL = 'INSERT into tbl_users (PKID, FKGameID, Name) values (:PKID, :FKGameID, :Name);';
+  cSQL = 'INSERT into tbl_users (PKID, FKGameID, Name, Deleted, LastUpdate) values (:PKID, :FKGameID, :Name, FALSE, Now());';
 begin
   fQry.SQL.Text := cSQL;
   fQry.ParamByName('PKID').AsString := NewUser.UserID;
@@ -83,6 +85,15 @@ begin
   fQry.ParamByName('Name').AsString := NewUser.Name;
   fQry.ExecSQL;
   NewUser.IsCurrentUser := AddFirstUserToGame(NewUser.GameID,NewUser.UserID);
+end;
+
+procedure TDataModel.CleanUp;
+const
+  cSQLUserCleanup = 'DELETE FROM tbl_users WHERE LastUpdate<SUBTIME(Now(),''0 0:0:30.000000'');';
+  cSQLGameCleanup = 'DELETE FROM tbl_games WHERE pkid IN (SELECT pkid FROM vw_LiveGames WHERE UserCount=0);';
+begin
+  fConn.ExecSQL(cSQLUserCleanup);
+  fConn.ExecSQL(cSQLGameCleanup);
 end;
 
 constructor TDataModel.Create;
@@ -128,11 +139,7 @@ const
 begin
   fQry.SQL.Text := cSQL;
   fQry.Params.ParamByName('PkId').AsString := GameData.SessionID;
-  if GameData.Running then begin
-    fQry.Params.ParamByName('Running').AsInteger := 1;
-  end else begin
-    fQry.Params.ParamByName('Running').AsInteger := 0;
-  end;
+  fQry.Params.ParamByName('Running').AsBoolean := GameData.Running;
   fQry.Params.ParamByName('SessionName').AsString := GameData.SessionName;
   fQry.Params.ParamByName('LangId').AsString := GameData.LangID;
   fQry.Params.ParamByName('MinUser').AsInteger := GameData.MinUser;
@@ -231,9 +238,19 @@ begin
   UserData.Name   := Qry.FieldByName('Name').AsString;
   UserData.UserID := Qry.FieldByName('PKID').AsString;
   UserData.IsCurrentUser := IsCurrentUser( UserData.UserID, UserData.GameID );
+  UserData.Deleted := Qry.FieldByName('Deleted').AsBoolean;
   if not IncludeUID then begin
     UserData.UserID := '';
   end;
+end;
+
+procedure TDataModel.UpdateUserPing(const UserID: string);
+const
+  cSQL = 'UPDATE tbl_users SET LastUpdate=Now() WHERE PKID=:PKID;';
+begin
+  fQry.SQL.Text := cSQL;
+  fQry.ParamByName('PKID').AsString := UserID;
+  fQry.ExecSQL;
 end;
 
 function TDataModel.getGameIDByUserID(const Key: string): string;

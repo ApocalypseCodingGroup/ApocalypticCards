@@ -31,11 +31,12 @@ CREATE TABLE  `tbl_games` (
   PRIMARY KEY (`PKID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-
 CREATE TABLE `tbl_users` (
   `PKID` VARCHAR(40) NOT NULL,
   `FKGameID` VARCHAR(40) NOT NULL,
   `Name` VARCHAR(255) NULL,
+  `LastUpdate` TIMESTAMP,
+  `Deleted` TINYINT(1),
   PRIMARY KEY (`PKID`),
   CONSTRAINT `keyGames`
     FOREIGN KEY (`FKGameID`)
@@ -44,6 +45,9 @@ CREATE TABLE `tbl_users` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
+
+CREATE OR REPLACE VIEW vw_LiveGames AS
+  ( SELECT PKID, MinUser, (select count(*) from tbl_users u where u.FKGameID=g.pkid and u.Deleted<>1) usercount FROM tbl_games g where g.CurrentUser IS NOT NULL ORDER BY usercount asc );
 
 CREATE TABLE `tbl_answers` (
   `PKID` VARCHAR(40) NOT NULL,
