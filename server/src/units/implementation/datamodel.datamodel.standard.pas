@@ -192,7 +192,11 @@ begin
   GameData.MinUser     := Qry.FieldByName('MinUser').AsInteger;
   GameData.MaxUser     := Qry.FieldByName('MaxUser').AsInteger;
   GameData.Running     := Qry.FieldByName('Running').AsBoolean;
-  GameData.UserCount   := Qry.FieldByName('usercount').AsInteger;
+  if assigned(Qry.FindField('UserCount')) then begin
+    GameData.UserCount   := Qry.FieldByName('UserCount').AsInteger;
+  end else begin
+    GameData.UserCount   := -1;
+  end;
 end;
 
 function TDataModel.getGames: IList<IGameData>;
