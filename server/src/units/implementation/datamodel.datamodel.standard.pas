@@ -196,7 +196,7 @@ end;
 
 function TDataModel.getGames: IList<IGameData>;
 const
-  cSQL = 'SELECT * from tbl_games LENGTH(SessionPW)<1 AND Running=0;';
+  cSQL = 'SELECT * from tbl_games WHERE LENGTH(SessionPW)<1 AND Running=0;';
 var
   NewGameData: IGameData;
 begin
