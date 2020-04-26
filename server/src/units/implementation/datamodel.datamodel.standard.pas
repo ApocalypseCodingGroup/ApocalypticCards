@@ -196,7 +196,7 @@ end;
 
 function TDataModel.getGames: IList<IGameData>;
 const
-  cSQL = 'SELECT * from tbl_games;';
+  cSQL = 'SELECT * from tbl_games LENGTH(SessionPW)<1 AND Running=0;';
 var
   NewGameData: IGameData;
 begin
@@ -271,7 +271,7 @@ end;
 
 function TDataModel.getUsers(const Key: string): IList<IUserData>;
 const
-  cSQL = 'SELECT * FROM tbl_users WHERE FKGameID=:GameID AND LENGTH(sessionPW)<1 AND Running=0;';
+  cSQL = 'SELECT * FROM tbl_users WHERE FKGameID=:GameID;';
 var
   NewUserData: IUserData;
   GameID: string;
