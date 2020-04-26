@@ -1,5 +1,6 @@
 object RemoteData: TRemoteData
   OldCreateOrder = False
+  OnCreate = DataModuleCreate
   Height = 399
   Width = 759
   object RESTClient1: TRESTClient
