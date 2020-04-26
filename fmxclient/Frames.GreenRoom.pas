@@ -105,7 +105,7 @@ begin
         + ' open slots remaining'
     else // waiting users to join
       WaitMessageLabel.Text :=
-          'Waiting for ' + MainData.CurrentGame.MinUser.ToString
+          'Waiting for ' + (MainData.CurrentGame.MinUser - MainData.GameUsers.Count).ToString
         + ' players to join ' + MainData.CurrentGame.SessionName.QuotedString;
 
 

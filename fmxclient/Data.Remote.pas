@@ -142,13 +142,14 @@ begin
     begin
       MainData.UserData := TJson.JsonToObject<TUserData>(UsersResponse.Content);
 
-      MainData.Games.ForEach(
-        procedure (const game: IGameData)
-        begin
-          if (MainData.CurrentGame <> game) and (game.SessionID = ASessionID) then
-            MainData.CurrentGame := game;
-        end
-      );
+      if Assigned(MainData.Games) then
+        MainData.Games.ForEach(
+          procedure (const game: IGameData)
+          begin
+            if (MainData.CurrentGame <> game) and (game.SessionID = ASessionID) then
+              MainData.CurrentGame := game;
+          end
+        );
 
       if Assigned(AOnSuccess) then
         AOnSuccess();
@@ -177,6 +178,7 @@ begin
   , procedure (AObj: TObject)
     begin
       // do nothing on error
+
     end
   );
 end;

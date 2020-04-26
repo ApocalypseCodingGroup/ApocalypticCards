@@ -39,8 +39,8 @@ object JoinFrame: TJoinFrame
       TabOrder = 7
     end
     object GamesListView: TListView
-      ItemAppearanceClassName = 'TListItemAppearance'
-      ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+      ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+      ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
       HeaderAppearanceClassName = 'TListHeaderObjects'
       FooterAppearanceClassName = 'TListHeaderObjects'
       Anchors = [akLeft, akTop, akRight, akBottom]
@@ -106,9 +106,11 @@ object JoinFrame: TJoinFrame
     TabOrder = 6
     object JoinGameButton: TButton
       Action = JoinGameAction
-      Align = Center
+      Anchors = [akLeft, akTop, akRight]
       Enabled = True
       ImageIndex = -1
+      Position.X = 264.000000000000000000
+      Position.Y = 14.000000000000000000
       TabOrder = 0
     end
   end

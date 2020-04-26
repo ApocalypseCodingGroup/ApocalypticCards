@@ -141,6 +141,7 @@ begin
       begin
         LItem := GamesListView.Items.Add;
         LItem.Text := game.SessionName;
+        LItem.Detail := game.UserCount.ToString + '/' + game.MinUser.ToString;
         LItem.Data['SessionID'] := game.SessionID; // borderline
 
         if game.SessionID = LPreviouslySelectedSessionID then
