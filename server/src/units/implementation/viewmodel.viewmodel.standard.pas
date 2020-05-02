@@ -18,6 +18,7 @@ type
     function CreateGame( const json: string ): string;
     function JoinGame( const json: string ): string;
     function getUsers( const AuthToken: string ): string;
+    function setGameState( AuthToken: string; const json: string ): string;
   private
     function ListToJSON( const value: IList<IGameDataObject> ): string;
     procedure ValidateUserCount(const GameData: IGameData);
@@ -81,7 +82,7 @@ begin
       NewGame.SessionPassword := NewGame.SessionPassword + chr( cStartPasswordChar+Random(cPasswordCharRange) );
     end;
   end;
-  NewGame.Running := False;
+  NewGame.GameState := gsGreenRoom;
   //- Load and validate min/max user
   ValidateUserCount(NewGame);
   //- Return game
@@ -147,6 +148,14 @@ begin
   finally
     Result := _Result;
   end;
+end;
+
+function TViewModel.setGameState(AuthToken: string; const json: string): string;
+var
+  GameData: IGameData;
+begin
+  GameData := TJSON.JsonToObject<TGameData>(json);
+  Result := fDataModel.setGameState(AuthToken,GameData);
 end;
 
 procedure TViewModel.UpdateUserPing(const UserID: string);

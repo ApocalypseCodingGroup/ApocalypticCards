@@ -40,7 +40,11 @@ begin
     end,
 
     // Update
-    nil,
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    begin
+      Response.Content := ViewModel.setGameState( AuthToken, Request.Content );
+    end,
+
 
     // Delete
     nil

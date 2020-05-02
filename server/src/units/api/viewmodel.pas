@@ -55,6 +55,11 @@ type
      /// </summary>
      function getUsers( const AuthToken: string ): string;
 
+     ///  <summary>
+     ///    Progress the game state.
+     ///  </summary>
+     function setGameState( AuthToken: string; const json: string ): string;
+
    end;
 
 implementation

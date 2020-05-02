@@ -14,18 +14,24 @@ type
     fName: string;
     fGameID: string;
     fIsCurrentUser: boolean;
+    fScore: Integer;
+    fPlayerState: TPlayerState;
   strict private //- IUserData -//
     function getIsCurrentUser: boolean;
     function getUserID: string;
     function getName: string;
     function getGameID: string;
     function getDeleted: boolean;
+    function getPlayerState: TPlayerState;
+    function getScore: integer;
 
     procedure setIsCurrentUser( const value: boolean );
     procedure setUserID( const value: string );
     procedure setName( const value: string );
     procedure setGameID( const value: string );
     procedure setDeleted( const value: boolean );
+    procedure setPlayerState( const value: TPlayerState );
+    procedure setScore( const value: integer );
   end;
 
 implementation
@@ -52,6 +58,16 @@ begin
   Result := fName;
 end;
 
+function TUserData.getPlayerState: TPlayerState;
+begin
+  Result := fPlayerState;
+end;
+
+function TUserData.getScore: integer;
+begin
+  Result := fScore;
+end;
+
 function TUserData.getUserID: string;
 begin
   Result := fUserID;
@@ -75,6 +91,16 @@ end;
 procedure TUserData.setName(const value: string);
 begin
   fName := Value;
+end;
+
+procedure TUserData.setPlayerState(const value: TPlayerState);
+begin
+  fPlayerState := value;
+end;
+
+procedure TUserData.setScore(const value: integer);
+begin
+  fScore := value;
 end;
 
 procedure TUserData.setUserID(const value: string);

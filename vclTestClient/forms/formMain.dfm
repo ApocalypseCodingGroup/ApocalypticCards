@@ -11,6 +11,8 @@ object frmMain: TfrmMain
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -19,12 +21,11 @@ object frmMain: TfrmMain
     Top = 0
     Width = 684
     Height = 479
-    ActivePage = pgWelcome
+    ActivePage = pgGreenRoom
     Align = alClient
     TabOrder = 0
     object pgWelcome: TTabSheet
       Caption = 'pgWelcome'
-      ExplicitHeight = 451
       object btnStartGame: TButton
         Left = 224
         Top = 88
@@ -41,15 +42,12 @@ object frmMain: TfrmMain
         Height = 41
         Caption = 'Join Existing Game'
         TabOrder = 1
+        OnClick = btnJoinGameClick
       end
     end
     object pgCreateGame: TTabSheet
       Caption = 'pgCreateGame'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = -16
-      ExplicitWidth = 609
-      ExplicitHeight = 373
       object Label1: TLabel
         Left = 207
         Top = 29
@@ -157,7 +155,8 @@ object frmMain: TfrmMain
     object pgGreenRoom: TTabSheet
       Caption = 'pgGreenRoom'
       ImageIndex = 2
-      ExplicitHeight = 451
+      ExplicitLeft = 0
+      ExplicitTop = 28
       object lblWaitingToStart: TLabel
         Left = 24
         Top = 16
@@ -179,6 +178,74 @@ object frmMain: TfrmMain
         Height = 241
         ItemHeight = 13
         TabOrder = 0
+        OnDblClick = btnStartGame2Click
+      end
+      object btnStartGame2: TButton
+        Left = 334
+        Top = 336
+        Width = 75
+        Height = 25
+        Caption = 'Start Game'
+        TabOrder = 1
+        OnClick = btnStartGame2Click
+      end
+    end
+    object pgJoinGame: TTabSheet
+      Caption = 'pgJoinGame'
+      ImageIndex = 3
+      object Label4: TLabel
+        Left = 72
+        Top = 72
+        Width = 67
+        Height = 13
+        Caption = 'Select a game'
+      end
+      object Label6: TLabel
+        Left = 56
+        Top = 346
+        Width = 71
+        Height = 13
+        Caption = 'Or Specify Key'
+      end
+      object Label7: TLabel
+        Left = 72
+        Top = 18
+        Width = 51
+        Height = 13
+        Caption = 'Your name'
+      end
+      object lstAvailGames: TListBox
+        Left = 88
+        Top = 91
+        Width = 257
+        Height = 249
+        ItemHeight = 13
+        TabOrder = 0
+        OnDblClick = btnJoinClick
+      end
+      object Edit1: TEdit
+        Left = 88
+        Top = 365
+        Width = 257
+        Height = 21
+        TabOrder = 1
+      end
+      object btnJoin: TButton
+        Left = 270
+        Top = 400
+        Width = 75
+        Height = 25
+        Caption = 'Join'
+        TabOrder = 2
+        OnClick = btnJoinClick
+      end
+      object edtPlayerName2: TEdit
+        Left = 88
+        Top = 37
+        Width = 257
+        Height = 21
+        TabOrder = 3
+        Text = 'Elon Musk'
       end
     end
   end
@@ -195,7 +262,7 @@ object frmMain: TfrmMain
     Top = 144
   end
   object client: TRESTClient
-    BaseURL = 'http://localhost:8080/'
+    BaseURL = 'https://apocalypse.chapmanworld.com/api'
     Params = <>
     Left = 632
     Top = 32
@@ -204,7 +271,14 @@ object frmMain: TfrmMain
     Enabled = False
     Interval = 3000
     OnTimer = tmrPollUsersTimer
-    Left = 632
-    Top = 208
+    Left = 576
+    Top = 88
+  end
+  object tmrAvailGames: TTimer
+    Enabled = False
+    Interval = 3000
+    OnTimer = tmrAvailGamesTimer
+    Left = 576
+    Top = 32
   end
 end

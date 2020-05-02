@@ -36,22 +36,40 @@ type
     Label5: TLabel;
     lstPlayers: TListBox;
     tmrPollUsers: TTimer;
+    pgJoinGame: TTabSheet;
+    lstAvailGames: TListBox;
+    Label4: TLabel;
+    Label6: TLabel;
+    Edit1: TEdit;
+    btnJoin: TButton;
+    Label7: TLabel;
+    edtPlayerName2: TEdit;
+    tmrAvailGames: TTimer;
+    btnStartGame2: TButton;
     procedure btnStartGameClick(Sender: TObject);
     procedure btnCreateGameClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure tmrPollUsersTimer(Sender: TObject);
+    procedure btnJoinGameClick(Sender: TObject);
+    procedure tmrAvailGamesTimer(Sender: TObject);
+    procedure btnJoinClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure btnStartGame2Click(Sender: TObject);
   private
     procedure SwitchPage(const PageName: string);
     procedure ClearRequest;
     procedure ExecuteRequest;
     { Private declarations }
   private
+    fJoinGames: IList<IGameData>;
     fGame: IGameData;
     fUser: IUserData;
     procedure DoEnterGreenRoom;
     function RequestUsers: IList<IUserData>;
     procedure AddRequestAuthentication;
     procedure UpdateGreenRoomPlayers;
+    procedure RefreashGames;
   public
     { Public declarations }
   end;
@@ -90,9 +108,45 @@ begin
   if not Switched then begin
     exit;
   end;
+  //- Do stuff on switch page.
   if utPageName = 'PGGREENROOM' then begin
+    btnStartGame2.Enabled := fUser.IsCurrentUser;
     DoEnterGreenRoom;
   end;
+  if utPageName = 'PGJOINGAME' then begin
+    edtPlayerName2.Text := Format('Elon Musk %s',[FormatDateTime('MMSS',Now)]);
+    RefreashGames;
+    tmrAvailGames.Enabled := True;
+  end;
+end;
+
+procedure TfrmMain.RefreashGames;
+var
+  idx: nativeuint;
+  JSONArray: TJSONArray;
+  GameIdx: nativeuint;
+begin
+  ClearRequest;
+  req.Resource := 'games';
+  req.Method := TRestRequestMethod.rmGET;
+  ExecuteRequest;
+  JSONArray := TJSONObject.ParseJSONValue(TEncoding.ASCII.GetBytes(resp.content),0) as TJSONArray;
+  if JSONArray.Size=0 then begin
+    exit;
+  end;
+  lstAvailGames.Clear;
+  fJoinGames.Clear;
+  for idx := 0 to pred(JSONArray.Count) do begin
+    GameIdx := fJoinGames.Add(TJSON.JsonToObject<TGameData>(JSONArray.Get(idx).ToJSON));
+    lstAvailGames.AddItem(fJoinGames[GameIdx].SessionName,nil);
+  end;
+end;
+
+procedure TfrmMain.tmrAvailGamesTimer(Sender: TObject);
+begin
+  tmrAvailGames.Enabled := False;
+  RefreashGames;
+  tmrAvailGames.Enabled := True;
 end;
 
 procedure TfrmMain.tmrPollUsersTimer(Sender: TObject);
@@ -167,12 +221,26 @@ begin
       lblWaitingToStart.Caption := 'Waiting for sufficient players and for '+Users[idx].Name+' to start the game...';
     end;
   end;
+  btnStartGame2.Enabled := fUser.IsCurrentUser;
 end;
 
 procedure TfrmMain.DoEnterGreenRoom;
 begin
   UpdateGreenRoomPlayers;
   tmrPollUsers.Enabled := True;
+end;
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+  if paramstr(1)='debug' then begin
+    client.BaseURL := 'http://localhost:8080';
+  end;
+  fJoinGames := TList<IGameData>.Create;
+end;
+
+procedure TfrmMain.FormDestroy(Sender: TObject);
+begin
+  fJoinGames := nil;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -217,6 +285,54 @@ begin
   fUser := TJSON.JsonToObject<TUserData>(resp.Content);
 
   SwitchPage('pgGreenRoom');
+end;
+
+procedure TfrmMain.btnJoinClick(Sender: TObject);
+begin
+  if lstAvailGames.ItemIndex<0 then begin
+    exit;
+  end;
+  tmrAvailGames.Enabled := False;
+  fGame := fJoinGames[lstAvailGames.ItemIndex];
+
+  // Create user data
+  fUser := TUserData.Create;
+  fUser.Name := edtPlayerName2.Text;
+  fUser.GameID := fGame.SessionID;
+
+  // Create user request.
+  ClearRequest;
+  req.Resource := '/users';
+  req.Method := TRestRequestMethod.rmPOST;
+  req.Body.Add(fUser.ToJSON,TRestContentType.ctAPPLICATION_JSON);
+  ExecuteRequest;
+  fUser := TJSON.JsonToObject<TUserData>(resp.Content);
+
+  SwitchPage('pgGreenRoom');
+end;
+
+procedure TfrmMain.btnJoinGameClick(Sender: TObject);
+begin
+  SwitchPage('pgJoinGame');
+end;
+
+procedure TfrmMain.btnStartGame2Click(Sender: TObject);
+begin
+  fGame.GameState := TGameState.gsRunning;
+  // Create user request.
+  ClearRequest;
+  AddRequestAuthentication;
+  req.Resource := '/games';
+  req.Method := TRestRequestMethod.rmPUT;
+  req.Body.Add(fGame.ToJSON,TRestContentType.ctAPPLICATION_JSON);
+  ExecuteRequest;
+  fGame := TJSON.JsonToObject<TGameData>(resp.Content);
+  if fGame.GameState=TGameState.gsRunning then begin
+    ShowMessage(resp.Content);
+  end else begin
+    ShowMessage('Game did not start - Number of required users not met.');
+    ShowMessage(resp.Content);
+  end;
 end;
 
 procedure TfrmMain.btnStartGameClick(Sender: TObject);

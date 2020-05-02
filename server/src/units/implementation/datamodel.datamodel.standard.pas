@@ -31,6 +31,10 @@ type
     function AddFirstUserToGame(const GameID, UserID: string): boolean;
     function IsCurrentUser(const UserID, GameID: string): boolean;
     function getGameIDByUserID(const Key: string): string;
+    function TransitionGameToRunning(const GameData: IGameData): string;
+    function ValidateUserCount( const GameData: IGameData; out UserCount: integer ): boolean;
+    procedure AllocateAnswers( const GameData: IGameData; const Users: array of string; const RequiredAnswers: Integer );
+    procedure AllocateQuestions( const GameData: IGameData; const RequiredQuestions: Integer );
   strict private
     procedure CleanUp;
     procedure UpdateUserPing( const UserID: string );
@@ -40,6 +44,7 @@ type
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
     function getUsers(const Key: string): IList<IUserData>;
+    function setGameState(AuthToken: string; const GameData: IGameData): string;
   public
     constructor Create; reintroduce;
   end;
@@ -90,7 +95,7 @@ end;
 procedure TDataModel.CleanUp;
 const
   cSQLUserCleanup = 'DELETE FROM tbl_users WHERE LastUpdate<SUBTIME(Now(),''0 0:0:30.000000'');';
-  cSQLGameCleanup = 'DELETE FROM tbl_games WHERE pkid IN (SELECT pkid FROM vw_LiveGames WHERE UserCount=0);';
+  cSQLGameCleanup = 'DELETE FROM tbl_games WHERE pkid IN (SELECT pkid FROM vw_livegames WHERE UserCount=0);';
 begin
   fConn.ExecSQL(cSQLUserCleanup);
   fConn.ExecSQL(cSQLGameCleanup);
@@ -135,11 +140,11 @@ end;
 
 function TDataModel.CreateGame(const GameData: IGameData): boolean;
 const
-  cSQL = 'insert into tbl_games (PkId,Running,SessionName,LangId,MinUser,MaxUser,LastUpdate) values ( :PkId, :Running, :SessionName, :LangId, :MinUser, :MaxUser, :LastUpdate );';
+  cSQL = 'insert into tbl_games (PkId,GameState,SessionName,LangId,MinUser,MaxUser,LastUpdate) values ( :PkId, :GameState, :SessionName, :LangId, :MinUser, :MaxUser, :LastUpdate );';
 begin
   fQry.SQL.Text := cSQL;
   fQry.Params.ParamByName('PkId').AsString := GameData.SessionID;
-  fQry.Params.ParamByName('Running').AsBoolean := GameData.Running;
+  fQry.Params.ParamByName('GameState').AsInteger := Integer(GameData.GameState);
   fQry.Params.ParamByName('SessionName').AsString := GameData.SessionName;
   fQry.Params.ParamByName('LangId').AsString := GameData.LangID;
   fQry.Params.ParamByName('MinUser').AsInteger := GameData.MinUser;
@@ -191,7 +196,7 @@ begin
   GameData.LangID      := Qry.FieldByName('LangID').AsString;
   GameData.MinUser     := Qry.FieldByName('MinUser').AsInteger;
   GameData.MaxUser     := Qry.FieldByName('MaxUser').AsInteger;
-  GameData.Running     := Qry.FieldByName('Running').AsBoolean;
+  GameData.GameState   := TGameState(Qry.FieldByName('GameState').AsInteger);
   if assigned(Qry.FindField('UserCount')) then begin
     GameData.UserCount   := Qry.FieldByName('UserCount').AsInteger;
   end else begin
@@ -201,7 +206,7 @@ end;
 
 function TDataModel.getGames: IList<IGameData>;
 const
-  cSQL = 'SELECT g.*,l.usercount FROM tbl_games g JOIN vw_LiveGames l ON g.pkid=l.pkid WHERE LENGTH(SessionPW)<1 AND Running=0;';
+  cSQL = 'SELECT g.*,l.usercount FROM tbl_games g JOIN vw_livegames l ON g.pkid=l.pkid WHERE LENGTH(SessionPW)<1 AND GameState=0;';
 var
   NewGameData: IGameData;
 begin
@@ -239,13 +244,157 @@ end;
 
 procedure TDataModel.QueryToUserData( const Qry: TFDQuery; const UserData: IUserData; const IncludeUID: boolean = FALSE );
 begin
-  UserData.GameID := Qry.FieldByName('FKGameID').AsString;
-  UserData.Name   := Qry.FieldByName('Name').AsString;
-  UserData.UserID := Qry.FieldByName('PKID').AsString;
-  UserData.IsCurrentUser := IsCurrentUser( UserData.UserID, UserData.GameID );
+  UserData.GameID  := Qry.FieldByName('FKGameID').AsString;
+  UserData.Name    := Qry.FieldByName('Name').AsString;
+  UserData.UserID  := Qry.FieldByName('PKID').AsString;
   UserData.Deleted := Qry.FieldByName('Deleted').AsBoolean;
+  UserData.Score   := Qry.FieldByName('Score').AsInteger;
+  UserData.PlayerState := TPlayerState(Qry.FieldByName('PlayerState').AsInteger);
+  UserData.IsCurrentUser := IsCurrentUser( UserData.UserID, UserData.GameID );
   if not IncludeUID then begin
     UserData.UserID := '';
+  end;
+end;
+
+function TDataModel.ValidateUserCount( const GameData: IGameData; out UserCount: integer ): boolean;
+const
+  cSQL = 'select usercount from vw_livegames where pkid=:PKID;';
+var
+  tmpQry: TFDQuery;
+begin
+  Result := False;
+  tmpQry := TFDQuery.Create(nil);
+  try
+    tmpQry.Connection := fConn;
+    tmpQry.SQL.Text := cSQL;
+    tmpQry.ParamByName('PKID').AsString := GameData.SessionID;
+    tmpQry.Active := True;
+    tmpQry.First;
+    if tmpQry.EOF then begin
+      exit;
+    end;
+    UserCount := tmpQry.FieldByName('usercount').AsInteger;
+    Result := (UserCount>=GameData.MinUser) and (UserCount<=GameData.MaxUser);
+    tmpQry.Active := False;
+  finally
+    tmpQry.Free;
+  end;
+end;
+
+procedure TDataModel.AllocateQuestions( const GameData: IGameData; const RequiredQuestions: Integer );
+const
+  cSrcSQL = 'SELECT * FROM tbl_questions ORDER BY RAND() LIMIT :RequiredQuestions';
+  cTgtSQL = 'INSERT INTO tbl_gamequestions (PKID, FKGameID, FKQuestionID) VALUES (:PKID, :FKGameID, :FKQuestionID);';
+var
+  RemainingRequired: Integer;
+  GUID: TGUID;
+  strGUID: string;
+  src: TFDQuery;
+  tgt: TFDQuery;
+begin
+  RemainingRequired := RequiredQuestions;
+  src := TFDQuery.Create(nil);
+  tgt := TFDQuery.Create(nil);
+  try
+    src.Connection := fConn;
+    tgt.Connection := fConn;
+    src.SQL.Text := cSrcSQL;
+    tgt.SQL.Text := cTgtSQL;
+    tgt.ParamByName('FKGameID').AsString := GameData.SessionID;
+    while RemainingRequired>0 do begin
+      src.ParamByName('RequiredQuestions').AsInteger := RemainingRequired;
+      src.Active := True;
+      src.First;
+      while not src.Eof do begin
+        CreateGUID(GUID);
+        strGUID := GUIDToString(GUID);
+        tgt.ParamByName('PKID').AsString := strGUID;
+        tgt.ParamByName('FKQuestionID').AsString := src.FieldByName('PKID').AsString;
+        if trim(GameData.CurrentQuestion)='' then begin
+          GameData.CurrentQuestion := strGUID;
+        end;
+        tgt.ExecSQL;
+        src.Next;
+        dec(RemainingRequired);
+      end;
+    end;
+  finally
+    tgt.DisposeOf;
+    src.DisposeOf;
+  end;
+end;
+
+procedure TDataModel.AllocateAnswers( const GameData: IGameData; const Users: array of string; const RequiredAnswers: Integer );
+begin
+
+end;
+
+function TDataModel.TransitionGameToRunning( const GameData: IGameData ): string;
+var
+  UserCount: Integer;
+  RequiredQuestions: Integer;
+  RequiredAnswers: Integer;
+begin
+  // Validate min/max users
+  try
+    if not ValidateUserCount(GameData, UserCount) then begin
+      exit;
+    end;
+    // Allocate initial hands of questions and answers
+    RequiredQuestions := (cGameRounds * UserCount);
+    RequiredAnswers := (succ(cGameRounds)*UserCount) + (UserCount * cCardsPerHand);
+    AllocateQuestions( GameData, RequiredQuestions );
+  //  AllocateAnswers( GameData, RequiredAnswers );
+    // Assign current question
+    // Set all users that are not current user to psPlayerSubmitting
+    // Set the current user to psJudgeWaitingForSubmit
+  finally
+    Result := GameData.ToJSON;
+  end;
+end;
+
+function TDataModel.setGameState(AuthToken: string; const GameData: IGameData): string;
+var
+  AuthorizedGameID: string;
+  ExistingGame: IGameData;
+begin
+  AuthorizedGameID := getGameIDByUserID( AuthToken );
+  if (AuthorizedGameID<>GameData.SessionID) or
+     (Trim(AuthorizedGameID)='') or
+     (Trim(GameData.SessionID)='') then begin
+    raise
+      Exception.Create('You do not have permission to edit this game. STOP TRYING TO CHEAT!!!');
+  end;
+  ExistingGame := FindGameByID(AuthorizedGameID);
+  if not assigned(ExistingGame) then begin
+    raise
+      Exception.Create('This is one of those errors which should not be possible, and should not even have a message about it.');
+  end;
+  case GameData.GameState of
+    gsGreenRoom: begin
+      raise
+        Exception.Create('The game may not transition back to the green room.');
+    end;
+    gsRunning: begin
+      if ExistingGame.GameState<>gsGreenRoom then begin
+        raise
+          Exception.Create('Cannot transition game to running state.');
+      end;
+      //- Trigger change to running state.
+      Result := TransitionGameToRunning(ExistingGame);
+    end;
+    gsNextTurn: begin
+      raise
+        Exception.Create('Not yet implemented.');
+    end;
+    gsGameOver: begin
+      raise
+        Exception.Create('Not yet implemented.');
+    end;
+    else begin
+      raise
+        Exception.Create('Unknown game state.');
+    end;
   end;
 end;
 
