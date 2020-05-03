@@ -61,7 +61,7 @@ const
   {$ifdef DEBUG}
   cDatabaseIni = '.\cardgame.ini';
   {$else}
-  cDatabaseIni = '/var/www/apocalypse/https/private/cardgame.ini';
+  cDatabaseIni = '/etc/apocalypsecards/cardgame.ini';
   {$endif}
 
 function TDataModel.AddFirstUserToGame(const GameID: string; const UserID: string): boolean;
