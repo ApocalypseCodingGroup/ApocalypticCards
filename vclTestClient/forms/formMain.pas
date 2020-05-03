@@ -46,6 +46,10 @@ type
     edtPlayerName2: TEdit;
     tmrAvailGames: TTimer;
     btnStartGame2: TButton;
+    pgJudging: TTabSheet;
+    pgSubmitting: TTabSheet;
+    Panel1: TPanel;
+    Panel2: TPanel;
     procedure btnStartGameClick(Sender: TObject);
     procedure btnCreateGameClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -112,11 +116,19 @@ begin
   if utPageName = 'PGGREENROOM' then begin
     btnStartGame2.Enabled := fUser.IsCurrentUser;
     DoEnterGreenRoom;
-  end;
+  end else
   if utPageName = 'PGJOINGAME' then begin
     edtPlayerName2.Text := Format('Elon Musk %s',[FormatDateTime('MMSS',Now)]);
     RefreashGames;
     tmrAvailGames.Enabled := True;
+  end else
+  if utPageName='PGJUDGING' then begin
+    tmrAvailGames.Enabled := False;
+    tmrPollUsers.Enabled := False;
+  end else
+  if utPageName='PGSUBMITTING' then begin
+    tmrAvailGames.Enabled := False;
+    tmrPollUsers.Enabled := False;
   end;
 end;
 
@@ -217,6 +229,22 @@ begin
   end;
   for idx := 0 to pred(Users.Count) do begin
     lstPlayers.Items.Add(Users[idx].Name);
+    // If my state changed to an in-game state, switch tabs
+    if (Users[idx].UserID = fUser.UserID) and
+       (Users[idx].PlayerState <> TPlayerState.psInGreenRoom) then begin
+      tmrPollUsers.Enabled := False;
+      fUser := Users[idx];
+      case fUser.PlayerState of
+        psJudgeWaitingForSubmit: begin
+          SwitchPage('pgJudging');
+        end;
+        psPlayerSubmitting: begin
+          SwitchPage('pgSubmitting');
+        end;
+      end;
+      exit;
+    end;
+    //- Otherwise...
     if Users[idx].IsCurrentUser then begin
       lblWaitingToStart.Caption := 'Waiting for sufficient players and for '+Users[idx].Name+' to start the game...';
     end;
@@ -328,10 +356,11 @@ begin
   ExecuteRequest;
   fGame := TJSON.JsonToObject<TGameData>(resp.Content);
   if fGame.GameState=TGameState.gsRunning then begin
-    ShowMessage(resp.Content);
+    fGame := TJSON.JsonToObject<TGameData>(resp.Content);
+    ShowMessage('Game started');
+    UpdateGreenRoomPlayers;
   end else begin
     ShowMessage('Game did not start - Number of required users not met.');
-    ShowMessage(resp.Content);
   end;
 end;
 

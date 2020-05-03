@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 684
     Height = 479
-    ActivePage = pgGreenRoom
+    ActivePage = pgSubmitting
     Align = alClient
     TabOrder = 0
     object pgWelcome: TTabSheet
@@ -155,8 +155,6 @@ object frmMain: TfrmMain
     object pgGreenRoom: TTabSheet
       Caption = 'pgGreenRoom'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 28
       object lblWaitingToStart: TLabel
         Left = 24
         Top = 16
@@ -246,6 +244,38 @@ object frmMain: TfrmMain
         Height = 21
         TabOrder = 3
         Text = 'Elon Musk'
+      end
+    end
+    object pgJudging: TTabSheet
+      Caption = 'pgJudging'
+      ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 28
+      object Panel1: TPanel
+        Left = 248
+        Top = 208
+        Width = 217
+        Height = 137
+        Caption = 'Panel1'
+        Color = clLime
+        ParentBackground = False
+        TabOrder = 0
+      end
+    end
+    object pgSubmitting: TTabSheet
+      Caption = 'pgSubmitting'
+      ImageIndex = 5
+      ExplicitLeft = 8
+      ExplicitTop = 28
+      object Panel2: TPanel
+        Left = 224
+        Top = 176
+        Width = 217
+        Height = 137
+        Caption = 'Panel1'
+        Color = clMaroon
+        ParentBackground = False
+        TabOrder = 0
       end
     end
   end

@@ -24,6 +24,11 @@ type
     function ToJSON: string;
   end;
 
+  TGameCardState = (
+    csOnDeck,
+    csInHand,
+    csDiscarded
+  );
 
   TGameState = (
     gsGreenRoom,  //- Waiting for players to join
@@ -115,8 +120,10 @@ type
     function FindGameByID(const GameID: string): IGameData;
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
-    function getUsers(const AuthToken: string): IList<IUserData>;
+    function getUsers(const Key: string): IList<IUserData>;
     function setGameState(AuthToken: string; const GameData: IGameData): string;
+    procedure UpdateUser(const User: IUserData);
+    procedure UpdateGame(const Game: IGameData);
 
   end;
 

@@ -103,6 +103,14 @@ var
   UserList: IList<IUserData>;
 begin
   UserList := fDataModel.getUsers( AuthToken );
+  UserList.ForEach(
+    procedure ( const Item: IUserData )
+    begin
+      if Item.UserID<>AuthToken then begin
+        Item.UserID := '';
+      end;
+    end
+  );
   Result := ListToJSON(UserList as IList<IGameDataObject>);
 end;
 
