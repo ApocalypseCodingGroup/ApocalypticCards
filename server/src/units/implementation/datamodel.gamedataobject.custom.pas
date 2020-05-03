@@ -9,7 +9,8 @@ type
   TGameDataObject = class( TInterfacedObject, IGameDataObject )
   strict private
     function AsObject: TObject;
-    function ToJSON: string;
+  protected
+    function ToJSON: string; virtual;
   end;
 
 implementation

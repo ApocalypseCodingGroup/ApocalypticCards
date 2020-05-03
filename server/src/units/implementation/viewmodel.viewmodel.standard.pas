@@ -19,6 +19,7 @@ type
     function JoinGame( const json: string ): string;
     function getUsers( const AuthToken: string ): string;
     function setGameState( AuthToken: string; const json: string ): string;
+    function getCurrentTurn( AuthToken: string ): string;
   private
     function ListToJSON( const value: IList<IGameDataObject> ): string;
     procedure ValidateUserCount(const GameData: IGameData);
@@ -88,6 +89,14 @@ begin
   //- Return game
   fDataModel.CreateGame(NewGame);
   Result := NewGame.ToJSON;
+end;
+
+function TViewModel.getCurrentTurn(AuthToken: string): string;
+var
+  Turn: ITurnData;
+begin
+  Turn := fDataModel.getCurrentTurn( AuthToken );
+  Result := Turn.ToJSON;
 end;
 
 function TViewModel.getPublicGames: string;

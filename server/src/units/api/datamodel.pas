@@ -27,6 +27,8 @@ type
   TGameCardState = (
     csOnDeck,
     csInHand,
+    csAnswerInPlay,
+    csSelected,
     csDiscarded
   );
 
@@ -62,15 +64,15 @@ type
     procedure setCurrentQuestion( const value: string );
 
     //- Properties
-    property SessionPassword: string  read getPassword        write setPassword;
-    property SessionID: string        read getSessionID       write setSessionID;
-    property SessionName: string      read getSessionName     write setSessionName;
-    property LangID: string           read getLangID          write setLangID;
-    property MinUser: integer         read getMinUser         write setMinUser;
-    property MaxUser: integer         read getMaxUser         write setMaxUser;
-    property GameState: TGameState    read getGameState       write setGameState;
-    property UserCount: integer       read getUserCount       write setUserCount;
-    property CurrentQuestion: string  read getCurrentQuestion write setCurrentQuestion;
+    property SessionPassword: string   read getPassword        write setPassword;
+    property SessionID: string         read getSessionID       write setSessionID;
+    property SessionName: string       read getSessionName     write setSessionName;
+    property LangID: string            read getLangID          write setLangID;
+    property MinUser: integer          read getMinUser         write setMinUser;
+    property MaxUser: integer          read getMaxUser         write setMaxUser;
+    property GameState: TGameState     read getGameState       write setGameState;
+    property UserCount: integer        read getUserCount       write setUserCount;
+    property CurrentQuestion: string   read getCurrentQuestion write setCurrentQuestion;
   end;
 
   TPlayerState = (
@@ -88,7 +90,7 @@ type
     function getGameID: string;
     function getDeleted: boolean;
     function getPlayerState: TPlayerState;
-    function getScore: integer;
+    function getScore: Integer;
 
     //- Setters
     procedure setIsCurrentUser( const value: boolean );
@@ -109,6 +111,33 @@ type
     property GameID: string            read getGameID        write setGameID; //<- Which game am I joined to?
   end;
 
+  ICardData = interface( IGameDataObject )
+    ['{34AAE92E-E89D-4423-A8D9-351240C5968A}']
+    function getCardID: string;
+    function getTitle: string;
+
+    procedure setCardID( const value: string );
+    procedure setTitle( const value: string );
+
+
+    property CardID: string            read getCardID write setCardID;
+    property Title: string             read getTitle write setTitle;
+  end;
+
+  ITurnData = interface( IGameDataObject )
+    ['{EB526058-332B-4BFF-93F9-83740F199360}']
+    function getQuestion: string;
+    function getSelection: ICardData;
+    function getAnswers: IList<ICardData>;
+    function getCards: IList<ICardData>;
+
+    procedure setQuestion( const value: string );
+
+    property Question: string          read getQuestion write setQuestion;
+    property Selection: ICardData      read getSelection;
+    property Answers: IList<ICardData> read getAnswers;
+    property Cards: IList<ICardData>   Read getCards;
+  end;
 
   IDataModel = interface
   ['{0C23B564-0030-4895-BF7C-88F910EFD825}']
@@ -124,9 +153,9 @@ type
     function setGameState(AuthToken: string; const GameData: IGameData): string;
     procedure UpdateUser(const User: IUserData);
     procedure UpdateGame(const Game: IGameData);
+    function getCurrentTurn( AuthToken: string ): ITurnData;
 
   end;
-
 
 implementation
 

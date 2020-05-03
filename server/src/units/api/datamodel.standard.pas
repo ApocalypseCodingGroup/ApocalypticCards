@@ -5,11 +5,15 @@ uses
   DataModel
 , datamodel.gamedata.standard
 , datamodel.userdata.standard
+, datamodel.carddata.standard
+, datamodel.turndata.standard
 ;
 
 type
   TGameData = datamodel.gamedata.standard.TGameData;
   TUserData = datamodel.userdata.standard.TUserData;
+  TCardData = datamodel.carddata.standard.TCardData;
+  TTurnData = datamodel.turndata.standard.TTurnData;
 
   TDataModel = record
     class function Create: IDataModel; static;

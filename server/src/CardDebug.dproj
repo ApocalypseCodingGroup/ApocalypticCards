@@ -138,6 +138,8 @@
         <DCCReference Include="units\api\datamodel.standard.pas"/>
         <DCCReference Include="units\implementation\datamodel.datamodel.standard.pas"/>
         <DCCReference Include="units\implementation\datamodel.userdata.standard.pas"/>
+        <DCCReference Include="units\implementation\datamodel.carddata.standard.pas"/>
+        <DCCReference Include="units\implementation\datamodel.turndata.standard.pas"/>
         <None Include="..\..\install\data.sql"/>
         <None Include="..\..\install\database.sql"/>
         <BuildConfiguration Include="Release">

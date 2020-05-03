@@ -60,6 +60,11 @@ type
      ///  </summary>
      function setGameState( AuthToken: string; const json: string ): string;
 
+     ///  <summary>
+     ///    Get current turn data for user specified by auth token
+     ///  </summary>
+     function getCurrentTurn( AuthToken: string ): string;
+
    end;
 
 implementation
