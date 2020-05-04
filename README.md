@@ -103,8 +103,8 @@ We have provided some SQL scripts that you can find under `<cardgame folder>/ins
 There you'll find 2 files: `data.sql` and `database.sql`.
 
 **ATTENTION**
-> When you run `database.sql`, pay attention that some of code there isn't fully working.
-> When you run `data.sql`, pay attention that some of code there isn't fully working.
+> When you run `database.sql` or `data.sql`, pay attention that some of code there isn't fully working.
+>
 > There's a Pull Request in the pipeline to fix this issue.
 
 
