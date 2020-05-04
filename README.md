@@ -135,7 +135,7 @@ Under `<cardgame folder>/server/out/bin/Linux64/Release` you'll find the `*.ini`
 Copy such file to the `/etc/apocalypsecards` folder:
 
 ```shell
-$ cp cardgame.ini /etc/apocalypsecards/
+$ sudo cp cardgame.ini /etc/apocalypsecards/
 ```
 
 The file should look something like this:
