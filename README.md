@@ -140,7 +140,7 @@ $ sudo cp cardgame.ini /etc/apocalypsecards/
 
 The file should look something like this:
 
-```
+```ini
 username=apocalypticcards
 password=apocalypticcards
 database=apocalypticcards
