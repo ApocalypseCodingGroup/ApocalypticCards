@@ -93,6 +93,7 @@ API/Run?SessionID="hGASjsd6"
 // Result should be the First Quetion for Display. (Acc_QDeckID)
 */
 
+/*
 //DROP TABLE IF EXISTS `developer`.`questionbase`;
 //CREATE TABLE  `developer`.`questionbase` (
 //  `PKID` VARCHAR(40) NOT NULL,
@@ -102,7 +103,9 @@ API/Run?SessionID="hGASjsd6"
 //  `MinAnswerCards` int(10) unsigned NOT NULL,
 //  PRIMARY KEY (`PKID`) USING BTREE
 //) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+*/
 
+/*
 //DROP TABLE IF EXISTS `developer`.`answerbase`;
 //CREATE TABLE  `developer`.`answerbase` (
 //  `PKID` VARCHAR(40) NOT NULL,
@@ -111,7 +114,9 @@ API/Run?SessionID="hGASjsd6"
 //  `LangID` varchar(2) NOT NULL,
 //  PRIMARY KEY (`PKID`) USING BTREE
 //) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+*/
 
+/*
 //DROP TABLE IF EXISTS `developer`.`deckQbase`;
 //CREATE TABLE  `developer`.`deckbase` (
 //  `PKID` VARCHAR(40) NOT NULL,
@@ -119,7 +124,9 @@ API/Run?SessionID="hGASjsd6"
 //  `Quertion` int(10) unsigned NOT NULL,  // Pointer to QuetionBaseID
 //  PRIMARY KEY (`PKID`) USING BTREE
 //) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+*/
 
+/*
 //DROP TABLE IF EXISTS `developer`.`deckAbase`;
 //CREATE TABLE  `developer`.`deckbase` (
 //  `PKID` VARCHAR(40) NOT NULL,
@@ -127,6 +134,8 @@ API/Run?SessionID="hGASjsd6"
 //  `Answer` int(10) unsigned NOT NULL,  // Pointer to AnswerBaseID
 //  PRIMARY KEY (`PKID`) USING BTREE
 //) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+*/
+
 
 /*
 API/JoinGame?SessionID="hGASjsd6"&SessionName="Glenn"&SessionPW=""
@@ -151,8 +160,9 @@ API/SelectResult?SessionID="hGASjsd6"&MasterToken="{EAC84404-8A36-4839-ADE0-BE9B
 // Collect Points
 // Redraw from deck
 // Select next Master
-
 */
+
+/*
 //DROP TABLE IF EXISTS `developer`.`userbase`;
 //CREATE TABLE  `developer`.`userbase` (
 //  `PKID` VARCHAR(40) NOT NULL,
@@ -172,3 +182,4 @@ API/SelectResult?SessionID="hGASjsd6"&MasterToken="{EAC84404-8A36-4839-ADE0-BE9B
 //  `Selected_2` int(10) unsigned NOT NULL,
 //  PRIMARY KEY (`PKID`) USING BTREE
 //) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+*/
