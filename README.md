@@ -1,21 +1,23 @@
 # ApocalypticCards
 A game to alleviate boredom while under "stay-at-home" orders.
 
-Developed during a series of live coding sessions which begand on March 28th 2020. *ongoing*
-This Delphi powered game aims to ease the pain of being ordered by our overlords to remain at home.
+Developed during a series of live coding sessions which began on March 28th 2020 and are currently on-going as of 5th May 2020, this Delphi-powered game aims to help while away the hours for those who are currently 'self isolating' or forced to stay at home during the 2020 COVID-19 pandemic.
+
+We also wanted to demonstrate that there are many approaches to solving the problems inherent in what looks like a simple task as well as show case some Delphi live-coding by a loose collection of Embarcadero MVPs.  In particular the client-side apps employ a multitude of technologies and operating system platform targets such as VCL, FMX, Web, Windows, Linux and macOS.  We might even stretch out and produce Android and iOS versions - Delphi can do it, so why not?
 
 NOTE: You do not have to wear a mask while coding but if you are sharing your keyboard
 or screen you do need to stay six feet away from your computer peripherals.  We don't
 have to ask you to practice social distancing - you're a coder, being socially distant
-from The Normals is the default setting.
+from `The Normals` is the default setting.  ;)
 
 https://www.youtube.com/watch?v=dbgaHNrDdBs&list=PL-oEujJyp0deGinpcUgiZwoa_rPnmgCwN
 
-## Setup a local apache virtual host server on Linux for this game
+## How to set up a local apache virtual host server on Linux for this game
 
 ### Your local hosts file
 
 **NOTE**
+
 > If you don't want to create a virtual host on your Apache setup, skip this step
 
 First you'll need to add an entry to your `/etc/hosts` file so you can have local `DNS` resolve:
@@ -54,7 +56,7 @@ The module is now available to be loaded by Apache.
 
 We now need to create a file under `/etc/apache2/mods-available` so that we can load it.
 
-Using your preferred text editor ( please no flame wars: vi vs &lt;insert text editor here&gt; ), create/edit a file called `cardgame.load`:
+Using your preferred plain text editor create/edit a file called `cardgame.load`:
 
 ```shell
 $ sudo nano /etc/apache2/mods-available/cardgame.load
@@ -177,9 +179,8 @@ Click on one of the links for information on how to setup your choice.
 ### Use the module across all virtual sites
 
 **NOTE**
-> I'm assuming this works without any issue.
->
-> I've only tested the Virtual Site option.
+
+> This has so far only been tested using the Virtual Site option.
 
 If you have no other virtual site setup on your local Apache server and don't mind the module running on what ever is the first site Apache serves then let's start by creating a `cardgame.conf` under `/etc/apache2/conf-available`:
 
@@ -262,5 +263,6 @@ If all went well, no errors where reported.
 
 You can now browse to [http://apocalypse-cards/api/games](http://apocalypse-cards/api/games) and see that it should return you a JSON empty array.
 
-**NOTE**
-> If any of these instruction go wrong blame [Gustavo Carreno](https://github.com/gcarreno).
+### NOTE
+
+Many thanks to [Gustavo Carreno](https://github.com/gcarreno) who made many excellent and significant contributions to this Read Me document.
