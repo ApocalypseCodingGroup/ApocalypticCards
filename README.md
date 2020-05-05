@@ -215,6 +215,13 @@ If all went well, no errors where reported and you can now browse to [http://loc
 
 In order to have a virtual server with the module, we'll need to create one.
 
+Since there's talk about the server serving animated gifs, I've chosen to create a folder in order to accommodate a site folder structure:
+
+```shell
+$ sudo mkdir -p /var/www/apocalypse-cards
+$ sudo chown www-data.www-data /etc/www/apocalypse-cards
+```
+
 Remember that if you want local DNS resolution of this virtual site, please follow instruction for [editing](#your-local-hosts-file) your `/etc/hosts` file.
 
 Use your preferred text editor to create/edit a file under `/etc/apache2/sites-available/`:
