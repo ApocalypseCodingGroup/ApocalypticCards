@@ -203,7 +203,9 @@ $ sudo a2enconf cardgame
 $ sude systemctl restart apache2.service
 ```
 
-If all went well, no errors where reported and you can now browse to [http://localhost/api/games](http://localhost/api/games) and see it should return you a JSON empty array.
+If all went well, no errors where reported.
+
+You can now browse to [http://localhost/api/games](http://localhost/api/games) and see that it should return you a JSON empty array.
 
 ### Use the module on a specific virtual site
 
@@ -256,7 +258,9 @@ $ sudo a2ensite 001-apocalypse-cards
 $ sudo systemctl reload apache2.service
 ```
 
-If all went well, no errors where reported and you can now browse to [http://apocalypse-cards/api/games](http://apocalypse-cards/api/games) and see it should return you a JSON empty array.
+If all went well, no errors where reported.
+
+You can now browse to [http://apocalypse-cards/api/games](http://apocalypse-cards/api/games) and see that it should return you a JSON empty array.
 
 **NOTE**
 > If any of these instruction go wrong blame [Gustavo Carreno](https://github.com/gcarreno).
