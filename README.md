@@ -263,3 +263,6 @@ $ sudo systemctl reload apache2.service
 ```
 
 If all went well, no errors where reported and you can now browse to [http://apocalypse-cards/api/games](http://apocalypse-cards/api/games) and see it should return you a JSON empty array.
+
+**NOTE**
+> If any of these instruction go wrong blame [Gustavo Carreno](https://github.com/gcarreno).
