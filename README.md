@@ -217,7 +217,7 @@ In order to have a virtual server with the module, we'll need to create one.
 
 Remember that if you want local DNS resolution of this virtual site, please follow instruction for [editing](#your-local-hosts-file) your `/etc/hosts` file.
 
-Use your preferred text editor create/edit a file under `/etc/apache2/sites-available/`:
+Use your preferred text editor to create/edit a file under `/etc/apache2/sites-available/`:
 
 ```shell
 $ nano /etc/apache2/sites-available/001-apocalypse-cards.conf
