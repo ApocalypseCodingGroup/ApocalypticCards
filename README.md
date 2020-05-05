@@ -24,7 +24,7 @@ First you'll need to add an entry to your `/etc/hosts` file so you can have loca
 $ sudo nano /etc/hosts
 ```
 
-Amend you file with something along these lines:
+Amend your file with something along these lines:
 
 ```shell
 # ...
@@ -54,10 +54,10 @@ The module is now available to be loaded by Apache.
 
 We now need to create a file under `/etc/apache2/mods-available` so that we can load it.
 
-Using your preferred text editor ( please no flame wars: vi vs <insert text editor here> ), create/edit a file called `cardgame.load`:
+Using your preferred text editor ( please no flame wars: vi vs &lt;insert text editor here&gt; ), create/edit a file called `cardgame.load`:
 
 ```shell
-nano /etc/apache2/mods-available/cardgame.load
+$ sudo nano /etc/apache2/mods-available/cardgame.load
 ```
 
 Add the following single line to it:
@@ -155,7 +155,7 @@ If that last command does not return any error, all went well.
 
 You can verify that the module is loaded by doing the following:
 
-```sheel
+```shell
 $ a2query -m | grep cardgame
 ```
 
@@ -200,10 +200,12 @@ Now let's enable that configuration and restart Apache:
 
 ```shell
 $ sudo a2enconf cardgame
-$ sude systemctl restart apache2.service
+$ sudo systemctl restart apache2.service
 ```
 
-If all went well, no errors where reported and you can now browse to [http://localhost/api/games](http://localhost/api/games) and see it should return you a JSON empty array.
+If all went well, no errors where reported.
+
+You can now browse to [http://localhost/api/games](http://localhost/api/games) and see that it should return you a JSON empty array.
 
 ### Use the module on a specific virtual site
 
@@ -221,7 +223,7 @@ Remember that if you want local DNS resolution of this virtual site, please foll
 Use your preferred text editor to create/edit a file under `/etc/apache2/sites-available/`:
 
 ```shell
-$ nano /etc/apache2/sites-available/001-apocalypse-cards.conf
+$ sudo nano /etc/apache2/sites-available/001-apocalypse-cards.conf
 ```
 
 This file should look like this:
@@ -256,7 +258,9 @@ $ sudo a2ensite 001-apocalypse-cards
 $ sudo systemctl reload apache2.service
 ```
 
-If all went well, no errors where reported and you can now browse to [http://apocalypse-cards/api/games](http://apocalypse-cards/api/games) and see it should return you a JSON empty array.
+If all went well, no errors where reported.
+
+You can now browse to [http://apocalypse-cards/api/games](http://apocalypse-cards/api/games) and see that it should return you a JSON empty array.
 
 **NOTE**
 > If any of these instruction go wrong blame [Gustavo Carreno](https://github.com/gcarreno).
