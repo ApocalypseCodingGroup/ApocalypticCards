@@ -221,7 +221,7 @@ Remember that if you want local DNS resolution of this virtual site, please foll
 Use your preferred text editor to create/edit a file under `/etc/apache2/sites-available/`:
 
 ```shell
-$ nano /etc/apache2/sites-available/001-apocalypse-cards.conf
+$ sudo nano /etc/apache2/sites-available/001-apocalypse-cards.conf
 ```
 
 This file should look like this:
