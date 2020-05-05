@@ -24,7 +24,7 @@ First you'll need to add an entry to your `/etc/hosts` file so you can have loca
 $ sudo nano /etc/hosts
 ```
 
-Amend you file with something along these lines:
+Amend your file with something along these lines:
 
 ```shell
 # ...
@@ -54,7 +54,7 @@ The module is now available to be loaded by Apache.
 
 We now need to create a file under `/etc/apache2/mods-available` so that we can load it.
 
-Using your preferred text editor ( please no flame wars: vi vs <insert text editor here> ), create/edit a file called `cardgame.load`:
+Using your preferred text editor ( please no flame wars: vi vs &lt;insert text editor here&gt; ), create/edit a file called `cardgame.load`:
 
 ```shell
 nano /etc/apache2/mods-available/cardgame.load
