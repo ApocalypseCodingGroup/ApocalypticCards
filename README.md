@@ -182,6 +182,11 @@ Click on one of the links for information on how to setup your choice.
 
 ### Use the module across all virtual sites
 
+**NOTE**
+> I'm assuming this works without any issue.
+>
+> I've tested the Virtual Site option
+
 If you have no other virtual site setup on your local Apache server and don't mind the module running on what ever is the first site Apache serves then let's start by creating a `cardgame.conf` under `/etc/apache2/conf-available`:
 
 ```shell
