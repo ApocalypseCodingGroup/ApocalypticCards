@@ -228,7 +228,6 @@ This file should look like this:
 ```apache
 <VirtualHost *:80>
     ServerName apocalypse-cards
-    ServerAlias apocalypse-cards.batchnet.local
     ServerAdmin yourname@example.com
 
     DirectoryIndex index.html.
