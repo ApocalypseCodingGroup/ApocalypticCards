@@ -24,7 +24,7 @@ First you'll need to add an entry to your `/etc/hosts` file so you can have loca
 $ sudo nano /etc/hosts
 ```
 
-Amend you file with sonmething along these lines:
+Amend you file with something along these lines:
 
 ```shell
 # ...
@@ -54,7 +54,7 @@ The module is now available to be loaded by Apache.
 
 We now need to create a file under `/etc/apache2/mods-available` so that we can load it.
 
-Using your prefered text editor ( please no flame wars: vi vs <insert text editor here> ), create/edit a file called `cardgame.load`:
+Using your preferred text editor ( please no flame wars: vi vs <insert text editor here> ), create/edit a file called `cardgame.load`:
 
 ```shell
 nano /etc/apache2/mods-available/cardgame.load
@@ -157,7 +157,7 @@ $ sudo a2enmod cardgame
 $ sudo systemctl restart apache2.service
 ```
 
-If that las command does not retun any error, all went well.
+If that last command does not return any error, all went well.
 
 You can verify that the module is loaded by doing the following:
 
@@ -210,7 +210,7 @@ If all went well, no errors where reported and you can now browse to [http://loc
 
 In order to have a virtual server with the module, we'll need to create one.
 
-Remember that if you want local DNS resolution of this virtual site, please follow instruction for [editting](#your-local-hosts-file) your `/etc/hosts` file.
+Remember that if you want local DNS resolution of this virtual site, please follow instruction for [editing](#your-local-hosts-file) your `/etc/hosts` file.
 
 Use your preferred text editor create/edit a file under `/etc/apache2/sites-available/`:
 
