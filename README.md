@@ -57,7 +57,7 @@ We now need to create a file under `/etc/apache2/mods-available` so that we can 
 Using your preferred text editor ( please no flame wars: vi vs &lt;insert text editor here&gt; ), create/edit a file called `cardgame.load`:
 
 ```shell
-nano /etc/apache2/mods-available/cardgame.load
+$ sudo nano /etc/apache2/mods-available/cardgame.load
 ```
 
 Add the following single line to it:
@@ -155,7 +155,7 @@ If that last command does not return any error, all went well.
 
 You can verify that the module is loaded by doing the following:
 
-```sheel
+```shell
 $ a2query -m | grep cardgame
 ```
 
@@ -200,7 +200,7 @@ Now let's enable that configuration and restart Apache:
 
 ```shell
 $ sudo a2enconf cardgame
-$ sude systemctl restart apache2.service
+$ sudo systemctl restart apache2.service
 ```
 
 If all went well, no errors where reported.
