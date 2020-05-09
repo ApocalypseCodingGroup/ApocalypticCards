@@ -128,6 +128,8 @@ begin
       then fConn.Params.Add('Server='+Credentials.ValueFromIndex[lIndex])
       else fConn.Params.Add('Server=127.0.0.1');
 
+    fConn.Params.Add('CharacterSet=latin1');
+
     fConn.Params.Database := Credentials.Values['database'];
     fConn.Params.UserName := Credentials.Values['username'];
     fConn.Params.Password := Credentials.Values['password'];
@@ -261,7 +263,7 @@ end;
 
 function TDataModel.ValidateUserCount( const GameData: IGameData; out UserCount: integer ): boolean;
 const
-  cSQL = 'select usercount from vw_livegames where pkid=:PKID;';
+  cSQL = 'select count(*) usercount from tbl_users where FKGameID=:PKID and Deleted<>1;';
 var
   tmpQry: TFDQuery;
 begin
@@ -274,7 +276,8 @@ begin
     tmpQry.Active := True;
     tmpQry.First;
     if tmpQry.EOF then begin
-      exit;
+      raise
+        Exception.Create('Live game not found while checking user count. Game('+GameData.SessionID+')');
     end;
     UserCount := tmpQry.FieldByName('usercount').AsInteger;
     Result := (UserCount>=GameData.MinUser) and (UserCount<=GameData.MaxUser);
@@ -286,7 +289,7 @@ end;
 
 procedure TDataModel.AllocateQuestions( const GameData: IGameData; const RequiredQuestions: Integer );
 const
-  cSrcSQL = 'SELECT * FROM tbl_questions ORDER BY RAND() LIMIT :RequiredQuestions';
+  cSrcSQL = 'SELECT * FROM tbl_questions ORDER BY RAND() LIMIT :RequiredQuestions;';
   cTgtSQL = 'INSERT INTO tbl_gamequestions (PKID, FKGameID, FKQuestionID) VALUES (:PKID, :FKGameID, :FKQuestionID);';
 var
   RemainingRequired: Integer;
@@ -329,7 +332,7 @@ end;
 
 procedure TDataModel.AllocateAnswers( const GameData: IGameData; const Users: IList<IUserData>; const RequiredAnswers: Integer );
 const
-  cSrcSQL = 'SELECT * FROM tbl_answers ORDER BY RAND() LIMIT :RequiredAnswers';
+  cSrcSQL = 'SELECT * FROM tbl_answers ORDER BY RAND() LIMIT :RequiredAnswers;';
   cTgtSQL = 'INSERT INTO tbl_gameanswers (PKID, FKGameID, FKPlayerID, FKAnswerID, State) VALUES (:PKID, :FKGameID, :FKPlayerID, :FKAnswerID, :State);';
 var
   RemainingRequired: Integer;
@@ -388,7 +391,8 @@ begin
   // Validate min/max users
   try
     if not ValidateUserCount(GameData, UserCount) then begin
-      exit;
+      raise
+        Exception.Create('Insufficient users to start game.');
     end;
     // Allocate initial hands of questions and answers
     RequiredQuestions := (cGameRounds * UserCount);
@@ -586,7 +590,7 @@ begin
   fQry.Active := True;
   if fQry.RowsAffected<1 then begin
     raise
-      Exception.Create('Failed to locate game by provided user ID');
+      Exception.Create('Failed to locate game by provided user ID: '+Key);
   end;
   fQry.First;
   Result := fQry.FieldByName('FKGameID').AsString;

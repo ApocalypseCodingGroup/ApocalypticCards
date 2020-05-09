@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 684
     Height = 479
-    ActivePage = pgSubmitting
+    ActivePage = pgGreenRoom
     Align = alClient
     TabOrder = 0
     object pgWelcome: TTabSheet
@@ -249,8 +249,6 @@ object frmMain: TfrmMain
     object pgJudging: TTabSheet
       Caption = 'pgJudging'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 28
       object Panel1: TPanel
         Left = 248
         Top = 208
@@ -265,8 +263,6 @@ object frmMain: TfrmMain
     object pgSubmitting: TTabSheet
       Caption = 'pgSubmitting'
       ImageIndex = 5
-      ExplicitLeft = 8
-      ExplicitTop = 28
       object Panel2: TPanel
         Left = 224
         Top = 176

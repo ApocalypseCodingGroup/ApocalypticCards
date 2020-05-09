@@ -34,11 +34,11 @@ CREATE TABLE `tbl_users` (
     REFERENCES `tbl_games` (`PKID`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = latin1;
+ENGINE = InnoDB DEFAULT CHARSET=latin1;
 
 CREATE OR REPLACE VIEW vw_livegames AS
-  ( SELECT PKID, MinUser, (select count(*) from tbl_users u where u.FKGameID=g.pkid and u.Deleted<>1) usercount FROM tbl_games g where g.CurrentUser IS NOT NULL ORDER BY usercount asc );
+  ( SELECT PKID, MinUser, (select count(*) from tbl_users u where u.FKGameID=g.pkid and u.Deleted<>1)
+   usercount FROM tbl_games g where g.CurrentUser IS NOT NULL ORDER BY usercount asc );
 
 CREATE TABLE `tbl_answers` (
   `PKID` varchar(40) NOT NULL,
@@ -47,13 +47,13 @@ CREATE TABLE `tbl_answers` (
   PRIMARY KEY (`PKID`),
   UNIQUE KEY `PKID_UNIQUE` (`PKID`),
   UNIQUE KEY `str_answer_UNIQUE` (`str_answer`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `tbl_questions` (
   PKID VARCHAR(40) NOT NULL,
   str_question TEXT NOT NULL,
   PRIMARY KEY (PKID)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `tbl_gamequestions` (
   `PKID` VARCHAR(40) NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE `tbl_gamequestions` (
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  DEFAULT CHARSET=latin1;
 
 CREATE TABLE `tbl_gameanswers` (
   `PKID` VARCHAR(40) NOT NULL,
@@ -81,8 +81,7 @@ CREATE TABLE `tbl_gameanswers` (
     REFERENCES `tbl_games` (`PKID`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
-  ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  ENGINE = InnoDB DEFAULT CHARSET=latin1;
 
 
 /*

@@ -346,6 +346,7 @@ end;
 
 procedure TfrmMain.btnStartGame2Click(Sender: TObject);
 begin
+  tmrPollUsers.Enabled := False;
   fGame.GameState := TGameState.gsRunning;
   // Create user request.
   ClearRequest;
