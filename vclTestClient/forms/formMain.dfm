@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 684
     Height = 479
-    ActivePage = pgGreenRoom
+    ActivePage = pgJudging
     Align = alClient
     TabOrder = 0
     object pgWelcome: TTabSheet
@@ -249,28 +249,26 @@ object frmMain: TfrmMain
     object pgJudging: TTabSheet
       Caption = 'pgJudging'
       ImageIndex = 4
-      object Panel1: TPanel
-        Left = 248
-        Top = 208
-        Width = 217
-        Height = 137
-        Caption = 'Panel1'
-        Color = clLime
-        ParentBackground = False
+      object Memo2: TMemo
+        Left = 72
+        Top = 56
+        Width = 425
+        Height = 273
+        Lines.Strings = (
+          'Memo2')
         TabOrder = 0
       end
     end
     object pgSubmitting: TTabSheet
       Caption = 'pgSubmitting'
       ImageIndex = 5
-      object Panel2: TPanel
-        Left = 224
-        Top = 176
-        Width = 217
-        Height = 137
-        Caption = 'Panel1'
-        Color = clMaroon
-        ParentBackground = False
+      object Memo1: TMemo
+        Left = 64
+        Top = 64
+        Width = 425
+        Height = 273
+        Lines.Strings = (
+          'Memo1')
         TabOrder = 0
       end
     end
@@ -306,5 +304,12 @@ object frmMain: TfrmMain
     OnTimer = tmrAvailGamesTimer
     Left = 576
     Top = 32
+  end
+  object tmrTurnData: TTimer
+    Enabled = False
+    Interval = 3000
+    OnTimer = tmrTurnDataTimer
+    Left = 576
+    Top = 152
   end
 end

@@ -114,7 +114,7 @@ begin
         Card := TJSONObject.Create;
         Card.AddPair('cardid',Item.CardID);
         Card.AddPair('title',Item.Title);
-        Cards.Add(Answer);
+        Cards.Add(Card);
       end
     );
     Result := TurnData.ToJSON;

@@ -48,8 +48,9 @@ type
     btnStartGame2: TButton;
     pgJudging: TTabSheet;
     pgSubmitting: TTabSheet;
-    Panel1: TPanel;
-    Panel2: TPanel;
+    tmrTurnData: TTimer;
+    Memo1: TMemo;
+    Memo2: TMemo;
     procedure btnStartGameClick(Sender: TObject);
     procedure btnCreateGameClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -60,6 +61,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnStartGame2Click(Sender: TObject);
+    procedure tmrTurnDataTimer(Sender: TObject);
   private
     procedure SwitchPage(const PageName: string);
     procedure ClearRequest;
@@ -74,6 +76,7 @@ type
     procedure AddRequestAuthentication;
     procedure UpdateGreenRoomPlayers;
     procedure RefreashGames;
+    procedure UpdateTurnData;
   public
     { Public declarations }
   end;
@@ -125,10 +128,14 @@ begin
   if utPageName='PGJUDGING' then begin
     tmrAvailGames.Enabled := False;
     tmrPollUsers.Enabled := False;
+    UpdateTurnData;
+    tmrTurnData.Enabled := True;
   end else
   if utPageName='PGSUBMITTING' then begin
     tmrAvailGames.Enabled := False;
     tmrPollUsers.Enabled := False;
+    UpdateTurnData;
+    tmrTurnData.Enabled := True;
   end;
 end;
 
@@ -164,6 +171,28 @@ end;
 procedure TfrmMain.tmrPollUsersTimer(Sender: TObject);
 begin
   UpdateGreenRoomPlayers;
+end;
+
+procedure TfrmMain.UpdateTurnData;
+begin
+  ClearRequest;
+  AddRequestAuthentication;
+  req.Method := TRestRequestMethod.rmGET;
+  req.Resource := '/turn';
+  ExecuteRequest;
+
+  if SameText(pgcMain.ActivePage.Name,'pgJudging') then begin
+    memo2.Lines.Text := resp.Content;
+  end else begin
+    memo1.Lines.Text := resp.Content;
+  end;
+end;
+
+procedure TfrmMain.tmrTurnDataTimer(Sender: TObject);
+begin
+  tmrTurnData.Enabled := False;
+  UpdateTurnData;
+  tmrTurnData.Enabled := True;
 end;
 
 procedure TfrmMain.ClearRequest;
@@ -357,8 +386,6 @@ begin
   ExecuteRequest;
   fGame := TJSON.JsonToObject<TGameData>(resp.Content);
   if fGame.GameState=TGameState.gsRunning then begin
-    fGame := TJSON.JsonToObject<TGameData>(resp.Content);
-    ShowMessage('Game started');
     UpdateGreenRoomPlayers;
   end else begin
     ShowMessage('Game did not start - Number of required users not met.');
