@@ -9,6 +9,8 @@ type
   TWebModule4 = class(TWebModule)
     procedure WebModule4wactGamesAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
     procedure WebModule4wactUsersAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+    procedure WebModule4wactTurnAction(Sender: TObject; Request: TWebRequest;
+      Response: TWebResponse; var Handled: Boolean);
   end;
 
 var
@@ -49,6 +51,31 @@ begin
     // Delete
     nil
   );
+end;
+
+procedure TWebModule4.WebModule4wactTurnAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);
+begin
+  TGameRequest.HandleRequest( Request, Response, Handled,
+
+    // Create
+    nil,
+
+    // Read
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    begin
+     Response.Content := ViewModel.getCurrentTurn( AuthToken );
+    end,
+
+    // Update
+    procedure(const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel)
+    begin
+
+    end,
+
+    // Delete
+    nil
+  );
+
 end;
 
 procedure TWebModule4.WebModule4wactUsersAction(Sender: TObject; Request: TWebRequest; Response: TWebResponse; var Handled: Boolean);

@@ -25,7 +25,7 @@ INSERT INTO tbl_questions (pkid,str_question) VALUES('{C150D7EB-9853-432F-B093-A
 INSERT INTO tbl_questions (pkid,str_question) VALUES('{A8DD8054-6CE6-4D92-9038-74C7F712EBEF}','Question22: What is (%blank%)?');
 INSERT INTO tbl_questions (pkid,str_question) VALUES('{89098D4F-D203-4C98-AF4A-D00A23E4C32E}','Question23: What is (%blank%)?');
 
-/* Games Data */');
+/* Games Data */
 INSERT INTO tbl_answers (pkid,str_type,str_answer) values('{A4851F8A-018C-4CFC-989F-FDCF39F7ABFF}','noun','Gold');
 INSERT INTO tbl_answers (pkid,str_type,str_answer) values('{D9DA65CA-82C5-49D4-9395-047D4C57C1AA}','noun','Painting');
 INSERT INTO tbl_answers (pkid,str_type,str_answer) values('{558A2524-2296-4E5E-BA81-ECA760E4AD2E}','noun','Advertisement');
