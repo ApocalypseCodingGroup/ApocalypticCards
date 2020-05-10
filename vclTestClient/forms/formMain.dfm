@@ -155,8 +155,6 @@ object frmMain: TfrmMain
     object pgGreenRoom: TTabSheet
       Caption = 'pgGreenRoom'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 28
       object lblWaitingToStart: TLabel
         Left = 24
         Top = 16
