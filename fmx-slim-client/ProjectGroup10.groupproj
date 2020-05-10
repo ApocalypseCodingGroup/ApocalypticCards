@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{8FF88754-8A6C-4338-80E9-29DC5FC19DC6}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ApoCards.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\vclTestClient\vclTestClient.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ApoCards">
+        <MSBuild Projects="ApoCards.dproj"/>
+    </Target>
+    <Target Name="ApoCards:Clean">
+        <MSBuild Projects="ApoCards.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ApoCards:Make">
+        <MSBuild Projects="ApoCards.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="vclTestClient">
+        <MSBuild Projects="..\vclTestClient\vclTestClient.dproj"/>
+    </Target>
+    <Target Name="vclTestClient:Clean">
+        <MSBuild Projects="..\vclTestClient\vclTestClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="vclTestClient:Make">
+        <MSBuild Projects="..\vclTestClient\vclTestClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ApoCards;vclTestClient"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ApoCards:Clean;vclTestClient:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ApoCards:Make;vclTestClient:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
