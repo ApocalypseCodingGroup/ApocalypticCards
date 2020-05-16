@@ -52,9 +52,9 @@ CREATE TABLE `tbl_answers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `tbl_questions` (
-  PKID VARCHAR(40) NOT NULL,
-  str_question TEXT NOT NULL,
-  PRIMARY KEY (PKID)
+  `PKID` VARCHAR(40) NOT NULL,
+  `str_question` TEXT NOT NULL,
+  PRIMARY KEY (`PKID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `tbl_gamequestions` (
