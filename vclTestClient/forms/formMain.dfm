@@ -21,7 +21,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 684
     Height = 479
-    ActivePage = pgJudging
+    ActivePage = pgGreenRoom
     Align = alClient
     TabOrder = 0
     object pgWelcome: TTabSheet

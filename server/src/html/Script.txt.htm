@@ -1,0 +1,25 @@
+﻿<script>
+
+<#WithPost <#Question>>
+
+function fetchdata()
+  { var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function()
+      {
+        if (this.readyState == 4 && this.status == 200)
+          {
+            <#AJAXRESULT <#AJAXContent>>
+          }
+       };
+
+  xhttp.open("GET", "<#URL><#HTMLSource>?UserID=<#UserID>&t=" + Math.random(), true);
+  xhttp.send();
+};
+
+window.onload = function(){
+ <#Error>
+ document.getElementById("Content").innerHTML = 'preparing...';
+ fetchdata();
+};
+
+</script>

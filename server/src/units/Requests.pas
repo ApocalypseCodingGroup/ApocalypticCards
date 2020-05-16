@@ -8,6 +8,7 @@ uses
 
 type
   THandleRequest = reference to procedure( const AuthToken: string; Response: TWebResponse; var Handled: Boolean; const ViewModel: IViewModel );
+  THandleWeb = reference to procedure( Const AutoToken : String;Response: TWebResponse; Const ViewModel : IViewModel );
 
   TGameRequest = class
   private
@@ -16,6 +17,7 @@ type
     class function PrepareResponse( var Response: TWebResponse ): boolean; static;
     class procedure PrepareException( var Response: TWebResponse; const Message: string ); static;
     class procedure HandleRequest( Request: TWebRequest; Response: TWebResponse; var Handled: Boolean; const _Create, _Read, _Update, _Delete: THandleRequest ); static;
+    class procedure HandleWeb(var Response : TWebResponse;Const AuthToken : String;_Doall: THandleWeb);
   end;
 
 implementation
@@ -47,12 +49,12 @@ begin
   ViewModel := TViewModel.Create;
   try
     try
-      ViewModel.UpdateUserPing(AuthToken);
-
       if not assigned(ViewModel) then begin
         raise
           Exception.Create('Game failed to initialize.');
       end;
+
+      ViewModel.UpdateUserPing(AuthToken);
 
       case Request.MethodType of
 
@@ -82,6 +84,32 @@ begin
   Response.SendResponse;
 end;
 
+
+class procedure TGameRequest.HandleWeb(var Response : TWebResponse;Const AuthToken : String;_Doall: THandleWeb);
+var
+  ViewModel: IViewModel;
+begin
+  ViewModel := TViewModel.Create;
+  try
+    try
+      if not assigned(ViewModel) then begin
+        raise
+          Exception.Create('Game failed to initialize.');
+      end;
+
+      ViewModel.UpdateUserPing(AuthToken);
+      _Doall(AuthToken,Response,ViewModel);
+
+    finally
+      ViewModel.CleanUp;
+    end;
+  except
+    on E: Exception do begin
+      PrepareException( Response, E.Message );
+    end;
+  end;
+
+end;
 
 class procedure TGameRequest.PrepareException(var Response: TWebResponse; const Message: string);
 begin

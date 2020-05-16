@@ -1,0 +1,49 @@
+﻿.MarkColor {
+	background-color: #FFFF00;
+}
+.apopicture {
+	background-image: url('<#IMGURL>Back.jpg');
+}
+.Tablesetting {
+	border-collapse: collapse;
+}
+.copyright {
+	color: #00FFFF;
+	text-align: center;
+}
+.webadr {
+	color: #00FFFF;
+}
+.noBorder {
+	border-width: 0px;
+}
+.divCenter {
+	text-align: center;
+}
+.LabelInput {
+    color: #FF0000;
+}
+.bodystyle {
+  background-color: #000000;
+}
+.ExceptionCaption {
+	color: #FF0000;
+	text-align: center;
+}
+.ExceptionMessage {
+	text-align: center;
+	color: #0000FF;
+}
+.Error {
+       height:827px;
+       width:1280px;
+       src:<#IMGURL>Error.jpg;
+}
+.DisplayError {
+       position: relative;
+       width: 503px;
+       height: 129px;
+       z-index: 1;
+       left: -20px;
+       top: -745px;
+}

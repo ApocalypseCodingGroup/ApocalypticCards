@@ -15,11 +15,19 @@ type
     Label1: TLabel;
     ApplicationEvents1: TApplicationEvents;
     ButtonOpenBrowser: TButton;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
     procedure FormCreate(Sender: TObject);
     procedure ApplicationEvents1Idle(Sender: TObject; var Done: Boolean);
     procedure ButtonStartClick(Sender: TObject);
     procedure ButtonStopClick(Sender: TObject);
     procedure ButtonOpenBrowserClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     FServer: TIdHTTPWebBrokerBridge;
     procedure StartServer;
@@ -43,6 +51,65 @@ begin
   ButtonStart.Enabled := not FServer.Active;
   ButtonStop.Enabled := FServer.Active;
   EditPort.Enabled := not FServer.Active;
+end;
+
+procedure TForm4.Button1Click(Sender: TObject);
+var
+  LURL: string;
+begin
+  StartServer;
+  LURL := Format('http://localhost:%s?Name=Craig', [EditPort.Text]);
+  ShellExecute(0,
+        nil,
+        PChar(LURL), nil, nil, SW_SHOWNOACTIVATE);
+end;
+
+procedure TForm4.Button2Click(Sender: TObject);
+var
+  LURL: string;
+begin
+  StartServer;
+  LURL := Format('http://localhost:%s?Name=Elon', [EditPort.Text]);
+  ShellExecute(0,
+        nil,
+        PChar(LURL), nil, nil, SW_SHOWNOACTIVATE);
+end;
+
+procedure TForm4.Button3Click(Sender: TObject);
+var
+  LURL: string;
+begin
+  StartServer;
+  LURL := Format('http://localhost:%s?Name=Frank', [EditPort.Text]);
+  ShellExecute(0,
+        nil,
+        PChar(LURL), nil, nil, SW_SHOWNOACTIVATE);
+end;
+
+procedure TForm4.Button4Click(Sender: TObject);
+var
+  LURL: string;
+
+begin
+  StartServer;
+
+  LURL := Format('http://localhost:%s/CreateOrJoin?Name=Frank&Button=Join', [EditPort.Text]);
+  ShellExecute(0,
+        nil,
+        PChar(LURL), nil, nil, SW_SHOWNOACTIVATE);
+
+  sleep(1000); // give the browser some time to load
+
+  LURL := Format('http://localhost:%s/CreateOrJoin?Name=Elon&Button=Join', [EditPort.Text]);
+  ShellExecute(0,
+        nil,
+        PChar(LURL), nil, nil, SW_SHOWNOACTIVATE);
+
+  LURL := Format('http://localhost:%s/CreateOrJoin?Name=Craig&Button=Create&Gamename=%s', [EditPort.Text,'Craig''s%20Game']);
+  ShellExecute(0,
+        nil,
+        PChar(LURL), nil, nil, SW_SHOWNOACTIVATE);
+
 end;
 
 procedure TForm4.ButtonOpenBrowserClick(Sender: TObject);

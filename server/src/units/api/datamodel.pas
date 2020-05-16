@@ -18,6 +18,7 @@ const
 const
   cNullString = '';
   cGeneratePasswordFlag = 'Generate';
+  cQuestToken           = '%blank%';
 
 type
   IGameDataObject = interface
@@ -114,27 +115,27 @@ type
 
   ICardData = interface( IGameDataObject )
     ['{34AAE92E-E89D-4423-A8D9-351240C5968A}']
-    function getCardID: string;
-    function getTitle: string;
+    function  getCardID: string;
+    function  getTitle: string;
+    function  getOwner: String;
 
     procedure setCardID( const value: string );
     procedure setTitle( const value: string );
+    procedure setOwner( const AValue: String );
 
-
-    property CardID: string            read getCardID write setCardID;
-    property Title: string             read getTitle write setTitle;
+    property Owner  : string read getOwner  write setOwner;
+    property CardID : string read getCardID write setCardID;
+    property Title  : string read getTitle  write setTitle;
   end;
 
   ITurnData = interface( IGameDataObject )
     ['{EB526058-332B-4BFF-93F9-83740F199360}']
-    function getQuestion: string;
+    function getQuestion: ICardData;
     function getSelection: ICardData;
     function getAnswers: IList<ICardData>;
     function getCards: IList<ICardData>;
 
-    procedure setQuestion( const value: string );
-
-    property Question: string          read getQuestion write setQuestion;
+    property Question: ICardData       read getQuestion;
     property Selection: ICardData      read getSelection;
     property Answers: IList<ICardData> read getAnswers;
     property Cards: IList<ICardData>   Read getCards;
@@ -148,6 +149,7 @@ type
     function getGames: IList<IGameData>;
     function CreateGame(const GameData: IGameData) : boolean;
     function FindGameByID(const GameID: string): IGameData;
+    function GetGameByUserID( const UserID: string ) : IGameData;
     function FindGameByPassword(const Password: string): IGameData;
     procedure CreateUser(const NewUser: IUserData);
     function getUsers(const Key: string): IList<IUserData>;
@@ -155,7 +157,7 @@ type
     procedure UpdateUser(const User: IUserData);
     procedure UpdateGame(const Game: IGameData);
     function getCurrentTurn( AuthToken: string ): ITurnData;
-
+    function setCurrentTurn( AuthToken: string; Const TurnData : ITurnData ): String;
   end;
 
 implementation

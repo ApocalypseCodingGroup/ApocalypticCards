@@ -1,4 +1,6 @@
 
+SET FOREIGN_KEY_CHECKS=0;
+
 DROP TABLE IF EXISTS `tbl_users`;
 DROP TABLE IF EXISTS `tbl_answers`;
 DROP TABLE IF EXISTS `tbl_questions`;
@@ -82,6 +84,8 @@ CREATE TABLE `tbl_gameanswers` (
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
   ENGINE = InnoDB DEFAULT CHARSET=latin1;
+
+SET FOREIGN_KEY_CHECKS=1;
 
 
 /*

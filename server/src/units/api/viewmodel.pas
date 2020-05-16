@@ -60,10 +60,17 @@ type
      ///  </summary>
      function setGameState( AuthToken: string; const json: string ): string;
 
+     function getCurrentGame( AuthToken : String) : IGameData;
+
      ///  <summary>
      ///    Get current turn data for user specified by auth token
      ///  </summary>
      function getCurrentTurn( AuthToken: string ): string;
+
+     ///  <summary>
+     ///    Set current turn data form user specified by auth token
+     ///  </summary>
+     function setCurrentTurn( AuthToken: string;Const json : String ): string;
 
    end;
 
