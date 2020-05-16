@@ -401,7 +401,7 @@ object WebModule4: TWebModule4
         #9#9'<a href="https://www.youtube.com/watch?v=dbgaHNrDdBs&amp;list=' +
         'PL-oEujJyp0deGinpcUgiZwoa_rPnmgCwN" target="_blank">'
       
-        #9#9'<img alt="" class="noBorder" height="114" src="<#IMGURL>Icon.p' +
+        #9#9'<img alt="" class="noBorder" height="114" src="<#IMGURL>icon.p' +
         'ng" width="210" /></a><br />'
       #9#9'<br />'
       
