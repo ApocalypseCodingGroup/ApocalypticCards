@@ -26190,4 +26190,16 @@ object MainForm: TMainForm
     Left = 112
     Top = 192
   end
+  object FrameStand1: TFrameStand
+    AnimationShow = 'OnShow*'
+    AnimationHide = 'OnHide*'
+    CommonActionPrefix = 'ca_'
+    DefaultHideAndCloseDeferTimeMS = 100
+    DefaultStyleName = 'framestand'
+    DefaultStandName = 'framestand'
+    StyleBook = Stands
+    StandBook = Stands
+    Left = 112
+    Top = 136
+  end
 end
