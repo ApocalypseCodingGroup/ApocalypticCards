@@ -43,7 +43,7 @@ implementation
 
 {$R *.dfm}
 
-uses System.Messaging;
+uses System.Messaging, Data.Remote;
 
 { TMainData }
 
@@ -74,10 +74,37 @@ begin
 end;
 
 procedure TMainData.SetGameUsers(const Value: IList<IUserData>);
+var
+  LUser: IUserData;
+  LIndex: Integer;
 begin
   FGameUsers := Value;
 
   TGameUsersChanged.CreateAndSend(Self);
+
+  if Assigned(UserData)
+     and Assigned(GameUsers)
+     and (CurrentView = TAppView.GreenRoom)
+  then
+  begin
+    // check if my PlayerState changed and update the current view
+    for LIndex := 0 to GameUsers.Count-1 do
+    begin
+      LUser := GameUsers.Items[LIndex];
+
+      if (LUser.UserID = UserData.UserID) // it's me
+         and (LUser.PlayerState <> TPlayerState.psInGreenRoom)
+      then
+      begin
+        RemoteData.StopPollingForUsers;
+        if LUser.PlayerState = TPlayerState.psJudgeWaitingForSubmit then
+          CurrentView := TAppView.Judging
+        else if LUser.PlayerState = TPlayerState.psPlayerSubmitting then
+          CurrentView := TAppView.Submitting;
+      end;
+    end;
+
+  end;
 end;
 
 end.

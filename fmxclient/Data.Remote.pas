@@ -23,6 +23,8 @@ type
     PollingForGamesRequest: TRESTRequest;
     PollingForGamesResponse: TRESTResponse;
     PollingForGamesTimer: TTimer;
+    StartGameResponse: TRESTResponse;
+    StartGameRequest: TRESTRequest;
     procedure PollingForUsersTimerTimer(Sender: TObject);
     procedure PollingForGamesTimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
@@ -41,6 +43,8 @@ type
 
     procedure JoinGame(const AUserName: string; const ASessionID: string;
       const AOnSuccess: TProc; const AOnError: TErrorProc);
+
+    procedure StartGame(const AOnSuccess: TProc; const AOnError: TErrorProc);
 
     procedure StartPollingForUsers();
     procedure StopPollingForUsers();
@@ -78,11 +82,11 @@ begin
   Result := TList<IGameData>.Create;
   JSONArray := TJSONObject.ParseJSONValue(
     TEncoding.ASCII.GetBytes(AJSONResponse),0) as TJSONArray;
-  if JSONArray.Size=0 then begin
+  if JSONArray.Count = 0 then begin
     exit;
   end;
   for idx := 0 to pred(JSONArray.Count) do begin
-    Result.Add(TJSON.JsonToObject<TGameData>(JSONArray.Get(idx).ToJSON));
+    Result.Add(TJSON.JsonToObject<TGameData>(JSONArray.Items[idx].ToJSON));
   end;
 end;
 
@@ -94,11 +98,11 @@ begin
   Result := TList<IUserData>.Create;
   JSONArray := TJSONObject.ParseJSONValue(
     TEncoding.ASCII.GetBytes(AJSONResponse),0) as TJSONArray;
-  if JSONArray.Size=0 then begin
+  if JSONArray.Count = 0 then begin
     exit;
   end;
   for idx := 0 to pred(JSONArray.Count) do begin
-    Result.Add(TJSON.JsonToObject<TUserData>(JSONArray.Get(idx).ToJSON));
+    Result.Add(TJSON.JsonToObject<TUserData>(JSONArray.Items[idx].ToJSON));
   end;
 end;
 
@@ -227,6 +231,40 @@ begin
   finally
     PollingForUsersTimer.Enabled := FPollingForUsers;
   end;
+end;
+
+procedure TRemoteData.StartGame(const AOnSuccess: TProc;
+  const AOnError: TErrorProc);
+var
+  LGame: IGameData;
+begin
+  Assert(Assigned(MainData.CurrentGame));
+
+  LGame := MainData.CurrentGame;
+  LGame.GameState := TGameState.gsRunning;
+  StartGameRequest.Params.ParameterByName('authentication-string').Value := MainData.UserData.UserID;
+  StartGameRequest.Body.Add(LGame.ToJSON, ctAPPLICATION_JSON);
+
+  StartGameRequest.ExecuteAsync(
+    procedure
+    begin
+      LGame := TJSON.JsonToObject<TGameData>(StartGameResponse.Content);
+//      if not LGame.GameState = TGameState.gsRunning then
+//        ShowMessage('Game did not start - Number of required users not met.'); //AM
+      MainData.CurrentGame := LGame;
+
+      if Assigned(AOnSuccess) then
+        AOnSuccess();
+    end
+  , True, True
+  , procedure(AObj: TObject)
+    begin
+      if Assigned(AOnError) then
+        AOnError(AObj.ToString)
+      else
+        raise Exception.Create(AObj.ToString);
+    end
+  );
 end;
 
 procedure TRemoteData.StartPollingForGames;

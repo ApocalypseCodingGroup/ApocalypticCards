@@ -10,7 +10,9 @@ uses
   Data.Main in 'Data.Main.pas' {MainData: TDataModule},
   Utils.Messages in 'Utils.Messages.pas',
   Frames.GreenRoom in 'Frames.GreenRoom.pas' {GreenRoomFrame: TFrame},
-  Frames.JoinGame in 'Frames.JoinGame.pas' {JoinFrame: TFrame};
+  Frames.JoinGame in 'Frames.JoinGame.pas' {JoinFrame: TFrame},
+  Frames.Judging in 'Frames.Judging.pas' {JudgingFrame: TFrame},
+  Frames.Submitting in 'Frames.Submitting.pas' {SubmittingFrame: TFrame};
 
 {$R *.res}
 

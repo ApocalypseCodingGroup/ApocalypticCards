@@ -82,6 +82,7 @@ object GreenRoomFrame: TGreenRoomFrame
     object StartGameAction: TAction
       AutoCheck = True
       Text = 'Start now!'
+      OnExecute = StartGameActionExecute
       OnUpdate = StartGameActionUpdate
     end
   end
