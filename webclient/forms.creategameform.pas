@@ -18,8 +18,6 @@ type
     WebLabel3: TWebLabel;
     WebLabel4: TWebLabel;
     PrivateGameCheckbox: TWebCheckBox;
-    WebLabel5: TWebLabel;
-    YourNameEdit: TWebEdit;
     BackButton: TWebButton;
     CreateButton: TWebButton;
     SpinMinUsers: TTMSFNCSpinEdit;
@@ -54,7 +52,7 @@ end;
 
 procedure TCreateGameForm.CheckButtons;
 begin
-  CreateButton.Visible := (Length(GameNameEdit.Text) > 0) and (Length(YourNameEdit.Text) > 0)
+  CreateButton.Visible := (Length(GameNameEdit.Text) > 0);
 end;
 
 procedure TCreateGameForm.GameNameEditChange(Sender: TObject);

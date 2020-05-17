@@ -5,18 +5,20 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, forms.baseform, WEBLib.Controls,
-  WEBLib.ExtCtrls, Vcl.StdCtrls, WEBLib.StdCtrls;
+  WEBLib.ExtCtrls, Vcl.StdCtrls, WEBLib.StdCtrls, Vcl.Imaging.jpeg;
 
 type
   TWelcomeForm = class(TBaseForm)
     StartButton: TWebButton;
     JoinGameButton: TWebButton;
+    WebImageControl1: TWebImageControl;
+    WebPanel1: TWebPanel;
+    WebLabel5: TWebLabel;
+    YourNameEdit: TWebEdit;
+    bgPanel: TWebPanel;
     procedure StartButtonClick(Sender: TObject);
     procedure JoinGameButtonClick(Sender: TObject);
-  private
-    { Private declarations }
-  public
-    { Public declarations }
+    procedure WebFormResize(Sender: TObject);
   end;
 
 var
@@ -56,6 +58,12 @@ begin
   inherited;
   TheForm := TCreateGameForm.CreateNew(@AfterCreate);
   TheForm.ShowModal(@AfterShowModal);
+end;
+
+procedure TWelcomeForm.WebFormResize(Sender: TObject);
+begin
+  inherited;
+  BaseCenterPanel.Left := (Width - BaseCenterPanel.Width) div 2;
 end;
 
 end.

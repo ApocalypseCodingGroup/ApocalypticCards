@@ -56,19 +56,6 @@ inherited CreateGameForm: TCreateGameForm
       Font.Style = [fsBold]
       ParentFont = False
     end
-    object WebLabel5: TWebLabel
-      Left = 40
-      Top = 253
-      Width = 59
-      Height = 14
-      Caption = 'Your Name'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Arial'
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
     object GameNameEdit: TWebEdit
       Left = 40
       Top = 44
@@ -107,15 +94,6 @@ inherited CreateGameForm: TCreateGameForm
       ParentFont = False
       State = cbUnchecked
     end
-    object YourNameEdit: TWebEdit
-      Left = 40
-      Top = 273
-      Width = 367
-      Height = 22
-      ChildOrder = 1
-      OnChange = YourNameEditChange
-      OnExit = YourNameEditExit
-    end
     object BackButton: TWebButton
       Left = 47
       Top = 317
@@ -151,7 +129,7 @@ inherited CreateGameForm: TCreateGameForm
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 6
+      TabOrder = 5
       Appearance.ButtonSize = 50
       Appearance.ButtonDownStroke.Color = clBlack
       Appearance.ButtonStroke.Color = clBlack
@@ -163,6 +141,7 @@ inherited CreateGameForm: TCreateGameForm
       Appearance.ValueFont.Name = 'Tahoma'
       Appearance.ValueFont.Style = [fsBold]
       Interaction.RepeatClick = True
+      EditFieldPrecision = 2
       Fill.Kind = gfkNone
       Stroke.Kind = gskNone
       Stroke.Color = 14524677
@@ -186,7 +165,7 @@ inherited CreateGameForm: TCreateGameForm
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 7
+      TabOrder = 6
       Appearance.ButtonSize = 50
       Appearance.ButtonDownStroke.Color = clBlack
       Appearance.ButtonStroke.Color = clBlack
@@ -198,6 +177,7 @@ inherited CreateGameForm: TCreateGameForm
       Appearance.ValueFont.Name = 'Tahoma'
       Appearance.ValueFont.Style = [fsBold]
       Interaction.RepeatClick = True
+      EditFieldPrecision = 2
       Fill.Kind = gfkNone
       Stroke.Kind = gskNone
       Stroke.Color = 14524677
