@@ -18,15 +18,18 @@ type
     FUserData: IUserData;
     FGameUsers: IList<IUserData>;
     FGames: IList<IGameData>;
+    FTurnData: ITurnData;
     procedure SetCurrentView(const Value: TAppView);
     procedure SetGameUsers(const Value: IList<IUserData>);
     procedure SetGames(const Value: IList<IGameData>);
+    procedure SetTurnData(const Value: ITurnData);
   protected
     procedure CurrentViewChanged;
   public
     constructor Create(AOwner: TComponent); override;
 
     property UserData: IUserData read FUserData write FUserData;
+    property TurnData: ITurnData read FTurnData write SetTurnData;
     property CurrentGame: IGameData read FCurrentGame write FCurrentGame;
     property GameUsers: IList<IUserData> read FGameUsers write SetGameUsers;
     property Games: IList<IGameData> read FGames write SetGames;
@@ -43,7 +46,10 @@ implementation
 
 {$R *.dfm}
 
-uses System.Messaging, Data.Remote;
+uses
+  System.Messaging, Data.Remote
+  , CodeSiteLogging
+;
 
 { TMainData }
 
@@ -97,6 +103,7 @@ begin
       then
       begin
         RemoteData.StopPollingForUsers;
+        CodeSite.SendMsg('MainData: Judging or Submitting');
         if LUser.PlayerState = TPlayerState.psJudgeWaitingForSubmit then
           CurrentView := TAppView.Judging
         else if LUser.PlayerState = TPlayerState.psPlayerSubmitting then
@@ -105,6 +112,23 @@ begin
     end;
 
   end;
+end;
+
+procedure TMainData.SetTurnData(const Value: ITurnData);
+begin
+  CodeSite.SendMsg('MainData: SetTurnData');
+  FTurnData := Value;
+
+  if Assigned(FTurnData) then
+  begin
+    // it would be probably better to refresh userData and check PlayerState here
+    if FTurnData.Cards[0].CardID = ''  then
+      CurrentView := TAppView.Judging
+    else
+      CurrentView := TAppView.Submitting;
+  end;
+
+  TTurnDataChanged.CreateAndSend(Self);
 end;
 
 end.

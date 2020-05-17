@@ -34,6 +34,7 @@ implementation
 
 uses Data.Main, System.Rtti, System.Messaging
 , Frames.JoinGame, Frames.Judging, Frames.Submitting
+, CodeSiteLogging
 ;
 
 procedure TMainForm.FormCreate(Sender: TObject);
@@ -58,9 +59,11 @@ begin
           FrameStand1.New<TJoinFrame>(MainContentLayout, 'solidBackground').Show;
         end;
         Submitting : begin
+          CodeSite.SendMsg('MainForm: Submitting');
           FrameStand1.New<TSubmittingFrame>(MainContentLayout, 'solidBackground').Show;
         end;
         Judging : begin
+          CodeSite.SendMsg('MainForm: Judging');
           FrameStand1.New<TJudgingFrame>(MainContentLayout, 'solidBackground').Show;
         end;
 

@@ -108,4 +108,21 @@ object RemoteData: TRemoteData
     Left = 616
     Top = 24
   end
+  object TurnResponse: TRESTResponse
+    Left = 752
+    Top = 80
+  end
+  object TurnRequest: TRESTRequest
+    Client = RESTClient1
+    Params = <
+      item
+        Kind = pkHTTPHEADER
+        Name = 'authentication-string'
+      end>
+    Resource = 'turn'
+    Response = TurnResponse
+    SynchronizedEvents = False
+    Left = 752
+    Top = 24
+  end
 end

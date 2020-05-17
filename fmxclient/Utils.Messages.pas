@@ -16,6 +16,7 @@ type
 
   TUsersPollingStopped = class(TMessage);
   TGamesPollingStopped = class(TMessage);
+  TTurnDataChanged = class(TMessage);
 
   TMessageHelper = class helper for TMessageBase
     procedure Send(const ASender: TObject);

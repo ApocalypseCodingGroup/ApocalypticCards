@@ -25,6 +25,8 @@ type
     PollingForGamesTimer: TTimer;
     StartGameResponse: TRESTResponse;
     StartGameRequest: TRESTRequest;
+    TurnResponse: TRESTResponse;
+    TurnRequest: TRESTRequest;
     procedure PollingForUsersTimerTimer(Sender: TObject);
     procedure PollingForGamesTimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
@@ -47,6 +49,8 @@ type
       const AOnSuccess: TProc; const AOnError: TErrorProc);
 
     procedure StartGame(const AOnSuccess: TProc; const AOnError: TErrorProc);
+
+    procedure RetrieveTurnData(const AOnSuccess: TProc; const AOnError: TErrorProc);
 
     procedure StartPollingForUsers();
     procedure StopPollingForUsers();
@@ -72,6 +76,7 @@ uses
   Generics.Collections, System.JSON, REST.JSON
 , datamodel.standard, cwCollections.standard
 , Data.Main, Utils.Messages
+, CodeSiteLogging
 ;
 
 { TRemoteData }
@@ -249,6 +254,36 @@ begin
   finally
     PollingForUsersTimer.Enabled := FPollingForUsers;
   end;
+end;
+
+procedure TRemoteData.RetrieveTurnData(const AOnSuccess: TProc;
+  const AOnError: TErrorProc);
+begin
+  EndorseAuthentication(TurnRequest);
+
+  TurnRequest.ExecuteAsync(
+    procedure
+    var
+      LTurnData: ITurnData;
+    begin
+      CodeSite.SendMsg('RetrieveTurnData: ' + TurnResponse.Content);
+
+//      LTurnData := TJSON.JsonToObject<TTurnData>(TurnResponse.Content);
+      LTurnData := TTurnData.FromJSON(TurnResponse.Content);
+      MainData.TurnData := LTurnData;
+
+      if Assigned(AOnSuccess) then
+        AOnSuccess();
+    end
+  , True, True
+  , procedure(AObj: TObject)
+    begin
+      if Assigned(AOnError) then
+        AOnError(AObj.ToString)
+      else
+        raise Exception.Create(AObj.ToString);
+    end
+  );
 end;
 
 procedure TRemoteData.StartGame(const AOnSuccess: TProc;
