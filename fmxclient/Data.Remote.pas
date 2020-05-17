@@ -32,6 +32,8 @@ type
     FPollingForUsers: Boolean;
     FPollingForGames: Boolean;
   protected
+    procedure EndorseAuthentication(const AReq: TRESTRequest);
+
     procedure PollForUsers();
     procedure PollForGames();
     function ParseGames(const AJSONResponse: string): IList<IGameData>;
@@ -140,6 +142,24 @@ begin
   end;
 end;
 
+procedure TRemoteData.EndorseAuthentication(const AReq: TRESTRequest);
+const AUTH_PARAM_NAME: string = 'authentication-string';
+var
+  LParam: TRESTRequestParameter;
+begin
+  if not Assigned(MainData.UserData) then
+    raise Exception.Create('No userdata available to endorse authentication');
+
+  if not AReq.Params.ContainsParameter(AUTH_PARAM_NAME) then
+  begin
+    LParam := AReq.Params.AddItem;
+    LParam.Kind := TRESTRequestParameterKind.pkHTTPHEADER;
+    LParam.Name := AUTH_PARAM_NAME;
+  end;
+
+  AReq.Params.ParameterByName(AUTH_PARAM_NAME).Value := MainData.UserData.UserID;
+end;
+
 procedure TRemoteData.JoinGame(const AUserName, ASessionID: string;
   const AOnSuccess: TProc; const AOnError: TErrorProc);
 var
@@ -180,8 +200,6 @@ end;
 
 procedure TRemoteData.PollForGames;
 begin
-//  PollingForGamesRequest.Params.ParameterByName('authentication-string').Value :=
-//    MainData.UserData.UserID;
   PollingForGamesRequest.ExecuteAsync(
     procedure
     begin
@@ -198,8 +216,8 @@ end;
 
 procedure TRemoteData.PollForUsers;
 begin
-  PollingForUsersRequest.Params.ParameterByName('authentication-string').Value :=
-    MainData.UserData.UserID;
+  EndorseAuthentication(PollingForUsersRequest);
+
   PollingForUsersRequest.ExecuteAsync(
     procedure
     begin
@@ -242,7 +260,7 @@ begin
 
   LGame := MainData.CurrentGame;
   LGame.GameState := TGameState.gsRunning;
-  StartGameRequest.Params.ParameterByName('authentication-string').Value := MainData.UserData.UserID;
+  EndorseAuthentication(StartGameRequest);
   StartGameRequest.Body.Add(LGame.ToJSON, ctAPPLICATION_JSON);
 
   StartGameRequest.ExecuteAsync(
