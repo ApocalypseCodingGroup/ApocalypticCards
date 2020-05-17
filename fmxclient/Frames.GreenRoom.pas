@@ -22,6 +22,7 @@ type
     StartGameAction: TAction;
     LastCheckLabel: TLabel;
     procedure StartGameActionUpdate(Sender: TObject);
+    procedure StartGameActionExecute(Sender: TObject);
   private
   protected
     procedure RenderUsers;
@@ -114,9 +115,17 @@ begin
   end;
 end;
 
+procedure TGreenRoomFrame.StartGameActionExecute(Sender: TObject);
+begin
+  RemoteData.StartGame(nil, nil);
+end;
+
 procedure TGreenRoomFrame.StartGameActionUpdate(Sender: TObject);
 begin
-  StartGameAction.Enabled := False;
+  StartGameAction.Enabled :=
+    (Assigned(MainData.CurrentGame) and Assigned(MainData.GameUsers))
+    and (MainData.GameUsers.Count >= MainData.CurrentGame.MinUser)
+  ;
 end;
 
 end.

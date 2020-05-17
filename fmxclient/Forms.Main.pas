@@ -32,7 +32,9 @@ implementation
 
 {$R *.fmx}
 
-uses Data.Main, System.Rtti, System.Messaging, Frames.JoinGame;
+uses Data.Main, System.Rtti, System.Messaging
+, Frames.JoinGame, Frames.Judging, Frames.Submitting
+;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
@@ -54,6 +56,12 @@ begin
         end;
         JoinGame : begin
           FrameStand1.New<TJoinFrame>(MainContentLayout, 'solidBackground').Show;
+        end;
+        Submitting : begin
+          FrameStand1.New<TSubmittingFrame>(MainContentLayout, 'solidBackground').Show;
+        end;
+        Judging : begin
+          FrameStand1.New<TJudgingFrame>(MainContentLayout, 'solidBackground').Show;
         end;
 
       end;

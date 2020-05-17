@@ -8,7 +8,7 @@ uses
 ;
 
 type
-  TAppView = (Init, Home, CreateGame, JoinGame, GreenRoom);
+  TAppView = (Init, Home, CreateGame, JoinGame, GreenRoom, Judging, Submitting);
 
   TCurrentViewChanged = class(TMessage<TAppView>);
   TGameUsersChanged = class(TMessage);
