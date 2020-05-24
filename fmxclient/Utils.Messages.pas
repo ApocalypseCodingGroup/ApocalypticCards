@@ -8,7 +8,7 @@ uses
 ;
 
 type
-  TAppView = (Init, Home, CreateGame, JoinGame, GreenRoom);
+  TAppView = (Init, Home, CreateGame, JoinGame, GreenRoom, Judging, Submitting);
 
   TCurrentViewChanged = class(TMessage<TAppView>);
   TGameUsersChanged = class(TMessage);
@@ -16,6 +16,7 @@ type
 
   TUsersPollingStopped = class(TMessage);
   TGamesPollingStopped = class(TMessage);
+  TTurnDataChanged = class(TMessage);
 
   TMessageHelper = class helper for TMessageBase
     procedure Send(const ASender: TObject);

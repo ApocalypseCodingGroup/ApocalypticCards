@@ -8526,6 +8526,16 @@ rtl.module("Classes",["System","RTLConsts","Types","SysUtils","JS","TypInfo","We
       };
       return Result;
     };
+    this.SetEvent = function (AInstance, ALookupRoot, APropName, AMethodName) {
+      var lMethod = pas.System.TMethod.$new();
+      lMethod.Code = ALookupRoot.$class.MethodAddress(AMethodName);
+      if (lMethod.Code === null) throw pas.SysUtils.Exception.$create("Create$1",[ALookupRoot.$classname + ' has no published method "' + AMethodName + '"']);
+      lMethod.Data = ALookupRoot;
+      pas.TypInfo.SetMethodProp$1(AInstance,APropName,lMethod);
+    };
+    this.SetEvent$1 = function (ALookupRoot, APropName, AMethodName) {
+      this.SetEvent(this,ALookupRoot,APropName,AMethodName);
+    };
   });
   $mod.$rtti.$ClassRef("TPersistentClass",{instancetype: $mod.$rtti["TPersistent"]});
   rtl.createClass($mod,"TInterfacedPersistent",$mod.TPersistent,function () {
@@ -10216,13 +10226,6 @@ rtl.module("Classes",["System","RTLConsts","Types","SysUtils","JS","TypInfo","We
       var Result = null;
       Result = $mod.TComponentEnumerator.$create("Create$1",[this]);
       return Result;
-    };
-    this.SetEvent = function (AInstance, ALookupRoot, APropName, AMethodName) {
-      var lMethod = pas.System.TMethod.$new();
-      lMethod.Code = ALookupRoot.$class.MethodAddress(AMethodName);
-      if (lMethod.Code === null) throw pas.SysUtils.Exception.$create("Create$1",[ALookupRoot.$classname + ' has no published method "' + AMethodName + '"']);
-      lMethod.Data = ALookupRoot;
-      pas.TypInfo.SetMethodProp$1(AInstance,APropName,lMethod);
     };
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
@@ -14283,12 +14286,13 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
   this.VK_F23 = 134;
   this.VK_F24 = 135;
   this.VK_NUMLOCK = 144;
+  $mod.$rtti.$inherited("TCursor",rtl.longint,{});
   this.crDefault = 0;
   this.crNone = 1;
   this.crArrow = 2;
   this.crCross = 3;
   this.crIBeam = 4;
-  this.crSize = 22;
+  this.crSize = 5;
   this.crSizeNESW = 6;
   this.crSizeNS = 7;
   this.crSizeNWSE = 8;
@@ -14306,6 +14310,8 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
   this.crHelp = 20;
   this.crHandPoint = 21;
   this.crSizeAll = 22;
+  this.CSSBackground = "background-color";
+  this.CSSZIndex = "z-index";
   $mod.$rtti.$Class("TCSSCodeManager");
   this.TDragState = {"0": "dsDragEnter", dsDragEnter: 0, "1": "dsDragLeave", dsDragLeave: 1, "2": "dsDragMove", dsDragMove: 2};
   $mod.$rtti.$Enum("TDragState",{minvalue: 0, maxvalue: 2, ordtype: 1, enumtype: this.TDragState});
@@ -14680,8 +14686,8 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
         this.DoBoundsChange();
         if (this.GetIsLinked() && !this.IsUpdating() && (this.GetElementHandle() != null)) {
           if (AValue >= 0) {
-            this.GetElementHandle().style.setProperty("height",pas.SysUtils.IntToStr(AValue))}
-           else this.GetElementHandle().style.removeProperty("height");
+            this.GetElementHandle().style.setProperty("width",pas.SysUtils.IntToStr(AValue))}
+           else this.GetElementHandle().style.removeProperty("width");
         };
       };
     };
@@ -15038,6 +15044,11 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
     this.IsStructuralElement = function () {
       var Result = false;
       Result = false;
+      return Result;
+    };
+    this.IsEnabled = function () {
+      var Result = false;
+      Result = this.FEnabled;
       return Result;
     };
     this.RecreateElement = function () {
@@ -15506,7 +15517,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       if (this.FOnEnter != null) this.FOnEnter(this);
     };
     this.Click = function () {
-      if ((this.FOnClick != null) && this.FEnabled) this.FOnClick(this);
+      if ((this.FOnClick != null) && this.IsEnabled()) this.FOnClick(this);
     };
     this.UpdateElement = function () {
       if (this.FBlockUpdateElement || (this.FUpdateCount > 0)) return;
@@ -15631,7 +15642,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       useCSS = !((this.FElementClassName === "") && (this.FElementFont === $mod.TElementFont.efProperty) && !this.GetIsLinked());
       $mod.SetHTMLElementFont(eh,this.FFont,useCSS);
       if (!useCSS) {
-        if (this.FEnabled) eh.style.setProperty("color",pas["WEBLib.Graphics"].ColorToHTML(this.FFont.FColor));
+        if (this.IsEnabled()) eh.style.setProperty("color",pas["WEBLib.Graphics"].ColorToHTML(this.FFont.FColor));
       } else {
         eh.style.removeProperty("color");
       };
@@ -15646,7 +15657,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
            else eh.style.setProperty("display","none");
         };
         this.EnableTab();
-        if (this.FEnabled) {
+        if (this.IsEnabled()) {
           this.FContainer.removeAttribute("disabled")}
          else this.FContainer.setAttribute("disabled","");
         if (this.GetIsLinked() && (this.FHint === "")) return;
@@ -15654,7 +15665,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
         if (this.FShowHint && (this.FHint !== "")) {
           this.FContainer.setAttribute("title",this.FHint)}
          else this.FContainer.removeAttribute("title");
-        if (!this.FEnabled) eh.style.removeProperty("color");
+        if (!this.IsEnabled()) eh.style.removeProperty("color");
       };
     };
     this.UpdateParent = function () {
@@ -15713,7 +15724,9 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
     };
     this.DisableTab = function () {
       var i = 0;
-      if (this.FTabStop && this.CanFocus() && (this.GetContainer() != null)) this.GetContainer().setAttribute("tabindex","-1");
+      if (!(this.FTabStop && this.CanFocus())) {
+        if (this.GetContainer() != null) this.GetContainer().setAttribute("tabindex","-1");
+      };
       for (var $l1 = 0, $end2 = this.GetControlsCount() - 1; $l1 <= $end2; $l1++) {
         i = $l1;
         this.GetControls(i).DisableTab();
@@ -15725,7 +15738,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
         if (this.FTabStop && this.CanFocus()) {
           this.FContainer.setAttribute("tabindex",pas.SysUtils.IntToStr(this.FTabOrder + 1));
         } else {
-          this.FContainer.removeAttribute("tabindex");
+          this.FContainer.setAttribute("tabindex","-1");
         };
       };
       for (var $l1 = 0, $end2 = this.GetControlsCount() - 1; $l1 <= $end2; $l1++) {
@@ -15756,10 +15769,12 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
         if (this.FParent != null) this.FParent.UnRegisterParent(this);
         this.FPrevParent = this.FParent;
         this.FParent = AValue;
+        this.FGotFocus = false;
         this.UpdateParent();
         this.UpdateElement();
         this.InitScript();
         if (this.FParent != null) this.FParent.RegisterParent(this);
+        this.Realign();
       };
     };
     this.RegisterParent = function (AValue) {
@@ -16276,7 +16291,9 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
          else eh.style.setProperty("overflow","");
       };
       r.$assign(this.GetClientRect());
-      if ((r.Bottom + ctop) > window.innerHeight) r.Bottom = window.innerHeight - ctop;
+      if ((r.Bottom + ctop) > window.innerHeight) {
+        if ((this.FParent != null) && pas["WEBLib.Forms"].TCustomForm.isPrototypeOf(this.FParent)) r.Bottom = window.innerHeight - ctop;
+      };
       if ((eh != null) && (eh.tagName === "BODY")) {
         vscrl = 0;
         if (document.body.scrollHeight > document.body.clientHeight) vscrl = 16;
@@ -16289,8 +16306,8 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
         };
       };
       if (pas["WEBLib.Forms"].TCustomForm.isPrototypeOf(AControl)) {
-        if (r.Bottom > window.outerHeight) r.Bottom = window.outerHeight;
-        if (r.Right > window.outerWidth) r.Right = window.outerWidth;
+        if (r.Bottom > window.innerHeight) r.Bottom = window.innerHeight;
+        if (r.Right > window.innerWidth) r.Right = window.innerWidth;
       };
       if (AControl.IsStructuralElement()) r.$assign(this.FParent.GetClientRect());
       this.AlignControls(AControl,r);
@@ -16342,8 +16359,12 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
         };
         this.GetControls(i).Loaded();
       };
-      var $tmp3 = this.FAlign;
-      if ($tmp3 === $mod.TAlign.alClient) {
+      for (var $l3 = 0, $end4 = this.GetComponentCount() - 1; $l3 <= $end4; $l3++) {
+        i = $l3;
+        if (pas.Classes.TComponentStateItem.csLoading in this.GetComponent(i).FComponentState) this.GetComponent(i).Loaded();
+      };
+      var $tmp5 = this.FAlign;
+      if ($tmp5 === $mod.TAlign.alClient) {
         if (this.FParent != null) this.SetBoundsInt(0,0,this.FParent.FWidth,this.FParent.FHeight);
       };
       this.Resize();
@@ -16380,7 +16401,9 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       this.FControlCreated = false;
       this.FLinkTouchEvents = true;
       this.FIsResizing = false;
-      if (((this.FOwner != null) && (pas.Classes.TComponentStateItem.csLoading in this.FOwner.FComponentState)) || !(this.FOwner != null)) this.Loading();
+      if (((this.FOwner != null) && (pas.Classes.TComponentStateItem.csLoading in this.FOwner.FComponentState)) || !(this.FOwner != null)) {
+        this.Loading();
+      };
       this.FElementPosition = $mod.TElementPosition.epAbsolute;
       this.FWidthStyle = $mod.TSizeStyle.ssAbsolute;
       this.FHeightStyle = $mod.TSizeStyle.ssAbsolute;
@@ -16672,7 +16695,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       eh.style.setProperty("ms-user-select","none");
       eh.style.setProperty("user-select","none");
       eh.style.setProperty("position","absolute");
-      eh.style.setProperty("z-index","999999");
+      eh.style.setProperty($mod.CSSZIndex,"999999");
       this.FCaptured = true;
       this.UpdateElement();
     };
@@ -16809,14 +16832,14 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       if (this.GetElementHandle() != null) {
         if (((this.FElementPosition !== $mod.TElementPosition.epAbsolute) || this.GetIsLinked()) && (this.GetElementHandle().parentElement != null)) {
           this.GetElementHandle().parentElement.appendChild(this.GetElementHandle());
-        } else this.GetElementHandle().style.setProperty("z-index","999998");
+        } else this.GetElementHandle().style.setProperty($mod.CSSZIndex,"999998");
       };
     };
     this.SendToBack = function () {
       if (this.GetElementHandle() != null) {
         if (((this.FElementPosition !== $mod.TElementPosition.epAbsolute) || this.GetIsLinked()) && (this.GetElementHandle().parentElement != null)) {
           this.GetElementHandle().parentElement.insertBefore(this.GetElementHandle(),this.GetElementHandle().parentElement.firstElementChild);
-        } else this.GetElementHandle().style.setProperty("z-index","0");
+        } else this.GetElementHandle().style.setProperty($mod.CSSZIndex,"0");
       };
     };
     this.PreventDefault = function () {
@@ -16858,7 +16881,9 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       p = this.FParent;
       while (p != null) {
         if (p.GetIsLinked()) {
-          cr = p.GetElementHandle().getBoundingClientRect();
+          if (pas["WEBLib.Forms"].TCustomForm.isPrototypeOf(p)) {
+            cr = p.GetContainer().getBoundingClientRect()}
+           else cr = p.GetElementHandle().getBoundingClientRect();
           AClientX.set(AClientX.get() - cr.left);
           AClientY.set(AClientY.get() - cr.top);
         };
@@ -16883,6 +16908,13 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       Y.set((AClientY + this.GetTop()) - document.body.scrollTop - document.documentElement.scrollTop);
       p = this.FParent;
       while (p != null) {
+        if (p.GetIsLinked()) {
+          if (pas["WEBLib.Forms"].TCustomForm.isPrototypeOf(p)) {
+            cr = p.GetContainer().getBoundingClientRect()}
+           else cr = p.GetElementHandle().getBoundingClientRect();
+          X.set(X.get() + cr.left);
+          Y.set(Y.get() + cr.top);
+        };
         if (pas["WEBLib.Forms"].TCustomForm.isPrototypeOf(p)) {
           if ((rtl.as(p,pas["WEBLib.Forms"].TCustomForm).GetContainer() != null) && (rtl.as(p,pas["WEBLib.Forms"].TCustomForm).FFormContainer === "") && (rtl.as(p,pas["WEBLib.Forms"].TCustomForm).FFormFileName !== "") && rtl.as(p,pas["WEBLib.Forms"].TCustomForm).FPopup) {
             cr = rtl.as(p,pas["WEBLib.Forms"].TCustomForm).GetContainer().getBoundingClientRect();
@@ -16890,8 +16922,10 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
             Y.set(Y.get() + cr.top);
           };
         };
-        X.set(X.get() + p.GetLeft());
-        Y.set(Y.get() + p.GetTop());
+        if (p.FElementPosition === $mod.TElementPosition.epAbsolute) {
+          X.set(X.get() + p.GetLeft());
+          Y.set(Y.get() + p.GetTop());
+        };
         p = p.FParent;
       };
     };
@@ -16938,7 +16972,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
   rtl.createClass($mod,"TWinControl",$mod.TControl,function () {
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
-    $r.addProperty("Cursor",2,rtl.longint,"FCursor","SetControlCursor",{Default: 0});
+    $r.addProperty("Cursor",2,$mod.$rtti["TCursor"],"FCursor","SetControlCursor",{Default: 0});
     $r.addProperty("ElementClassName",2,$mod.$rtti["TElementClassName"],"FElementClassName","SetElementClassName");
     $r.addProperty("Enabled",2,rtl.boolean,"FEnabled","SetEnabled",{Default: true});
     $r.addProperty("Height",3,rtl.longint,"GetHeight","SetHeight");
@@ -17110,6 +17144,11 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
             } else this.GetElementHandle().style.setProperty("border-style","");
           } else this.GetElementHandle().style.setProperty("border-style","none");
         };
+        if (this.FElementClassName !== "") {
+          this.GetElementHandle().style.removeProperty("border-style");
+          this.GetElementHandle().style.removeProperty("border-width");
+          this.GetElementHandle().style.removeProperty("border-color");
+        };
       };
     };
     this.CreateElement = function () {
@@ -17185,6 +17224,14 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       if (this.FCanvas != null) this.FCanvas.Clear();
       this.Paint();
       this.FPainting = false;
+    };
+    this.SetFocus = function () {
+      $mod.TControl.SetFocus.call(this);
+    };
+    this.Focused = function () {
+      var Result = false;
+      Result = $mod.TControl.Focused.call(this);
+      return Result;
     };
     rtl.addIntf(this,pas.System.IUnknown);
   });
@@ -17365,6 +17412,11 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
     var $r = this.$rtti;
     $r.addProperty("CSSFragments",2,$mod.$rtti["TCSSCodeFragments"],"FCSSFragments","SetCSSFragments");
   });
+  rtl.createHelper($mod,"TCollectionItemHelper",null,function () {
+    this.SetEvent = function (ALookupRoot, APropName, AMethodName) {
+      pas.Classes.TPersistent.SetEvent.call(this,this,ALookupRoot,APropName,AMethodName);
+    };
+  });
   this.FindGlobalComponent = function (Name) {
     var Result = null;
     Result = null;
@@ -17452,6 +17504,7 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       AElement.style.removeProperty("font-family");
       AElement.style.removeProperty("font-style");
       AElement.style.removeProperty("font-weight");
+      AElement.style.removeProperty("font-size");
       AElement.style.removeProperty("text-decoration");
     } else {
       AElement.style.setProperty("font-family",AFont.FName);
@@ -17521,7 +17574,110 @@ rtl.module("WEBLib.Controls",["System","Classes","WEBLib.Graphics","Types","SysU
       Result = "help"}
      else if ($tmp1 === 21) {
       Result = "pointer"}
-     else if ($tmp1 === 22) Result = "move";
+     else if (($tmp1 === 22) || ($tmp1 === 5)) Result = "move";
+    return Result;
+  };
+  this.CursorToString = function (ACursor) {
+    var Result = "";
+    Result = "crDefault";
+    var $tmp1 = ACursor;
+    if ($tmp1 === 0) {
+      Result = "crDefault"}
+     else if ($tmp1 === 2) {
+      Result = "crArrow"}
+     else if ($tmp1 === 1) {
+      Result = "crNone"}
+     else if ($tmp1 === 3) {
+      Result = "crCross"}
+     else if ($tmp1 === 5) {
+      Result = "ctSize"}
+     else if ($tmp1 === 4) {
+      Result = "crIBeam"}
+     else if ($tmp1 === 6) {
+      Result = "crSizeNESW"}
+     else if ($tmp1 === 7) {
+      Result = "crSizeNS"}
+     else if ($tmp1 === 8) {
+      Result = "crSizeNWSE"}
+     else if ($tmp1 === 9) {
+      Result = "crSizeWE"}
+     else if ($tmp1 === 10) {
+      Result = "crUpArrow"}
+     else if ($tmp1 === 11) {
+      Result = "crHourGlass"}
+     else if ($tmp1 === 12) {
+      Result = "crDrag"}
+     else if ($tmp1 === 13) {
+      Result = "crNoDrop"}
+     else if ($tmp1 === 14) {
+      Result = "crHSplit"}
+     else if ($tmp1 === 15) {
+      Result = "crVSplit"}
+     else if ($tmp1 === 16) {
+      Result = "crMultiDrag"}
+     else if ($tmp1 === 17) {
+      Result = "crSQLWait"}
+     else if ($tmp1 === 18) {
+      Result = "crNo"}
+     else if ($tmp1 === 19) {
+      Result = "crAppStart"}
+     else if ($tmp1 === 20) {
+      Result = "crHelp"}
+     else if ($tmp1 === 21) {
+      Result = "crHandpoint"}
+     else if ($tmp1 === 22) Result = "crSizeAll";
+    return Result;
+  };
+  this.StringToCursor = function (S) {
+    var Result = 0;
+    var us = "";
+    Result = 0;
+    us = pas.SysUtils.UpperCase(S);
+    if (us === "CRDEFAULT") {
+      Result = 0}
+     else if (us === "CRARROW") {
+      Result = 2}
+     else if (us === "CRNONE") {
+      Result = 1}
+     else if (us === "CRCROSS") {
+      Result = 3}
+     else if (us === "CRSIZE") {
+      Result = 5}
+     else if (us === "CRIBEAM") {
+      Result = 4}
+     else if (us === "CRSIZENESW") {
+      Result = 6}
+     else if (us === "CRSIZENS") {
+      Result = 7}
+     else if (us === "CRSIZENWSE") {
+      Result = 8}
+     else if (us === "CRSIZEWE") {
+      Result = 9}
+     else if (us === "CRUPARROW") {
+      Result = 10}
+     else if (us === "CRHOURGLASS") {
+      Result = 11}
+     else if (us === "CRDRAG") {
+      Result = 12}
+     else if (us === "CRNODROP") {
+      Result = 13}
+     else if (us === "CRHSPLIT") {
+      Result = 14}
+     else if (us === "CRVSPLIT") {
+      Result = 15}
+     else if (us === "CRMULTIDRAG") {
+      Result = 16}
+     else if (us === "CRSQLWAIT") {
+      Result = 17}
+     else if (us === "CRNO") {
+      Result = 18}
+     else if (us === "CRAPPSTART") {
+      Result = 19}
+     else if (us === "CRHELP") {
+      Result = 20}
+     else if (us === "CRHANDPOINT") {
+      Result = 21}
+     else if (us === "CRSIZEALL") Result = 22;
     return Result;
   };
   $mod.$init = function () {
@@ -18413,7 +18569,7 @@ rtl.module("WEBLib.Consts",["System"],function () {
   var $mod = this;
   $mod.$resourcestrings = {SWarning: {org: "Warning"}, SError: {org: "Error"}, SInformation: {org: "Information"}, SConfirm: {org: "Confirm"}, SOK: {org: "OK"}, SCancel: {org: "Cancel"}, SYes: {org: "Yes"}, SNo: {org: "No"}, SAbort: {org: "Abort"}, SRetry: {org: "Retry"}, SIgnore: {org: "Ignore"}, SHelp: {org: "Help"}, SClose: {org: "Close"}, SAll: {org: "All"}, SYesToAll: {org: "Yes to all"}, SNoToAll: {org: "No to all"}, SReadError: {org: "Stream read error"}, SWriteError: {org: "Stream write error"}, SCannotGetFile: {org: "Cannot get the file from the URL %s because of the error %d!"}, SErrorLoadFromFile: {org: "There was an error during the download of the file %s!"}, SLoadFromFileAborted: {org: "The download of the file %s was abroted!"}};
 });
-rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],function () {
+rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Math","Classes","JS"],function () {
   "use strict";
   var $mod = this;
   var $impl = $mod.$impl;
@@ -18609,6 +18765,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
       Result = !$mod.TIntegerHelper.Equals.call(this,AValue);
       return Result;
     };
+    this.Parse = function (AValue) {
+      var Result = 0;
+      Result = pas.SysUtils.StrToInt(AValue);
+      return Result;
+    };
     this.ToString = function () {
       var Result = "";
       Result = $mod.TIntegerHelper.ToString$1(this.get());
@@ -18616,6 +18777,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
     };
     this.ToString$1 = function (AValue) {
       return AValue.toString();
+    };
+    this.TryParse = function (AString, AValue) {
+      var Result = false;
+      Result = pas.SysUtils.TryStrToInt(AString,AValue);
+      return Result;
     };
   });
   rtl.createHelper($mod,"TLongIntHelper",null,function () {
@@ -18629,6 +18795,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
       Result = !$mod.TLongIntHelper.Equals.call(this,AValue);
       return Result;
     };
+    this.Parse = function (AValue) {
+      var Result = 0;
+      Result = pas.SysUtils.StrToInt(AValue);
+      return Result;
+    };
     this.ToString = function () {
       var Result = "";
       Result = $mod.TLongIntHelper.ToString$1(this.get());
@@ -18636,6 +18807,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
     };
     this.ToString$1 = function (AValue) {
       return AValue.toString();
+    };
+    this.TryParse = function (AString, AValue) {
+      var Result = false;
+      Result = pas.SysUtils.TryStrToInt(AString,AValue);
+      return Result;
     };
   });
   rtl.createHelper($mod,"TWordHelper",null,function () {
@@ -19902,6 +20078,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
     var $r = this.$rtti;
     $r.addMethod("GetEnumerator",1,null,$mod.$rtti["TInterfaceListEnumerator"]);
   });
+  $mod.$rtti.$RefToProcVar("TCompareItems",{procsig: rtl.newTIProcSig([["ALeft",pas.System.$rtti["IUnknown"],2],["ARight",pas.System.$rtti["IUnknown"],2]],pas.Math.$rtti["TValueRelationship"])});
+  rtl.createInterface($mod,"IInterfaceListEx2","{4FE71218-0F8F-4027-B050-5E84E2202604}",["Sort"],$mod.IInterfaceList,function () {
+    var $r = this.$rtti;
+    $r.addMethod("Sort",0,[["ACompare",$mod.$rtti["TCompareItems"],2]]);
+  });
   rtl.createClass($mod,"TInterfaceList",pas.System.TInterfacedObject,function () {
     this.$init = function () {
       pas.System.TInterfacedObject.$init.call(this);
@@ -20024,6 +20205,14 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
       this.FList.Put(AIndex,AItem);
       if (AItem !== null) AItem._AddRef();
     };
+    this.Sort = function (ACompare) {
+      $impl.FCompare = ACompare;
+      try {
+        this.FList.Sort($impl.InternalCompare);
+      } finally {
+        $impl.FCompare = null;
+      };
+    };
     this.Unlock = function () {
     };
     this.Create$1 = function () {
@@ -20038,6 +20227,7 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
     };
     rtl.addIntf(this,$mod.IInterfaceList);
     rtl.addIntf(this,$mod.IInterfaceListEx);
+    rtl.addIntf(this,$mod.IInterfaceListEx2);
     rtl.addIntf(this,pas.System.IUnknown);
   });
   rtl.recNewT($mod,"TPath",function () {
@@ -20122,10 +20312,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
   $mod.$init = function () {
     $mod.FormatSettings.$assign($mod.TFormatSettings.Create());
   };
-},["Math","WEBLib.Consts"],function () {
+},["WEBLib.Consts"],function () {
   "use strict";
   var $mod = this;
   var $impl = $mod.$impl;
+  $impl.FCompare = null;
   rtl.recNewT($impl,"TFormatDateTimeHelper",function () {
     this.$eq = function (b) {
       return true;
@@ -20533,6 +20724,11 @@ rtl.module("WEBLib.Utils",["System","Types","Web","SysUtils","Classes","JS"],fun
     var $r = $mod.$rtti.$Record("TFormatDateTimeHelper",{});
     $r.addMethod("FormatDateTime",5,[["AFormatStr",rtl.string,2],["AFormatSettings",$mod.$rtti["TFormatSettings"],2],["ADateTime",pas.System.$rtti["TDateTime"],2]],rtl.string,{flags: 1});
   },true);
+  $impl.InternalCompare = function (AItem1, AItem2) {
+    var Result = 0;
+    Result = $impl.FCompare(rtl.getObject(AItem1),rtl.getObject(AItem2));
+    return Result;
+  };
 });
 rtl.module("WEBLib.WebTools",["System","Classes","Web","JS"],function () {
   "use strict";
@@ -22434,9 +22630,9 @@ rtl.module("WEBLib.WebCtrls",["System","Classes","WEBLib.Controls","WEBLib.Graph
   });
   this.TDriveView = {"0": "dvList", dvList: 0, "1": "dvGrid", dvGrid: 1};
   $mod.$rtti.$Enum("TDriveView",{minvalue: 0, maxvalue: 1, ordtype: 1, enumtype: this.TDriveView});
-  rtl.createClass($mod,"TGoogleDrive",pas["WEBLib.Controls"].TWinControl,function () {
+  rtl.createClass($mod,"TGoogleDrive",pas["WEBLib.Controls"].TCustomControl,function () {
     this.$init = function () {
-      pas["WEBLib.Controls"].TWinControl.$init.call(this);
+      pas["WEBLib.Controls"].TCustomControl.$init.call(this);
       this.FView = 0;
       this.FFolderID = "";
     };
@@ -22466,12 +22662,14 @@ rtl.module("WEBLib.WebCtrls",["System","Classes","WEBLib.Controls","WEBLib.Graph
         vs = "list"}
        else if ($tmp1 === $mod.TDriveView.dvGrid) vs = "grid";
       if (this.GetElementHandle() != null) {
-        this.GetElementHandle().setAttribute("src","https:\/\/drive.google.com\/embeddedfolderview?id=" + this.FFolderID + "&embedded=true#" + vs);
-        this.GetElementHandle().style.setProperty("border","0");
+        if (this.FFolderID !== "") {
+          this.GetElementHandle().setAttribute("src","https:\/\/drive.google.com\/embeddedfolderview?id=" + this.FFolderID + "&embedded=true#" + vs);
+          this.GetElementHandle().style.setProperty("border","0");
+        } else if (pas.Classes.TComponentStateItem.csDesigning in this.FComponentState) this.RenderDesigning(this.$classname,this.GetContainer(),this,true);
       };
     };
     this.CreateInitialize = function () {
-      pas["WEBLib.Controls"].TControl.CreateInitialize.call(this);
+      pas["WEBLib.Controls"].TCustomControl.CreateInitialize.call(this);
       this.SetWidth(400);
       this.SetHeight(300);
     };
@@ -22486,7 +22684,6 @@ rtl.module("WEBLib.WebCtrls",["System","Classes","WEBLib.Controls","WEBLib.Graph
   rtl.createClass($mod,"TTwitterFeed",pas["WEBLib.Controls"].TCustomControl,function () {
     this.$init = function () {
       pas["WEBLib.Controls"].TCustomControl.$init.call(this);
-      this.FCode = false;
       this.FUpdatedFeed = false;
       this.FFeed = "";
       this.FFeedLinkText = "";
@@ -22507,22 +22704,28 @@ rtl.module("WEBLib.WebCtrls",["System","Classes","WEBLib.Controls","WEBLib.Graph
     };
     this.UpdateElement = function () {
       var srcurl = "";
+      var script = null;
       pas["WEBLib.Controls"].TControl.UpdateElement.call(this);
-      if ((this.GetElementHandle() != null) && !this.IsUpdating() && !this.FCode) {
+      if ((this.GetElementHandle() != null) && !this.IsUpdating()) {
         srcurl = "https:\/\/platform.twitter.com\/widgets.js";
-        var script = document.createElement('script');
-        script.src = srcurl;
-        script.async = true;
-        script.type = 'text/javascript';
-        script.charset = 'utf-8';
-        document.head.appendChild(script);
-        this.FCode = true;
+        script = document.getElementById($impl.TWITTERSCRIPTID);
+        if (!(script != null)) {
+          script = document.createElement("script");
+          script.setAttribute("id",$impl.TWITTERSCRIPTID);
+          script.async = true;
+          script.setAttribute("type","text\/javascript");
+          script.setAttribute("charset","utf-8");
+          script.setAttribute("src",srcurl);
+          document.head.appendChild(script);
+        };
       };
       if ((this.GetElementHandle() != null) && !this.IsUpdating() && !this.FUpdatedFeed) {
         if (this.FFeed !== "") {
+          srcurl = '<a class="twitter-timeline" href="https:\/\/twitter.com\/' + this.FFeed + '" data-chrome="nofooter noborders">' + this.FFeedLinkText + "<\/a>";
           this.SetBorderStyle(pas["WEBLib.Controls"].TBorderStyle.bsNone);
-          this.GetElementHandle().innerHTML = '<a class="twitter-timeline" href="https:\/\/twitter.com\/' + this.FFeed + '" data-chrome="nofooter noborders">' + this.FFeedLinkText + "<\/a>";
-          twttr.widgets.load();
+          this.GetElementHandle().innerHTML = srcurl;
+          if (typeof twttr !== 'undefined') {
+          twttr.widgets.load() };
         } else {
           if (pas.Classes.TComponentStateItem.csDesigning in this.FComponentState) this.RenderDesigning(this.$classname,this.GetContainer(),this,true);
         };
@@ -23315,12 +23518,12 @@ rtl.module("WEBLib.WebCtrls",["System","Classes","WEBLib.Controls","WEBLib.Graph
       return Result;
     };
     this.CreateInitialize = function () {
+      this.FHTML = pas.Classes.TStringList.$create("Create$1");
+      rtl.as(this.FHTML,pas.Classes.TStringList).FOnChange = rtl.createCallback(this,"HTMLChanged");
       pas["WEBLib.Controls"].TCustomControl.CreateInitialize.call(this);
       this.FControlStyle = rtl.unionSet(this.FControlStyle,rtl.createSet(pas["WEBLib.Controls"].TControlStyleValue.csAcceptsControls));
       this.SetTabStop(false);
       this.SetClipChildren(false);
-      this.FHTML = pas.Classes.TStringList.$create("Create$1");
-      rtl.as(this.FHTML,pas.Classes.TStringList).FOnChange = rtl.createCallback(this,"HTMLChanged");
     };
     this.Destroy = function () {
       rtl.free(this,"FHTML");
@@ -23465,6 +23668,7 @@ rtl.module("WEBLib.WebCtrls",["System","Classes","WEBLib.Controls","WEBLib.Graph
   "use strict";
   var $mod = this;
   var $impl = $mod.$impl;
+  $impl.TWITTERSCRIPTID = "twitterscriptid";
   $impl.isAdvancedUpload = function () {
     var div = document.createElement('div');
     return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
@@ -24476,6 +24680,8 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
   $mod.$rtti.$Set("TInteractiveGestureFlags",{comptype: $mod.$rtti["TInteractiveGestureFlag"]});
   this.TMouseActivate = {"0": "maDefault", maDefault: 0, "1": "maActivate", maActivate: 1, "2": "maActivateAndEat", maActivateAndEat: 2, "3": "maNoActivate", maNoActivate: 3, "4": "maNoActivateAndEat", maNoActivateAndEat: 4};
   $mod.$rtti.$Enum("TMouseActivate",{minvalue: 0, maxvalue: 4, ordtype: 1, enumtype: this.TMouseActivate});
+  this.TScreenOrientation = {"0": "soPortrait", soPortrait: 0, "1": "soLandscape", soLandscape: 1};
+  $mod.$rtti.$Enum("TScreenOrientation",{minvalue: 0, maxvalue: 1, ordtype: 1, enumtype: this.TScreenOrientation});
   rtl.recNewT($mod,"TSmallPoint",function () {
     this.x = 0;
     this.y = 0;
@@ -24548,6 +24754,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
   });
   $mod.$rtti.$MethodVar("TCloseEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["Action",$mod.$rtti["TCloseAction"],1]]), methodkind: 0});
   $mod.$rtti.$MethodVar("TCloseQueryEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["CanClose",rtl.boolean,1]]), methodkind: 0});
+  $mod.$rtti.$MethodVar("TOrientationChangeEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["AOrientation",$mod.$rtti["TScreenOrientation"]]]), methodkind: 0});
   $mod.$rtti.$MethodVar("TBeforeUnloadEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["AMessage",rtl.string,1]]), methodkind: 0});
   $mod.$rtti.$MethodVar("TAlignInsertBeforeEvent",{procsig: rtl.newTIProcSig([["Sender",pas["WEBLib.Controls"].$rtti["TWinControl"]],["C1",pas["WEBLib.Controls"].$rtti["TControl"]],["C2",pas["WEBLib.Controls"].$rtti["TControl"]]],rtl.boolean), methodkind: 1});
   $mod.$rtti.$MethodVar("TAlignPositionEvent",{procsig: rtl.newTIProcSig([["Sender",pas["WEBLib.Controls"].$rtti["TWinControl"]],["Control",pas["WEBLib.Controls"].$rtti["TControl"]],["NewLeft",rtl.longint,1],["NewTop",rtl.longint,1],["NewWidth",rtl.longint,1],["NewHeight",rtl.longint,1],["AlignRect",pas.Types.$rtti["TRect"],1],["AlignInfo",$mod.$rtti["TAlignInfo"]]]), methodkind: 0});
@@ -24735,11 +24942,13 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       this.FTitleDownPtr = null;
       this.FDoClickPtr = null;
       this.FKeyDownPtr$1 = null;
+      this.FOrientationChangePtr = null;
       this.FCSSLibrary = 0;
       this.FNoHTML = false;
       this.FPrevActiveForm = null;
       this.FElementCaptionClassName = "";
       this.FMenu = null;
+      this.FOnOrientationChange = null;
     };
     this.$final = function () {
       this.FDesignContainer = undefined;
@@ -24763,6 +24972,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       this.FOnDestroy = undefined;
       this.FPrevActiveForm = undefined;
       this.FMenu = undefined;
+      this.FOnOrientationChange = undefined;
       pas["WEBLib.Controls"].TWinControl.$final.call(this);
     };
     this.SetModalResult = function (Value) {
@@ -24835,22 +25045,6 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       if (this.FPopup) {
         eh = this.FPopupElement;
         if (eh != null) eh.style.setProperty("height",pas.SysUtils.IntToStr(AValue) + "px");
-      };
-    };
-    this.SetLeft = function (AValue) {
-      var eh = null;
-      pas["WEBLib.Controls"].TControl.SetLeft.apply(this,arguments);
-      if (this.FPopup) {
-        eh = this.FPopupElement;
-        if (eh != null) eh.style.setProperty("left",pas.SysUtils.IntToStr(AValue) + "px");
-      };
-    };
-    this.SetTop = function (AValue) {
-      var eh = null;
-      pas["WEBLib.Controls"].TControl.SetTop.apply(this,arguments);
-      if (this.FPopup) {
-        eh = this.FPopupElement;
-        if (eh != null) eh.style.setProperty("top",pas.SysUtils.IntToStr(AValue) + "px");
       };
     };
     this.HandleLoaded = function (Event) {
@@ -24973,6 +25167,22 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       Result = true;
       return Result;
     };
+    this.SetLeft = function (AValue) {
+      var eh = null;
+      pas["WEBLib.Controls"].TControl.SetLeft.apply(this,arguments);
+      if (this.FPopup) {
+        eh = this.FPopupElement;
+        if (eh != null) eh.style.setProperty("left",pas.SysUtils.IntToStr(AValue) + "px");
+      };
+    };
+    this.SetTop = function (AValue) {
+      var eh = null;
+      pas["WEBLib.Controls"].TControl.SetTop.apply(this,arguments);
+      if (this.FPopup) {
+        eh = this.FPopupElement;
+        if (eh != null) eh.style.setProperty("top",pas.SysUtils.IntToStr(AValue) + "px");
+      };
+    };
     this.ClearMethodPointers = function () {
       pas["WEBLib.Controls"].TControl.ClearMethodPointers.call(this);
       this.FLoadedPtr = null;
@@ -24985,6 +25195,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       this.FTitleDownPtr = null;
       this.FDoClickPtr = null;
       this.FKeyDownPtr$1 = null;
+      this.FOrientationChangePtr = null;
     };
     this.GetMethodPointers = function () {
       pas["WEBLib.Controls"].TControl.GetMethodPointers.call(this);
@@ -24999,6 +25210,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         this.FTitleDownPtr = rtl.createCallback(this,"HandleTitleDown");
         this.FDoClickPtr = rtl.createCallback(this,"HandleDoClick$1");
         this.FKeyDownPtr$1 = rtl.createCallback(this,"HandleKeyDown");
+        this.FOrientationChangePtr = rtl.createCallback(this,"HandleOrientationChange");
       };
     };
     this.Resize$1 = function () {
@@ -25051,6 +25263,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       window.addEventListener("unload",this.FUnloadPtr);
       window.addEventListener("beforeunload",this.FBeforeUnloadPtr);
       window.addEventListener("keydown",this.FKeyDownPtr$1);
+      window.addEventListener("orientationchange",this.FOrientationChangePtr);
     };
     this.UnbindEvents = function () {
       pas["WEBLib.Controls"].TControl.UnbindEvents.call(this);
@@ -25061,6 +25274,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       window.removeEventListener("unload",this.FUnloadPtr);
       window.removeEventListener("beforeunload",this.FBeforeUnloadPtr);
       window.removeEventListener("keywown",this.FKeyDownPtr$1);
+      window.removeEventListener("orientationchange",this.FOrientationChangePtr);
     };
     this.DoCreate = function () {
       this.BeginUpdate();
@@ -25097,6 +25311,24 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         this.Close();
       };
       Result = true;
+      return Result;
+    };
+    this.HandleOrientationChange = function (Event) {
+      var Result = false;
+      var so = 0;
+      var isPortrait = false;
+      this.Resize$1();
+      this.Realign();
+      Result = true;
+      if (this.FOnOrientationChange != null) {
+        var mql = window.matchMedia("(orientation: portrait)");
+        isPortrait = (mql.matches);
+        if (isPortrait) {
+          so = $mod.TScreenOrientation.soLandscape}
+         else so = $mod.TScreenOrientation.soPortrait;
+        this.FOnOrientationChange(this,so);
+      };
+      if (this.FOnResize$1 != null) this.FOnResize$1(this);
       return Result;
     };
     this.HandleDoResize = function () {
@@ -25271,7 +25503,8 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         };
         clr = pas["WEBLib.Graphics"].ColorToHTML(this.FColor);
         if (this.GetContainer() != null) {
-          if ((this.FColor !== -1) && (this.FElementClassName === "")) this.GetContainer().style.setProperty("background-Color",clr);
+          if ((this.FColor !== -1) && (this.FElementClassName === "")) this.GetContainer().style.setProperty(pas["WEBLib.Controls"].CSSBackground,clr);
+          if (this.FElementClassName !== "") this.GetContainer().style.removeProperty(pas["WEBLib.Controls"].CSSBackground);
           if ((this.FElementClassName === "") && !this.FPopup) {
             document.documentElement.style.setProperty('height','100%');
           };
@@ -25330,6 +25563,12 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
        else Result = this.FormContainerElement();
       return Result;
     };
+    this.SetElementClassName = function (AValue) {
+      pas["WEBLib.Controls"].TControl.SetElementClassName.apply(this,arguments);
+      if (this.FPopup && (this.FPopupElement != null)) {
+        this.FPopupElement.setAttribute("class",AValue);
+      };
+    };
     this.CloseQuery = function () {
       var Result = false;
       Result = true;
@@ -25375,7 +25614,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       BarHeight = "22";
       this.FCaptionElement = document.createElement("DIV");
       this.FCaptionElement.innerHTML = this.FCaption;
-      this.FCaptionElement.style.setProperty("background-color",pas["WEBLib.Graphics"].ColorToHTML($mod.Application.FThemeColor));
+      this.FCaptionElement.style.setProperty(pas["WEBLib.Controls"].CSSBackground,pas["WEBLib.Graphics"].ColorToHTML($mod.Application.FThemeColor));
       this.FCaptionElement.style.setProperty("color",pas["WEBLib.Graphics"].ColorToHTML($mod.Application.FThemeTextColor));
       this.FCaptionElement.style.setProperty("cursor","move");
       this.FCaptionElement.style.setProperty("height",BarHeight + "px");
@@ -25625,7 +25864,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
           if (this.FPopup) {
             this.FContainer = this.CreateElement();
             this.FLayer$1.appendChild(this.GetContainer());
-            this.FLayer$1.style.setProperty("background-color","silver");
+            this.FLayer$1.style.setProperty(pas["WEBLib.Controls"].CSSBackground,"silver");
           } else {
             this.FContainer = this.CreateLayer();
             document.body.appendChild(this.GetContainer());
@@ -25687,6 +25926,26 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       this.Show();
       return Result;
     };
+    this.AddCSS = function (id, css) {
+      function writeStylesOnce(styleName, cssText) {
+          var styleElement = document.getElementById(styleName);
+          if (styleElement) {
+               styleElement.innerHTML = cssText;
+            return;
+            }
+          styleElement = document.createElement('style');
+          styleElement.type = 'text/css';
+          styleElement.id = styleName;
+          styleElement.innerHTML = cssText;
+          document.getElementsByTagName('head')[0].appendChild(styleElement);
+      }
+      writeStylesOnce(id,css);
+    };
+    this.RemoveCSS = function (id) {
+      var el = null;
+      el = document.getElementById(id);
+      if (el != null) document.head.removeChild(el);
+    };
     rtl.addIntf(this,pas.System.IUnknown);
   });
   $mod.$rtti.$Class("TForm");
@@ -25717,6 +25976,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
     $r.addProperty("OnResize",0,pas["WEBLib.Controls"].$rtti["TNotifyEvent"],"FOnResize$1","FOnResize$1");
     $r.addProperty("OnShow",0,pas["WEBLib.Controls"].$rtti["TNotifyEvent"],"FOnShow","FOnShow");
     $r.addProperty("OnScroll",0,pas["WEBLib.Controls"].$rtti["TNotifyEvent"],"FOnScroll","FOnScroll");
+    $r.addProperty("OnOrientationChange",0,$mod.$rtti["TOrientationChangeEvent"],"FOnOrientationChange","FOnOrientationChange");
     $r.addProperty("OnPaint",0,pas["WEBLib.Controls"].$rtti["TNotifyEvent"],"FOnPaint","FOnPaint");
     $r.addProperty("OnTouchStart",0,pas["WEBLib.Controls"].$rtti["TTouchEvent"],"FOnTouchStart","FOnTouchStart");
     $r.addProperty("OnTouchMove",0,pas["WEBLib.Controls"].$rtti["TTouchEvent"],"FOnTouchMove","FOnTouchMove");
@@ -25828,7 +26088,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
     $r.addProperty("Constraints",2,$mod.$rtti["TSizeConstraints"],"FConstraints","setConstraints");
     $r.addProperty("DockSite",0,rtl.boolean,"FDockSite","FDockSite",{Default: false});
     $r.addProperty("DoubleBuffered",0,rtl.boolean,"FDoubleBuffered","FDoubleBuffered",{Default: false});
-    $r.addProperty("DragCursor",0,rtl.longint,"FDragCursor","FDragCursor",{Default: 12});
+    $r.addProperty("DragCursor",0,pas["WEBLib.Controls"].$rtti["TCursor"],"FDragCursor","FDragCursor",{Default: 12});
     $r.addProperty("DragKind",0,pas["WEBLib.Controls"].$rtti["TDragKind"],"FDragKind","FDragKind",{Default: pas["WEBLib.Controls"].TDragKind.dkDrag});
     $r.addProperty("DragMode",0,pas["WEBLib.Controls"].$rtti["TDragMode"],"FDragMode","FDragMode",{Default: pas["WEBLib.Controls"].TDragMode.dmManual});
     $r.addProperty("Enabled",2,rtl.boolean,"FEnabled","SetEnabled",{Default: true});
@@ -26157,7 +26417,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         eh = document.getElementById(this.FActiveForm.FFormElement);
         if (eh != null) {
           eh.innerHTML = HTML;
-          if (this.FActiveForm.FElementClassName === "") eh.style.setProperty("background-color",pas["WEBLib.Graphics"].ColorToHTML(this.FActiveForm.FColor));
+          if (this.FActiveForm.FElementClassName === "") eh.style.setProperty(pas["WEBLib.Controls"].CSSBackground,pas["WEBLib.Graphics"].ColorToHTML(this.FActiveForm.FColor));
         };
       } else {
         this.FActiveForm.ClearControls();
@@ -26166,13 +26426,13 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         eh = this.FActiveForm.FLayer$1;
         if (this.FActiveForm.FPopup && (this.FActiveForm.FPopupOpacity < 1)) {
           op = this.FActiveForm.CreateLayer();
-          op.style.setProperty("background-color","black");
+          op.style.setProperty(pas["WEBLib.Controls"].CSSBackground,"black");
           op.style.setProperty("opacity",pas["WEBLib.WebTools"].DoubleToHTML(this.FActiveForm.FPopupOpacity));
-          op.style.setProperty("z-index","999998");
+          op.style.setProperty(pas["WEBLib.Controls"].CSSZIndex,"999998");
           eh.appendChild(op);
         };
         span = document.createElement("DIV");
-        span.style.setProperty("z-index","999999");
+        span.style.setProperty(pas["WEBLib.Controls"].CSSZIndex,"999999");
         this.FActiveForm.FPopupElement = span;
         if (this.FActiveForm.FBorder === $mod.TFormBorderStyle.fbDialogSizeable) {
           span.style.setProperty("resize","both");
@@ -26196,7 +26456,6 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         };
         if (this.FActiveForm.FElementClassName !== "") span.setAttribute("class",this.FActiveForm.FElementClassName);
         if (this.FActiveForm.FShadow && this.FActiveForm.FPopup) span.style.setProperty("box-shadow","3px 3px 3px silver");
-        if (!this.FActiveForm.FPopup && (this.FActiveForm.FColor !== -1)) span.style.setProperty("background-color",pas["WEBLib.Graphics"].ColorToHTML(this.FActiveForm.FColor));
         eh.appendChild(span);
         if (this.FActiveForm.FBorder in rtl.createSet($mod.TFormBorderStyle.fbDialog,$mod.TFormBorderStyle.fbDialogSizeable)) {
           this.FActiveForm.GetMethodPointers();
@@ -26218,8 +26477,10 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       if (this.FActiveForm.FLayer$1 != null) {
         if (!this.FActiveForm.FPopup) {
           if (this.FActiveForm.FElementClassName === "") {
-            eh.style.setProperty("background-color","white")}
-           else eh.setAttribute("class",this.FActiveForm.FElementClassName);
+            if (this.FActiveForm.FColor !== -1) {
+              eh.style.setProperty(pas["WEBLib.Controls"].CSSBackground,pas["WEBLib.Graphics"].ColorToHTML(this.FActiveForm.FColor))}
+             else eh.style.setProperty(pas["WEBLib.Controls"].CSSBackground,"white");
+          } else eh.setAttribute("class",this.FActiveForm.FElementClassName);
         };
       };
       if ((span != null) && (this.FActiveForm.FFormContainer === "") && this.FActiveForm.FPopup) {
@@ -26228,8 +26489,10 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
         t = Math.round((window.innerHeight - this.FActiveForm.GetHeight()) / 2);
         w = this.FActiveForm.GetWidth();
         h = this.FActiveForm.GetHeight() + LCaptionHeight;
-        span.style.setProperty("background-color",pas["WEBLib.Graphics"].ColorToHTML(this.FActiveForm.FColor));
-        span.style.setProperty("border","1px Black solid");
+        if (this.FActiveForm.FElementClassName === "") {
+          span.style.setProperty(pas["WEBLib.Controls"].CSSBackground,pas["WEBLib.Graphics"].ColorToHTML(this.FActiveForm.FColor));
+          span.style.setProperty("border","1px Black solid");
+        };
         span.style.setProperty("top",pas.SysUtils.IntToStr(t) + "px");
         span.style.setProperty("left",pas.SysUtils.IntToStr(l) + "px");
         span.style.setProperty("width",pas.SysUtils.IntToStr(w) + "px");
@@ -26249,6 +26512,7 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       this.FActiveForm.FCreating = false;
       this.FActiveForm.UpdateElement();
       if (!this.FActiveForm.EventsBound()) this.FActiveForm.BindEvents();
+      this.FActiveForm.Resize$1();
       this.FActiveForm.DoShow();
     };
     this.GetFormExtension = function () {
@@ -26684,6 +26948,26 @@ rtl.module("WEBLib.Forms",["System","Classes","Types","SysUtils","WEBLib.Graphic
       Result = window.document.location.href;
       return Result;
     };
+    this.IDETheme = function () {
+      var Result = "";
+      var s = "";
+      Result = "";
+      if (!($mod.VSIDE != null)) return Result;
+      s = pas["WEBLib.Forms"].VSIDE.theme;
+      Result = s;
+      return Result;
+    };
+    this.IDECSS = function () {
+      var Result = "";
+      Result = "";
+      if (this.IDETheme() === "vscode-light") {
+        Result = ".IDECaption { background-color: #F0F0F0 !important; color: #555555 !important; border: 1px solid #DDDDDD !important}" + "\r\n" + ".IDEBkg { background-color: white !important; color: #555555 !important; border: 1px solid #DDDDDD !important}" + "\r\n" + ".IDEButton { background-color: #FAFAFA !important; color: #555555 !important; border: 1px solid #DDDDDD !important}" + "\r\n" + ".IDEButton:hover {background-color:#F0F0F0 !important}";
+      };
+      if (this.IDETheme() === "vscode") {
+        Result = ".IDECaption,.IDEButton { background-color: #3F3E43 !important; color: #FFFFFF !important; border: 1px solid #35353A !important}" + "\r\n" + ".IDEBkg { background-color: #2A2A2C !important; color: #A9ACB4 !important; border: 1px solid #35353A !important}" + "\r\n" + ".IDEButton:hover {background-color:#434857 !important}";
+      };
+      return Result;
+    };
     this.NeedsFormRouting = function () {
       var Result = false;
       var s = "";
@@ -26969,7 +27253,9 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
         pas["WEBLib.Controls"].SetHTMLElementColor(this.GetContentHandle(),this.FColor$1,this.FTransparent && ((this.FColor$1 === 16777215) || (this.FColor$1 === -1)));
         this.GetContentHandle().style.setProperty("display","table-cell");
         if (this.FElementClassName === "") {
-          if (this.FEnabled && (this.FElementFont === pas["WEBLib.Controls"].TElementFont.efProperty) && !this.GetIsLinked()) this.GetContentHandle().style.setProperty("color",pas["WEBLib.Graphics"].ColorToHTML(this.FFont.FColor));
+          if (this.FEnabled && (this.FElementFont === pas["WEBLib.Controls"].TElementFont.efProperty) && !this.GetIsLinked()) {
+            this.GetContentHandle().style.setProperty("color",pas["WEBLib.Graphics"].ColorToHTML(this.FFont.FColor))}
+           else this.GetContentHandle().style.removeProperty("color");
           this.SetElementPointer(this.GetContentHandle(),this.FCursor);
           pas["WEBLib.Controls"].SetHTMLElementFont(this.GetContentHandle(),this.FFont,!((this.FElementFont === pas["WEBLib.Controls"].TElementFont.efProperty) && !this.GetIsLinked()));
         };
@@ -26987,6 +27273,15 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
         this.GetElementHandle().style.setProperty("user-select","");
         if (this.FCursor === 0) this.GetElementHandle().style.setProperty("cursor","");
         if (this.FAutoSize && (this.FAlign === pas["WEBLib.Controls"].TAlign.alNone) && !(pas.Classes.TComponentStateItem.csDesigning in this.FComponentState)) {
+          this.GetElementHandle().style.removeProperty("width");
+          this.GetElementHandle().style.removeProperty("height");
+        };
+      };
+    };
+    this.UpdateElementSize = function () {
+      pas["WEBLib.Controls"].TControl.UpdateElementSize.call(this);
+      if (this.FAutoSize && (this.GetElementHandle() != null)) {
+        if (!(pas.Classes.TComponentStateItem.csDesigning in this.FComponentState)) {
           this.GetElementHandle().style.removeProperty("width");
           this.GetElementHandle().style.removeProperty("height");
         };
@@ -27358,6 +27653,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       var e = null;
       var ss = 0;
       var sl = 0;
+      var isNum = false;
       pas["WEBLib.Controls"].TControl.UpdateElementData.call(this);
       if (this.GetElementInputHandle() != null) {
         if (!this.GetIsLinked()) {
@@ -27402,7 +27698,8 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
           this.GetElementInputHandle().removeAttribute("maxLength")}
          else this.GetElementInputHandle().maxLength = this.FMaxLength;
         this.GetElementInputHandle().value = this.GetDisplayText();
-        if (!this.FNumeric && !this.GetIsLinked() && !this.IsCustomEditor()) {
+        isNum = pas.SysUtils.UpperCase(this.GetInputType()) === "NUMBER";
+        if (!isNum && !this.GetIsLinked() && !this.IsCustomEditor()) {
           ss = this.FSelStart;
           sl = this.FSelStart + this.FSelLength;
           e = this.GetElementInputHandle();
@@ -27509,7 +27806,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
     $r.addProperty("Pattern",2,rtl.string,"FPattern","SetPattern");
     $r.addProperty("Margins",2,pas["WEBLib.Controls"].$rtti["TMargins"],"FMargins","SetMargins");
     $r.addProperty("MaxLength",2,rtl.longint,"FMaxLength","SetMaxLength");
-    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly");
+    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly",{Default: false});
     $r.addProperty("Required",2,rtl.boolean,"FRequired","SetRequired");
     $r.addProperty("ShowFocus",2,rtl.boolean,"FShowFocus","SetShowFocus");
     $r.addProperty("ShowHint",2,rtl.boolean,"FShowHint","SetShowHint",{Default: false});
@@ -27682,7 +27979,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
     $r.addProperty("MaxValue",2,rtl.longint,"FMaxValue","SetMaxValue",{Default: 100});
     $r.addProperty("MinValue",2,rtl.longint,"FMinValue","SetMinValue",{Default: 0});
     $r.addProperty("ParentFont",2,rtl.boolean,"FParentFont","SetParentFont",{Default: true});
-    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly");
+    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly",{Default: false});
     $r.addProperty("Role",3,rtl.string,"GetRole","SetRole");
     $r.addProperty("ShowFocus",2,rtl.boolean,"FShowFocus","SetShowFocus");
     $r.addProperty("ShowHint",2,rtl.boolean,"FShowHint","SetShowHint",{Default: false});
@@ -27718,6 +28015,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       this.FKind = 0;
       this.FTime = 0.0;
       this.FOnChange = null;
+      this.FReadOnly = false;
     };
     this.$final = function () {
       this.FOnChange = undefined;
@@ -27817,6 +28115,10 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       Result = this.GetContainer().value;
       return Result;
     };
+    this.SetReadOnly = function (Value) {
+      this.FReadOnly = Value;
+      this.UpdateElement();
+    };
     this.DoHandleChange = function (Event) {
       var Result = false;
       this.Change();
@@ -27837,6 +28139,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
         if ($tmp1 === $mod.TDateTimeKind.dtkTime) {
           this.GetContainer().value = pas.SysUtils.FormatDateTime(pas.SysUtils.LongTimeFormat,this.FTime)}
          else if ($tmp1 === $mod.TDateTimeKind.dtkDate) this.GetContainer().value = pas.SysUtils.FormatDateTime("yyyy-MM-dd",this.FDate);
+        this.GetContainer().readOnly = this.IsReadOnly();
       };
     };
     this.CreateElement = function () {
@@ -27856,12 +28159,18 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       this.FDate = this.GetDate();
       if (this.FOnChange != null) this.FOnChange(this);
     };
+    this.IsReadOnly = function () {
+      var Result = false;
+      Result = this.FReadOnly;
+      return Result;
+    };
     this.CreateInitialize = function () {
       $mod.TCustomInput.CreateInitialize.call(this);
       this.SetDate(pas.SysUtils.Now());
       this.SetShowFocus(true);
       this.SetWidth(170);
       this.SetHeight(25);
+      this.FReadOnly = false;
     };
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
@@ -27884,6 +28193,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
     $r.addProperty("Left",3,rtl.longint,"GetLeft","SetLeft");
     $r.addProperty("Margins",2,pas["WEBLib.Controls"].$rtti["TMargins"],"FMargins","SetMargins");
     $r.addProperty("ParentFont",2,rtl.boolean,"FParentFont","SetParentFont",{Default: true});
+    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly",{Default: false});
     $r.addProperty("Role",3,rtl.string,"GetRole","SetRole");
     $r.addProperty("ShowFocus",2,rtl.boolean,"FShowFocus","SetShowFocus");
     $r.addProperty("ShowHint",2,rtl.boolean,"FShowHint","SetShowHint",{Default: false});
@@ -28702,6 +29012,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       this.FStyle = 0;
       this.FDroppedDown = false;
       this.FOnChange = null;
+      this.FTextHint = "";
     };
     this.$final = function () {
       this.FItems = undefined;
@@ -28733,6 +29044,13 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       Result = this.GetContainer();
       return Result;
     };
+    this.SetTextHint = function (Value) {
+      if (this.FTextHint !== Value) {
+        this.FTextHint = Value;
+        window.console.log("do update for hint");
+        this.DoUpdateList();
+      };
+    };
     this.DoHandleChange = function (Event) {
       var Result = false;
       this.Change();
@@ -28741,6 +29059,18 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
     };
     this.DoItemsChange = function (Sender) {
       this.DoUpdateList();
+    };
+    this.AddTextHint = function () {
+      var opt = null;
+      if (this.FTextHint !== "") {
+        opt = document.createElement("OPTION");
+        opt.setAttribute("value","");
+        opt.setAttribute("disabled","true");
+        opt.setAttribute("selected","true");
+        opt.setAttribute("hidden","true");
+        opt.innerHTML = this.FTextHint;
+        this.GetContainer().appendChild(opt);
+      };
     };
     this.DoUpdateList = function () {
       var i = 0;
@@ -28751,6 +29081,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
         i = $l1;
         this.GetContainer().remove(i);
       };
+      this.AddTextHint();
       for (var $l2 = 0, $end3 = this.FItems.GetCount() - 1; $l2 <= $end3; $l2++) {
         i = $l2;
         s = this.FItems.Get(i);
@@ -28764,7 +29095,10 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
     this.GetItemIndex = function () {
       var Result = 0;
       Result = this.FItemIndex;
-      if (this.GetContainer() != null) Result = this.GetContainer().selectedIndex;
+      if (this.GetContainer() != null) {
+        Result = this.GetContainer().selectedIndex;
+        if (this.FTextHint !== "") Result = Result - 1;
+      };
       return Result;
     };
     this.CreateElement = function () {
@@ -28779,9 +29113,12 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
       };
     };
     this.UpdateElementData = function () {
+      var d = 0;
       pas["WEBLib.Controls"].TControl.UpdateElementData.call(this);
       if (this.GetElementSelectHandle() != null) {
-        this.GetElementSelectHandle().selectedIndex = this.FItemIndex;
+        d = 0;
+        if (this.FTextHint !== "") d = 1;
+        this.GetElementSelectHandle().selectedIndex = this.FItemIndex + d;
         this.GetElementSelectHandle().setAttribute("role","combobox");
       };
     };
@@ -28857,6 +29194,7 @@ rtl.module("WEBLib.StdCtrls",["System","Classes","WEBLib.Controls","SysUtils","W
     $r.addProperty("TabStop",2,rtl.boolean,"FTabStop","SetTabStop",{Default: true});
     $r.addProperty("Text",3,rtl.string,"GetText","SetText");
     $r.addProperty("TextDirection",0,pas["WEBLib.Controls"].$rtti["TTextDirection"],"FTextDirection","FTextDirection");
+    $r.addProperty("TextHint",2,rtl.string,"FTextHint","SetTextHint");
     $r.addProperty("Top",3,rtl.longint,"GetTop","SetTop");
     $r.addProperty("Visible",2,rtl.boolean,"FVisible","SetVisible",{Default: true});
     $r.addProperty("Width",3,rtl.longint,"GetWidth","SetWidth");
@@ -33542,6 +33880,7 @@ rtl.module("WEBLib.ExtCtrls",["System","Classes","SysUtils","Types","WEBLib.Cont
         i = $l1;
         this.GetContainer().remove(i);
       };
+      this.AddTextHint();
       for (var $l2 = 0, $end3 = this.FLookupValues.GetCount() - 1; $l2 <= $end3; $l2++) {
         i = $l2;
         opt = document.createElement("OPTION");
@@ -33587,6 +33926,7 @@ rtl.module("WEBLib.ExtCtrls",["System","Classes","SysUtils","Types","WEBLib.Cont
     $r.addProperty("TabOrder",2,rtl.longint,"FTabOrder","SetTabOrder");
     $r.addProperty("TabStop",2,rtl.boolean,"FTabStop","SetTabStop",{Default: true});
     $r.addProperty("TextDirection",0,pas["WEBLib.Controls"].$rtti["TTextDirection"],"FTextDirection","FTextDirection");
+    $r.addProperty("TextHint",2,rtl.string,"FTextHint","SetTextHint");
     $r.addProperty("Top",3,rtl.longint,"GetTop","SetTop");
     $r.addProperty("Visible",2,rtl.boolean,"FVisible","SetVisible",{Default: true});
     $r.addProperty("Width",3,rtl.longint,"GetWidth","SetWidth");
@@ -33664,6 +34004,12 @@ rtl.module("forms.baseform",["System","SysUtils","Classes","JS","Web","WEBLib.Gr
 rtl.module("Variants",["System"],function () {
   "use strict";
   var $mod = this;
+});
+rtl.module("WEBLib.Imaging.jpeg",["System"],function () {
+  "use strict";
+  var $mod = this;
+  $mod.$init = function () {
+  };
 });
 rtl.module("DateUtils",["System","SysUtils","Math"],function () {
   "use strict";
@@ -37295,7 +37641,7 @@ rtl.module("WEBLib.TMSFNCUtils",["System","Classes","SysUtils","Types","WEBLib.G
       var v = null;
       Result = "";
       v = this.GetJSONValue(AJSONValue,APropertyName);
-      if (v != null) Result = v.GetStrValue();
+      if ((v != null) && !pas["WEBLib.JSON"].TJSONNull.isPrototypeOf(v)) Result = v.GetStrValue();
       return Result;
     };
     this.GetJSONValueAsString = function (AJSONValue) {
@@ -37319,9 +37665,14 @@ rtl.module("WEBLib.TMSFNCUtils",["System","Classes","SysUtils","Types","WEBLib.G
     };
     this.GetJSONDoubleValue = function (AJSONValue, APropertyName) {
       var Result = 0.0;
+      Result = this.GetJSONValueAsDouble(this.GetJSONValue(AJSONValue,APropertyName));
+      return Result;
+    };
+    this.GetJSONValueAsDouble = function (AJSONValue) {
+      var Result = 0.0;
       var v = null;
       Result = 0;
-      v = this.GetJSONValue(AJSONValue,APropertyName);
+      v = AJSONValue;
       if ((v != null) && pas["WEBLib.JSON"].TJSONNumber.isPrototypeOf(v)) {
         Result = rtl.as(v,pas["WEBLib.JSON"].TJSONNumber).FDouble;
       };
@@ -37329,9 +37680,14 @@ rtl.module("WEBLib.TMSFNCUtils",["System","Classes","SysUtils","Types","WEBLib.G
     };
     this.GetJSONIntegerValue = function (AJSONValue, APropertyName) {
       var Result = 0;
+      Result = this.GetJSONValueAsInteger(this.GetJSONValue(AJSONValue,APropertyName));
+      return Result;
+    };
+    this.GetJSONValueAsInteger = function (AJSONValue) {
+      var Result = 0;
       var v = null;
       Result = 0;
-      v = this.GetJSONValue(AJSONValue,APropertyName);
+      v = AJSONValue;
       if ((v != null) && pas["WEBLib.JSON"].TJSONNumber.isPrototypeOf(v)) {
         Result = rtl.as(v,pas["WEBLib.JSON"].TJSONNumber).FInt;
       };
@@ -41261,6 +41617,3761 @@ rtl.module("WEBLib.TMSFNCGraphicsTypes",["System","Classes","Types","WEBLib.TMSF
     rtl.free($impl,"FColorLookup");
   };
 });
+rtl.module("WEBLib.TMSFNCJSONReader",["System","Classes","SysUtils","WEBLib.TMSFNCTypes"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  rtl.createClass($mod,"TTMSFNCJSONStreamReader",pas.System.TObject,function () {
+    rtl.createClass(this,"EInvalidJsonInput",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Invalid JSON Input");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EInternalError",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"JSON stream reader internal error");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EEndOfInputReached",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"End of JSON input reached.");
+        return this;
+      };
+    });
+    this.$init = function () {
+      pas.System.TObject.$init.call(this);
+      this.FStream = null;
+      this.FReadStream = null;
+    };
+    this.$final = function () {
+      this.FStream = undefined;
+      this.FReadStream = undefined;
+      pas.System.TObject.$final.call(this);
+    };
+    this.Create$1 = function (aStream) {
+      this.FStream = aStream;
+      this.FReadStream = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[""]);
+      this.FReadStream.CopyFrom(this.FStream,this.FStream.FSize);
+      this.FReadStream.FPosition = 0;
+      return this;
+    };
+    this.Destroy = function () {
+      rtl.free(this,"FReadStream");
+      pas.System.TObject.Destroy.call(this);
+    };
+    this.NextChar = function () {
+      var Result = "";
+      if (this.Eof()) throw this.EEndOfInputReached.$create("Create$2");
+      Result = this.ReadChar();
+      return Result;
+    };
+    this.PeekChar = function () {
+      var Result = "";
+      var p = 0;
+      p = this.FReadStream.FPosition;
+      Result = this.ReadChar();
+      this.FReadStream.FPosition = p;
+      return Result;
+    };
+    this.ReadChar = function () {
+      var Result = "";
+      var i = 0;
+      var s = "";
+      Result = "\x00";
+      i = 1;
+      if (this.FReadStream.FPosition < this.FReadStream.FSize) {
+        s = this.FReadStream.ReadString(1);
+        if ((s !== "") && pas.System.Assigned(s)) Result = s.charAt(i - 1);
+      };
+      return Result;
+    };
+    this.Backup = function (c) {
+      this.FReadStream.FPosition = this.FReadStream.FPosition - 1;
+    };
+    this.MoveNext = function (Count) {
+      this.FReadStream.FPosition = this.FReadStream.FPosition + Count;
+    };
+    this.Eof = function () {
+      var Result = false;
+      Result = this.FReadStream.FPosition === this.FReadStream.FSize;
+      return Result;
+    };
+  });
+  this.TTMSFNCJSONToken = {"0": "jstoBeginObject", jstoBeginObject: 0, "1": "jstoEndObject", jstoEndObject: 1, "2": "jstoBeginArray", jstoBeginArray: 2, "3": "jstoEndArray", jstoEndArray: 3, "4": "jstoName", jstoName: 4, "5": "jstoBoolean", jstoBoolean: 5, "6": "jstoNull", jstoNull: 6, "7": "jstoText", jstoText: 7, "8": "jstoNumber", jstoNumber: 8, "9": "jstoEOF", jstoEOF: 9};
+  $mod.$rtti.$Enum("TTMSFNCJSONToken",{minvalue: 0, maxvalue: 9, ordtype: 1, enumtype: this.TTMSFNCJSONToken});
+  rtl.createClass($mod,"TTMSFNCJSONReader",pas.System.TObject,function () {
+    this.TTMSFNCJSONState = {"0": "jstNone", jstNone: 0, "1": "jstBeginObject", jstBeginObject: 1, "2": "jstEndObject", jstEndObject: 2, "3": "jstBeginArray", jstBeginArray: 3, "4": "jstEndArray", jstEndArray: 4, "5": "jstTrue", jstTrue: 5, "6": "jstFalse", jstFalse: 6, "7": "jstNull", jstNull: 7, "8": "jstDoubleQuoted", jstDoubleQuoted: 8, "9": "jstBuffered", jstBuffered: 9, "10": "jstDoubleQuotedName", jstDoubleQuotedName: 10, "11": "jstInt64", jstInt64: 11, "12": "jstNumber", jstNumber: 12, "13": "jstEOF", jstEOF: 13};
+    $mod.$rtti.$Enum("TTMSFNCJSONReader.TTMSFNCJSONState",{minvalue: 0, maxvalue: 13, ordtype: 1, enumtype: this.TTMSFNCJSONState});
+    this.TTMSFNCJSONNumberState = {"0": "jnstNone", jnstNone: 0, "1": "jnstSign", jnstSign: 1, "2": "jnstDigit", jnstDigit: 2, "3": "jnstDecimal", jnstDecimal: 3, "4": "jnstFraction", jnstFraction: 4, "5": "jnstExpE", jnstExpE: 5, "6": "jnstExpSign", jnstExpSign: 6, "7": "jnstExpDigit", jnstExpDigit: 7};
+    $mod.$rtti.$Enum("TTMSFNCJSONReader.TTMSFNCJSONNumberState",{minvalue: 0, maxvalue: 7, ordtype: 1, enumtype: this.TTMSFNCJSONNumberState});
+    this.TTMSFNCJSONScope = {"0": "jscEmptyDocument", jscEmptyDocument: 0, "1": "jscEmptyArray", jscEmptyArray: 1, "2": "jscEmptyObject", jscEmptyObject: 2, "3": "jscNonEmptyDocument", jscNonEmptyDocument: 3, "4": "jscNonEmptyArray", jscNonEmptyArray: 4, "5": "jscNonEmptyObject", jscNonEmptyObject: 5, "6": "jscDanglingName", jscDanglingName: 6};
+    $mod.$rtti.$Enum("TTMSFNCJSONReader.TTMSFNCJSONScope",{minvalue: 0, maxvalue: 6, ordtype: 1, enumtype: this.TTMSFNCJSONScope});
+    rtl.createClass(this,"EInvalidStateException",pas.SysUtils.Exception,function () {
+      this.Create$2 = function (AState) {
+        pas.SysUtils.Exception.CreateFmt.call(this,"Invalid Json parser state. Expected state: %d",[AState]);
+        return this;
+      };
+    });
+    rtl.createClass(this,"EUnterminatedArray",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Unterminated array");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EUnterminatedObject",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Unterminated object");
+        return this;
+      };
+    });
+    rtl.createClass(this,"ENameExpected",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Name expected");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EColonExpected",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Colon expected");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EReaderClosed",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Reader already closed");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EMultipleRootNotAllowed",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Multiple root values not allowed");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EExpectedValue",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Value expected but invalid character found");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EObjectOrArrayExpected",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Object or array expected as top-level value");
+        return this;
+      };
+    });
+    rtl.createClass(this,"ETooManyDepthLevels",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Maximum level of nested structured reached.");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EInvalidEscaped",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Invalid escaped sequence");
+        return this;
+      };
+    });
+    this.MaxNumberBuffer = 255;
+    this.MaxStackSize = 255;
+    this.$init = function () {
+      pas.System.TObject.$init.call(this);
+      this.FReader = null;
+      this.FStack = rtl.arraySetLength(null,0,256);
+      this.FStackSize = 0;
+      this.FPeeked = 0;
+      this.FPeekedInt64 = 0;
+      this.FPeekedNumber = rtl.arraySetLength(null,"",256);
+      this.FPeekedString = "";
+    };
+    this.$final = function () {
+      this.FReader = undefined;
+      this.FStack = undefined;
+      this.FPeekedNumber = undefined;
+      pas.System.TObject.$final.call(this);
+    };
+    this.NextPeek = function () {
+      var Result = 0;
+      if (this.FPeeked === this.TTMSFNCJSONState.jstNone) this.FPeeked = this.DoPeek();
+      Result = this.FPeeked;
+      return Result;
+    };
+    this.CheckState = function (State) {
+      if (this.NextPeek() !== State) throw this.EInvalidStateException.$create("Create$2",[State]);
+    };
+    this.SkipChar = function () {
+      this.FReader.MoveNext(1);
+      while (this.FReader.PeekChar().charCodeAt() in $impl.Wspace) this.FReader.MoveNext(1);
+    };
+    this.IsLiteral = function (C) {
+      var Result = false;
+      Result = !pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.CharInSet(C,pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.CreateCharSet("\/\\;#{}[]:,' \r\n\f\t"));
+      return Result;
+    };
+    this.IsDigit = function (C) {
+      var Result = false;
+      Result = (C <= "ÿ") && pas["WEBLib.TMSFNCTypes"].CharIsNumber(C);
+      return Result;
+    };
+    this.DoPeek = function () {
+      var Result = 0;
+      var FPeekStack = 0;
+      var C = "";
+      FPeekStack = this.FStack[this.FStackSize - 1];
+      if (FPeekStack === this.TTMSFNCJSONScope.jscEmptyArray) {
+        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscNonEmptyArray}
+       else if (FPeekStack === this.TTMSFNCJSONScope.jscNonEmptyArray) {
+        C = this.NextNonWhitespace();
+        var $tmp1 = C;
+        if ($tmp1 === "]") {
+          this.SkipChar();
+          this.FPeeked = this.TTMSFNCJSONState.jstEndArray;
+          return this.FPeeked;
+        } else if ($tmp1 === ",") {
+          this.SkipChar()}
+         else {
+          throw this.EUnterminatedArray.$create("Create$2");
+        };
+      } else if (FPeekStack in rtl.createSet(this.TTMSFNCJSONScope.jscEmptyObject,this.TTMSFNCJSONScope.jscNonEmptyObject)) {
+        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscDanglingName;
+        if (FPeekStack === this.TTMSFNCJSONScope.jscNonEmptyObject) {
+          C = this.NextNonWhitespace();
+          var $tmp2 = C;
+          if ($tmp2 === "}") {
+            this.SkipChar();
+            this.FPeeked = this.TTMSFNCJSONState.jstEndObject;
+            return this.FPeeked;
+          } else if ($tmp2 === ",") {
+            this.SkipChar()}
+           else {
+            throw this.EUnterminatedObject.$create("Create$2");
+          };
+        };
+        C = this.NextNonWhitespace();
+        var $tmp3 = C;
+        if ($tmp3 === '"') {
+          this.SkipChar();
+          this.FPeeked = this.TTMSFNCJSONState.jstDoubleQuotedName;
+          return this.FPeeked;
+        } else if ($tmp3 === "}") {
+          if (FPeekStack !== this.TTMSFNCJSONScope.jscNonEmptyObject) {
+            this.SkipChar();
+            this.FPeeked = this.TTMSFNCJSONState.jstEndObject;
+            return this.FPeeked;
+          } else throw this.ENameExpected.$create("Create$2")}
+         else {
+          throw this.ENameExpected.$create("Create$2");
+        };
+      } else if (FPeekStack === this.TTMSFNCJSONScope.jscDanglingName) {
+        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscNonEmptyObject;
+        C = this.NextNonWhitespace();
+        if (C === ":") {
+          this.SkipChar()}
+         else throw this.EColonExpected.$create("Create$2");
+      } else if (FPeekStack === this.TTMSFNCJSONScope.jscEmptyDocument) {
+        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscNonEmptyDocument}
+       else if (FPeekStack === this.TTMSFNCJSONScope.jscNonEmptyDocument) {
+        if (this.SkipWhitespaceUntilEnd()) {
+          this.FPeeked = this.TTMSFNCJSONState.jstEOF;
+          return this.FPeeked;
+        } else throw this.EMultipleRootNotAllowed.$create("Create$2");
+      };
+      C = this.NextNonWhitespace();
+      var $tmp4 = C;
+      if ($tmp4 === "]") {
+        if (FPeekStack === this.TTMSFNCJSONScope.jscEmptyArray) {
+          this.SkipChar();
+          this.FPeeked = this.TTMSFNCJSONState.jstEndArray;
+          return this.FPeeked;
+        } else throw this.EExpectedValue.$create("Create$2")}
+       else if ($tmp4 === '"') {
+        if (this.FStackSize === 1) throw this.EObjectOrArrayExpected.$create("Create$2");
+        this.SkipChar();
+        this.FPeeked = this.TTMSFNCJSONState.jstDoubleQuoted;
+        return this.FPeeked;
+      } else if ($tmp4 === "[") {
+        this.SkipChar();
+        this.FPeeked = this.TTMSFNCJSONState.jstBeginArray;
+        return this.FPeeked;
+      } else if ($tmp4 === "{") {
+        this.SkipChar();
+        this.FPeeked = this.TTMSFNCJSONState.jstBeginObject;
+        return this.FPeeked;
+      };
+      if (this.FStackSize === 1) throw this.EObjectOrArrayExpected.$create("Create$2");
+      Result = this.PeekKeyword();
+      if (Result !== this.TTMSFNCJSONState.jstNone) return Result;
+      Result = this.PeekNumber();
+      if (Result !== this.TTMSFNCJSONState.jstNone) return Result;
+      throw this.EExpectedValue.$create("Create$2");
+      return Result;
+    };
+    this.PushScope = function (Scope) {
+      if (this.FStackSize > 255) throw this.ETooManyDepthLevels.$create("Create$2");
+      this.FStack[this.FStackSize] = Scope;
+      this.FStackSize += 1;
+    };
+    this.NextNonWhitespace = function () {
+      var Result = "";
+      var s = "";
+      var p = 0;
+      p = this.FReader.FReadStream.FPosition;
+      Result = "\x00";
+      s = this.ReadChar();
+      do {
+        if ((s > " ") || !(s.charCodeAt() in $impl.Wspace)) {
+          this.FReader.FReadStream.FPosition = p;
+          return s;
+        };
+        s = this.ReadChar();
+      } while (!this.FReader.Eof());
+      this.FReader.FReadStream.FPosition = p;
+      return Result;
+    };
+    this.ReadChar = function () {
+      var Result = "";
+      Result = this.FReader.ReadChar();
+      return Result;
+    };
+    this.PeekKeyword = function () {
+      var Result = 0;
+      var $tmp1 = this.FReader.PeekChar();
+      if (($tmp1 === "t") || ($tmp1 === "T")) {
+        this.FReader.MoveNext(1);
+        var $tmp2 = this.FReader.NextChar();
+        if (($tmp2 === "r") || ($tmp2 === "R")) {
+          var $tmp3 = this.FReader.NextChar();
+          if (($tmp3 === "u") || ($tmp3 === "U")) {
+            var $tmp4 = this.FReader.NextChar();
+            if (($tmp4 === "e") || ($tmp4 === "E")) if (this.FReader.Eof() || !this.IsLiteral(this.FReader.PeekChar())) return this.TTMSFNCJSONState.jstTrue;
+          };
+        };
+      } else if (($tmp1 === "f") || ($tmp1 === "F")) {
+        this.FReader.MoveNext(1);
+        var $tmp5 = this.FReader.NextChar();
+        if (($tmp5 === "a") || ($tmp5 === "A")) {
+          var $tmp6 = this.FReader.NextChar();
+          if (($tmp6 === "l") || ($tmp6 === "L")) {
+            var $tmp7 = this.FReader.NextChar();
+            if (($tmp7 === "s") || ($tmp7 === "S")) {
+              var $tmp8 = this.FReader.NextChar();
+              if (($tmp8 === "e") || ($tmp8 === "E")) if (this.FReader.Eof() || !this.IsLiteral(this.FReader.PeekChar())) return this.TTMSFNCJSONState.jstFalse;
+            };
+          };
+        };
+      } else if (($tmp1 === "n") || ($tmp1 === "N")) {
+        this.FReader.MoveNext(1);
+        var $tmp9 = this.FReader.NextChar();
+        if (($tmp9 === "u") || ($tmp9 === "U")) {
+          var $tmp10 = this.FReader.NextChar();
+          if (($tmp10 === "l") || ($tmp10 === "L")) {
+            var $tmp11 = this.FReader.NextChar();
+            if (($tmp11 === "l") || ($tmp11 === "L")) if (this.FReader.Eof() || !this.IsLiteral(this.FReader.PeekChar())) return this.TTMSFNCJSONState.jstNull;
+          };
+        };
+      } else {
+        return this.TTMSFNCJSONState.jstNone;
+      };
+      throw this.EExpectedValue.$create("Create$2");
+      return Result;
+    };
+    var MinIncompleteInteger = Math.floor(-4503599627370496 / 10);
+    this.PeekNumber = function () {
+      var Result = 0;
+      var Last = 0;
+      var Negative = false;
+      var FitsInInt64 = false;
+      var Value = 0;
+      var NewValue = 0;
+      var C = "";
+      var BufIndex = 0;
+      C = this.FReader.PeekChar();
+      if ((C !== "-") && !this.IsDigit(C)) return this.TTMSFNCJSONState.jstNone;
+      Negative = false;
+      FitsInInt64 = true;
+      Last = this.TTMSFNCJSONNumberState.jnstNone;
+      BufIndex = 0;
+      Value = -1;
+      do {
+        if (BufIndex >= 255) throw this.EExpectedValue.$create("Create$2");
+        C = this.FReader.NextChar();
+        this.FPeekedNumber[BufIndex] = C;
+        BufIndex += 1;
+        var $tmp1 = C;
+        if ($tmp1 === "-") {
+          if (Last === this.TTMSFNCJSONNumberState.jnstNone) {
+            Negative = true;
+            Last = this.TTMSFNCJSONNumberState.jnstSign;
+            continue;
+          } else if (Last === this.TTMSFNCJSONNumberState.jnstExpE) {
+            Last = this.TTMSFNCJSONNumberState.jnstExpSign;
+            continue;
+          } else throw this.EExpectedValue.$create("Create$2")}
+         else if ($tmp1 === "+") {
+          if (Last === this.TTMSFNCJSONNumberState.jnstExpE) {
+            Last = this.TTMSFNCJSONNumberState.jnstExpSign;
+            continue;
+          } else throw this.EExpectedValue.$create("Create$2")}
+         else if (($tmp1 === "e") || ($tmp1 === "E")) {
+          if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstDigit,this.TTMSFNCJSONNumberState.jnstFraction)) {
+            Last = this.TTMSFNCJSONNumberState.jnstExpE;
+            continue;
+          } else throw this.EExpectedValue.$create("Create$2")}
+         else if ($tmp1 === ".") {
+          if (Last === this.TTMSFNCJSONNumberState.jnstDigit) {
+            Last = this.TTMSFNCJSONNumberState.jnstDecimal;
+            continue;
+          } else throw this.EExpectedValue.$create("Create$2")}
+         else {
+          if (!this.IsDigit(C)) if (!this.IsLiteral(C)) {
+            this.FReader.Backup(C);
+            BufIndex -= 1;
+            break;
+          } else throw this.EExpectedValue.$create("Create$2");
+          if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstSign,this.TTMSFNCJSONNumberState.jnstNone)) {
+            Value = -(C.charCodeAt() - 48);
+            Last = this.TTMSFNCJSONNumberState.jnstDigit;
+          } else if (Last === this.TTMSFNCJSONNumberState.jnstDigit) {
+            if (Value === 0) throw this.EExpectedValue.$create("Create$2");
+            NewValue = (Value * 10) - (C.charCodeAt() - 48);
+            FitsInInt64 = FitsInInt64 && ((Value > -450359962737049) || ((Value === -450359962737049) && (NewValue < Value)));
+            Value = NewValue;
+          } else if (Last === this.TTMSFNCJSONNumberState.jnstDecimal) {
+            Last = this.TTMSFNCJSONNumberState.jnstFraction}
+           else if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstExpE,this.TTMSFNCJSONNumberState.jnstExpSign)) Last = this.TTMSFNCJSONNumberState.jnstExpDigit;
+        };
+      } while (!false);
+      if ((Last === this.TTMSFNCJSONNumberState.jnstDigit) && FitsInInt64 && ((Value !== -4503599627370496) || Negative)) {
+        if (Negative) {
+          this.FPeekedInt64 = Value}
+         else this.FPeekedInt64 = -Value;
+        return this.TTMSFNCJSONState.jstInt64;
+      } else if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstDigit,this.TTMSFNCJSONNumberState.jnstFraction,this.TTMSFNCJSONNumberState.jnstExpDigit)) {
+        this.FPeekedNumber[BufIndex] = "\x00";
+        return this.TTMSFNCJSONState.jstNumber;
+      } else throw this.EExpectedValue.$create("Create$2");
+      return Result;
+    };
+    this.InternalReadQuoted = function (BuildString) {
+      var Result = "";
+      var c = "";
+      var s = "";
+      Result = "";
+      s = "";
+      while (!this.FReader.Eof()) {
+        c = this.ReadChar();
+        if (c === '"') {
+          break}
+         else s = s + c;
+      };
+      if (BuildString) Result = s;
+      return Result;
+    };
+    this.ReadQuoted = function () {
+      var Result = "";
+      Result = this.InternalReadQuoted(true);
+      return Result;
+    };
+    this.SkipQuoted = function () {
+      this.InternalReadQuoted(false);
+    };
+    this.SkipWhitespaceUntilEnd = function () {
+      var Result = false;
+      var s = "";
+      var p = 0;
+      p = this.FReader.FReadStream.FPosition;
+      Result = true;
+      s = this.ReadChar();
+      do {
+        if ((s > " ") || !(s.charCodeAt() in $impl.Wspace)) {
+          this.FReader.FReadStream.FPosition = p;
+          return false;
+        };
+        s = this.ReadChar();
+      } while (!this.FReader.Eof());
+      this.FReader.FReadStream.FPosition = p;
+      return Result;
+    };
+    this.Create$1 = function (AStream) {
+      pas.System.TObject.Create.call(this);
+      this.FReader = $mod.TTMSFNCJSONStreamReader.$create("Create$1",[AStream]);
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      this.FStack[0] = this.TTMSFNCJSONScope.jscEmptyDocument;
+      this.FStackSize = 1;
+      return this;
+    };
+    this.Destroy = function () {
+      rtl.free(this,"FReader");
+      pas.System.TObject.Destroy.call(this);
+    };
+    this.ReadBeginArray = function () {
+      this.CheckState(this.TTMSFNCJSONState.jstBeginArray);
+      this.PushScope(this.TTMSFNCJSONScope.jscEmptyArray);
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+    };
+    this.ReadEndArray = function () {
+      this.CheckState(this.TTMSFNCJSONState.jstEndArray);
+      this.FStackSize -= 1;
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+    };
+    this.ReadBeginObject = function () {
+      this.CheckState(this.TTMSFNCJSONState.jstBeginObject);
+      this.PushScope(this.TTMSFNCJSONScope.jscEmptyObject);
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+    };
+    this.ReadEndObject = function () {
+      this.CheckState(this.TTMSFNCJSONState.jstEndObject);
+      this.FStackSize -= 1;
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+    };
+    this.ReadName = function () {
+      var Result = "";
+      this.CheckState(this.TTMSFNCJSONState.jstDoubleQuotedName);
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      Result = this.ReadQuoted();
+      return Result;
+    };
+    this.ReadString = function () {
+      var Result = "";
+      var $tmp1 = this.NextPeek();
+      if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
+        Result = this.ReadQuoted()}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
+        Result = pas.SysUtils.IntToStr(this.FPeekedInt64)}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
+        Result = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0))}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {
+        Result = this.FPeekedString}
+       else {
+        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstDoubleQuoted]);
+      };
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      Result = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.UnescapeString(Result);
+      return Result;
+    };
+    this.ReadBoolean = function () {
+      var Result = false;
+      var $tmp1 = this.NextPeek();
+      if ($tmp1 === this.TTMSFNCJSONState.jstTrue) {
+        Result = true}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstFalse) {
+        Result = false}
+       else {
+        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstTrue]);
+      };
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      return Result;
+    };
+    this.ReadDouble = function () {
+      var Result = 0.0;
+      var $tmp1 = this.NextPeek();
+      if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
+        this.FPeeked = this.TTMSFNCJSONState.jstNone;
+        return this.FPeekedInt64;
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
+        if (pas.SysUtils.TryStrToFloat($impl.ArrayOfCharToString(this.FPeekedNumber.slice(0)),{get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }})) {
+          this.FPeeked = this.TTMSFNCJSONState.jstNone;
+          return Result;
+        } else this.FPeekedString = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0));
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
+        this.FPeekedString = this.ReadQuoted()}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {}
+      else {
+        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstNumber]);
+      };
+      this.FPeeked = this.TTMSFNCJSONState.jstBuffered;
+      Result = pas.SysUtils.StrToFloat(this.FPeekedString);
+      this.FPeekedString = "";
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      return Result;
+    };
+    this.ReadInt64 = function () {
+      var Result = 0;
+      var AsDouble = 0.0;
+      var $tmp1 = this.NextPeek();
+      if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
+        this.FPeeked = this.TTMSFNCJSONState.jstNone;
+        return this.FPeekedInt64;
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
+        if (pas.SysUtils.TryStrToInt64($impl.ArrayOfCharToString(this.FPeekedNumber.slice(0)),{get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }})) {
+          this.FPeeked = this.TTMSFNCJSONState.jstNone;
+          return Result;
+        } else this.FPeekedString = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0));
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
+        this.FPeekedString = this.ReadQuoted();
+        if (pas.SysUtils.TryStrToInt64(this.FPeekedString,{get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }})) {
+          this.FPeeked = this.TTMSFNCJSONState.jstNone;
+          return Result;
+        };
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {}
+      else {
+        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
+      };
+      this.FPeeked = this.TTMSFNCJSONState.jstBuffered;
+      AsDouble = pas.SysUtils.StrToFloat(this.FPeekedString);
+      Result = Math.round(AsDouble);
+      if (AsDouble !== Result) throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
+      this.FPeekedString = "";
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      return Result;
+    };
+    this.ReadInteger = function () {
+      var Result = 0;
+      var AsDouble = 0.0;
+      var $tmp1 = this.NextPeek();
+      if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
+        Result = this.FPeekedInt64 & 0xFFFFFFFF;
+        if (Result !== this.FPeekedInt64) throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
+        this.FPeeked = this.TTMSFNCJSONState.jstNone;
+        return Result;
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
+        if (pas.SysUtils.TryStrToInt($impl.ArrayOfCharToString(this.FPeekedNumber.slice(0)),{get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }})) {
+          this.FPeeked = this.TTMSFNCJSONState.jstNone;
+          return Result;
+        } else this.FPeekedString = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0));
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
+        this.FPeekedString = this.ReadQuoted();
+        if (pas.SysUtils.TryStrToInt(this.FPeekedString,{get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }})) {
+          this.FPeeked = this.TTMSFNCJSONState.jstNone;
+          return Result;
+        };
+      } else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {}
+      else {
+        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
+      };
+      this.FPeeked = this.TTMSFNCJSONState.jstBuffered;
+      AsDouble = pas.SysUtils.StrToFloat(this.FPeekedString);
+      Result = Math.round(AsDouble);
+      if (AsDouble !== Result) throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
+      this.FPeekedString = "";
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      return Result;
+    };
+    this.SkipValue = function () {
+      var Count = 0;
+      Count = 0;
+      do {
+        var $tmp1 = this.NextPeek();
+        if ($tmp1 === this.TTMSFNCJSONState.jstBeginArray) {
+          this.PushScope(this.TTMSFNCJSONScope.jscEmptyArray);
+          Count += 1;
+        } else if ($tmp1 === this.TTMSFNCJSONState.jstBeginObject) {
+          this.PushScope(this.TTMSFNCJSONScope.jscEmptyObject);
+          Count += 1;
+        } else if (($tmp1 === this.TTMSFNCJSONState.jstEndArray) || ($tmp1 === this.TTMSFNCJSONState.jstEndObject)) {
+          this.FStackSize -= 1;
+          Count -= 1;
+        } else if (($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) || ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuotedName)) this.SkipQuoted();
+        this.FPeeked = this.TTMSFNCJSONState.jstNone;
+      } while (!(Count <= 0));
+    };
+    this.ReadNull = function () {
+      this.CheckState(this.TTMSFNCJSONState.jstNull);
+      this.FPeeked = this.TTMSFNCJSONState.jstNone;
+    };
+    this.HasNext = function () {
+      var Result = false;
+      Result = !(this.NextPeek() in rtl.createSet(this.TTMSFNCJSONState.jstEndObject,this.TTMSFNCJSONState.jstEndArray));
+      return Result;
+    };
+    this.Peek = function () {
+      var Result = 0;
+      var $tmp1 = this.NextPeek();
+      if ($tmp1 === this.TTMSFNCJSONState.jstBeginObject) {
+        Result = $mod.TTMSFNCJSONToken.jstoBeginObject}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstEndObject) {
+        Result = $mod.TTMSFNCJSONToken.jstoEndObject}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstBeginArray) {
+        Result = $mod.TTMSFNCJSONToken.jstoBeginArray}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstEndArray) {
+        Result = $mod.TTMSFNCJSONToken.jstoEndArray}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuotedName) {
+        Result = $mod.TTMSFNCJSONToken.jstoName}
+       else if (($tmp1 === this.TTMSFNCJSONState.jstTrue) || ($tmp1 === this.TTMSFNCJSONState.jstFalse)) {
+        Result = $mod.TTMSFNCJSONToken.jstoBoolean}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstNull) {
+        Result = $mod.TTMSFNCJSONToken.jstoNull}
+       else if (($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) || ($tmp1 === this.TTMSFNCJSONState.jstBuffered)) {
+        Result = $mod.TTMSFNCJSONToken.jstoText}
+       else if (($tmp1 === this.TTMSFNCJSONState.jstInt64) || ($tmp1 === this.TTMSFNCJSONState.jstNumber)) {
+        Result = $mod.TTMSFNCJSONToken.jstoNumber}
+       else if ($tmp1 === this.TTMSFNCJSONState.jstEOF) {
+        Result = $mod.TTMSFNCJSONToken.jstoEOF}
+       else {
+        Result = $mod.TTMSFNCJSONToken.jstoEOF;
+      };
+      return Result;
+    };
+    this.IsNull = function () {
+      var Result = false;
+      Result = this.Peek() === $mod.TTMSFNCJSONToken.jstoNull;
+      return Result;
+    };
+    this.Eof = function () {
+      var Result = false;
+      Result = this.Peek() === $mod.TTMSFNCJSONToken.jstoEOF;
+      return Result;
+    };
+  });
+},["WEBLib.TMSFNCUtils"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  $impl.Wspace = rtl.createSet(0x20,0xA,0xD,0x9,0xC);
+  $impl.ArrayOfCharToString = function (AArray) {
+    var Result = "";
+    var I = 0;
+    Result = "";
+    for (var $l1 = 0, $end2 = rtl.length(AArray) - 1; $l1 <= $end2; $l1++) {
+      I = $l1;
+      if (AArray[I] === "\x00") break;
+      Result = Result + AArray[I];
+    };
+    return Result;
+  };
+});
+rtl.module("WEBLib.TMSFNCJSONWriter",["System","Classes","SysUtils","WEBLib.TMSFNCTypes"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  rtl.createClass($mod,"TTMSFNCJSONStreamWriter",pas.System.TObject,function () {
+    this.$init = function () {
+      pas.System.TObject.$init.call(this);
+      this.FStream = null;
+      this.FWriteStream = null;
+    };
+    this.$final = function () {
+      this.FStream = undefined;
+      this.FWriteStream = undefined;
+      pas.System.TObject.$final.call(this);
+    };
+    this.Create$1 = function (AStream) {
+      this.FStream = AStream;
+      this.FWriteStream = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[""]);
+      return this;
+    };
+    this.Destroy = function () {
+      try {
+        this.FWriteStream.FPosition = 0;
+        this.FStream.CopyFrom(this.FWriteStream,this.FWriteStream.FSize);
+      } finally {
+        rtl.free(this,"FWriteStream");
+      };
+      pas.System.TObject.Destroy.call(this);
+    };
+    this.Write = function (Value) {
+      this.FWriteStream.WriteString(Value);
+    };
+  });
+  rtl.createClass($mod,"TTMSFNCJSONWriter",pas.System.TObject,function () {
+    rtl.createClass(this,"ECannotWriteName",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Cannot write name in current Json scope");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EMultipleRootNotAllowed",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Multiple root values not allowed");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EObjectOrArrayExpected",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Object or array expected as top-level value");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EInvalidNesting",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Invalid nesting. Not all arrays\/objects were properly closed.");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EMissingValue",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Json value missing");
+        return this;
+      };
+    });
+    rtl.createClass(this,"ETooManyDepthLevels",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Maximum level of nested structured reached.");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EEmptyJson",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Json is still empty. Cannot perform operation.");
+        return this;
+      };
+    });
+    rtl.createClass(this,"EEmptyName",pas.SysUtils.Exception,function () {
+      this.Create$2 = function () {
+        pas.SysUtils.Exception.Create$1.call(this,"Cannot write empty name");
+        return this;
+      };
+    });
+    this.TTMSFNCJSONScope = {"0": "jscEmptyDocument", jscEmptyDocument: 0, "1": "jscEmptyArray", jscEmptyArray: 1, "2": "jscEmptyObject", jscEmptyObject: 2, "3": "jscNonEmptyDocument", jscNonEmptyDocument: 3, "4": "jscNonEmptyArray", jscNonEmptyArray: 4, "5": "jscNonEmptyObject", jscNonEmptyObject: 5, "6": "jscDanglingName", jscDanglingName: 6};
+    $mod.$rtti.$Enum("TTMSFNCJSONWriter.TTMSFNCJSONScope",{minvalue: 0, maxvalue: 6, ordtype: 1, enumtype: this.TTMSFNCJSONScope});
+    this.MaxStackSize = 255;
+    this.$init = function () {
+      pas.System.TObject.$init.call(this);
+      this.FWriter = null;
+      this.FStack = rtl.arraySetLength(null,0,256);
+      this.FStackSize = 0;
+      this.FIndent = "";
+      this.FSeparator = "";
+      this.FDeferredName = "";
+      this.FClosed = false;
+    };
+    this.$final = function () {
+      this.FWriter = undefined;
+      this.FStack = undefined;
+      pas.System.TObject.$final.call(this);
+    };
+    this.SetIndentLength = function (Value) {
+      if (Value <= 0) {
+        this.FIndent = "";
+        this.FSeparator = ":";
+      } else {
+        this.FIndent = pas.System.StringOfChar(" ",Value);
+        this.FSeparator = ": ";
+      };
+    };
+    this.GetIndentLength = function () {
+      var Result = 0;
+      Result = this.FIndent.length;
+      return Result;
+    };
+    this.OpenItem = function (Empty, OpenBracket) {
+      var Result = null;
+      this.BeforeValue(true);
+      this.PushScope(Empty);
+      this.FWriter.Write(OpenBracket);
+      Result = this;
+      return Result;
+    };
+    this.CloseItem = function (Empty, NonEmpty, CloseBracket) {
+      var Result = null;
+      var Context = 0;
+      Context = this.PeekScope();
+      if (!(Context in rtl.createSet(Empty,NonEmpty))) throw this.EInvalidNesting.$create("Create$2");
+      if (this.FDeferredName !== "") throw this.EMissingValue.$create("Create$2");
+      this.FStackSize -= 1;
+      if (Context === NonEmpty) this.NewLine();
+      this.FWriter.Write(CloseBracket);
+      Result = this;
+      return Result;
+    };
+    this.PushScope = function (Scope) {
+      if (this.FStackSize > 255) throw this.ETooManyDepthLevels.$create("Create$2");
+      this.FStack[this.FStackSize] = Scope;
+      this.FStackSize += 1;
+    };
+    this.PeekScope = function () {
+      var Result = 0;
+      if (this.FStackSize === 0) throw this.EEmptyJson.$create("Create$2");
+      Result = this.FStack[this.FStackSize - 1];
+      return Result;
+    };
+    this.ReplaceTop = function (Scope) {
+      if (this.FStackSize === 0) throw this.EEmptyJson.$create("Create$2");
+      this.FStack[this.FStackSize - 1] = Scope;
+    };
+    this.WriteDeferredName = function () {
+      if (this.FDeferredName !== "") {
+        this.BeforeName();
+        this.InternalWriteString(this.FDeferredName);
+        this.FDeferredName = "";
+      };
+    };
+    this.InternalWriteString = function (Value) {
+      this.FWriter.Write('"');
+      this.FWriter.Write(pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.EscapeString(Value));
+      this.FWriter.Write('"');
+    };
+    this.NewLine = function () {
+      var I = 0;
+      if (this.FIndent !== "") {
+        this.FWriter.Write("\r\n");
+        for (var $l1 = 1, $end2 = this.FStackSize - 1; $l1 <= $end2; $l1++) {
+          I = $l1;
+          this.FWriter.Write(this.FIndent);
+        };
+      };
+    };
+    this.BeforeName = function () {
+      var $tmp1 = this.PeekScope();
+      if ($tmp1 === this.TTMSFNCJSONScope.jscNonEmptyObject) {
+        this.FWriter.Write(",")}
+       else if ($tmp1 === this.TTMSFNCJSONScope.jscEmptyObject) {}
+      else {
+        throw this.ECannotWriteName.$create("Create$2");
+      };
+      this.NewLine();
+      this.ReplaceTop(this.TTMSFNCJSONScope.jscDanglingName);
+    };
+    this.BeforeValue = function (Root) {
+      var $tmp1 = this.PeekScope();
+      if ($tmp1 === this.TTMSFNCJSONScope.jscNonEmptyDocument) {
+        throw this.EMultipleRootNotAllowed.$create("Create$2")}
+       else if ($tmp1 === this.TTMSFNCJSONScope.jscEmptyDocument) {
+        if (!Root) throw this.EObjectOrArrayExpected.$create("Create$2");
+        this.ReplaceTop(this.TTMSFNCJSONScope.jscNonEmptyDocument);
+      } else if ($tmp1 === this.TTMSFNCJSONScope.jscEmptyArray) {
+        this.ReplaceTop(this.TTMSFNCJSONScope.jscNonEmptyArray);
+        this.NewLine();
+      } else if ($tmp1 === this.TTMSFNCJSONScope.jscNonEmptyArray) {
+        this.FWriter.Write(",");
+        this.NewLine();
+      } else if ($tmp1 === this.TTMSFNCJSONScope.jscDanglingName) {
+        this.FWriter.Write(this.FSeparator);
+        this.ReplaceTop(this.TTMSFNCJSONScope.jscNonEmptyObject);
+      } else {
+        throw this.EInvalidNesting.$create("Create$2");
+      };
+    };
+    this.Create$1 = function (AStream) {
+      pas.System.TObject.Create.call(this);
+      this.FWriter = $mod.TTMSFNCJSONStreamWriter.$create("Create$1",[AStream]);
+      this.FSeparator = ":";
+      this.PushScope(this.TTMSFNCJSONScope.jscEmptyDocument);
+      return this;
+    };
+    this.Destroy = function () {
+      rtl.free(this,"FWriter");
+      pas.System.TObject.Destroy.call(this);
+    };
+    this.WriteBeginArray = function () {
+      var Result = null;
+      this.WriteDeferredName();
+      Result = this.OpenItem(this.TTMSFNCJSONScope.jscEmptyArray,"[");
+      return Result;
+    };
+    this.WriteEndArray = function () {
+      var Result = null;
+      Result = this.CloseItem(this.TTMSFNCJSONScope.jscEmptyArray,this.TTMSFNCJSONScope.jscNonEmptyArray,"]");
+      return Result;
+    };
+    this.WriteBeginObject = function () {
+      var Result = null;
+      this.WriteDeferredName();
+      Result = this.OpenItem(this.TTMSFNCJSONScope.jscEmptyObject,"{");
+      return Result;
+    };
+    this.WriteEndObject = function () {
+      var Result = null;
+      Result = this.CloseItem(this.TTMSFNCJSONScope.jscEmptyObject,this.TTMSFNCJSONScope.jscNonEmptyObject,"}");
+      return Result;
+    };
+    this.WriteName = function (Name) {
+      var Result = null;
+      if (Name === "") throw this.EEmptyName.$create("Create$2");
+      if (this.FDeferredName !== "") throw this.EMissingValue.$create("Create$2");
+      if (this.FStackSize === 0) throw this.EEmptyJson.$create("Create$2");
+      this.FDeferredName = Name;
+      Result = this;
+      return Result;
+    };
+    this.WriteString = function (Value) {
+      var Result = null;
+      this.WriteDeferredName();
+      this.BeforeValue(false);
+      this.InternalWriteString(Value);
+      Result = this;
+      return Result;
+    };
+    this.WriteRawString = function (Value) {
+      var Result = null;
+      this.WriteDeferredName();
+      this.BeforeValue(false);
+      this.FWriter.Write('"');
+      this.FWriter.Write(Value);
+      this.FWriter.Write('"');
+      Result = this;
+      return Result;
+    };
+    this.WriteBoolean = function (Value) {
+      var Result = null;
+      this.WriteDeferredName();
+      this.BeforeValue(false);
+      if (Value) {
+        this.FWriter.Write("true")}
+       else this.FWriter.Write("false");
+      Result = this;
+      return Result;
+    };
+    this.WriteNull = function () {
+      var Result = null;
+      this.WriteDeferredName();
+      this.BeforeValue(false);
+      this.FWriter.Write("null");
+      Result = this;
+      return Result;
+    };
+    this.WriteDouble = function (Value) {
+      var Result = null;
+      this.WriteDeferredName();
+      this.BeforeValue(false);
+      this.FWriter.Write(pas.SysUtils.FloatToStr(Value));
+      Result = this;
+      return Result;
+    };
+    this.WriteInteger = function (Value) {
+      var Result = null;
+      this.WriteDeferredName();
+      this.BeforeValue(false);
+      this.FWriter.Write(pas.SysUtils.IntToStr(Value));
+      Result = this;
+      return Result;
+    };
+    this.Close = function () {
+      if ((this.FStackSize > 1) || ((this.FStackSize === 1) && (this.PeekScope() !== this.TTMSFNCJSONScope.jscNonEmptyDocument))) throw this.EInvalidNesting.$create("Create$2");
+      this.FClosed = true;
+    };
+  });
+},["WEBLib.TMSFNCUtils"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  $impl.RaiseErrInvalidString = function () {
+    throw pas.SysUtils.Exception.$create("Create$1",[rtl.getResStr(pas["WEBLib.TMSFNCJSONWriter"],"ErrInvalidString")]);
+  };
+  $mod.$resourcestrings = {ErrInvalidString: {org: "The file contains a string that can't be encoded in UTF-8"}};
+});
+rtl.module("strutils",["System","SysUtils"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  this.AnsiResemblesText = function (AText, AOther) {
+    var Result = false;
+    if ($mod.AnsiResemblesProc != null) {
+      Result = $mod.AnsiResemblesProc(AText,AOther)}
+     else Result = false;
+    return Result;
+  };
+  this.AnsiContainsText = function (AText, ASubText) {
+    var Result = false;
+    Result = pas.System.Pos(pas.SysUtils.UpperCase(ASubText),pas.SysUtils.UpperCase(AText)) > 0;
+    return Result;
+  };
+  this.AnsiStartsText = function (ASubText, AText) {
+    var Result = false;
+    if ((AText.length >= ASubText.length) && (ASubText !== "")) {
+      Result = pas.SysUtils.SameText(ASubText,pas.System.Copy(AText,1,ASubText.length))}
+     else Result = false;
+    return Result;
+  };
+  this.AnsiEndsText = function (ASubText, AText) {
+    var Result = false;
+    if (AText.length >= ASubText.length) {
+      Result = pas.SysUtils.SameText(ASubText,$mod.RightStr(AText,ASubText.length))}
+     else Result = false;
+    return Result;
+  };
+  this.AnsiReplaceText = function (AText, AFromText, AToText) {
+    var Result = "";
+    Result = pas.SysUtils.StringReplace(AText,AFromText,AToText,rtl.createSet(pas.SysUtils.TStringReplaceFlag.rfReplaceAll,pas.SysUtils.TStringReplaceFlag.rfIgnoreCase));
+    return Result;
+  };
+  this.AnsiMatchText = function (AText, AValues) {
+    var Result = false;
+    Result = $mod.AnsiIndexText(AText,AValues) !== -1;
+    return Result;
+  };
+  this.AnsiIndexText = function (AText, AValues) {
+    var Result = 0;
+    var i = 0;
+    Result = -1;
+    if (((rtl.length(AValues) - 1) === -1) || ((rtl.length(AValues) - 1) > 2147483647)) return Result;
+    for (var $l1 = 0, $end2 = rtl.length(AValues) - 1; $l1 <= $end2; $l1++) {
+      i = $l1;
+      if (pas.SysUtils.CompareText(AValues[i],AText) === 0) return i;
+    };
+    return Result;
+  };
+  this.StartsText = function (ASubText, AText) {
+    var Result = false;
+    Result = $mod.AnsiStartsText(ASubText,AText);
+    return Result;
+  };
+  this.EndsText = function (ASubText, AText) {
+    var Result = false;
+    Result = $mod.AnsiEndsText(ASubText,AText);
+    return Result;
+  };
+  this.ResemblesText = function (AText, AOther) {
+    var Result = false;
+    if ($mod.ResemblesProc != null) {
+      Result = $mod.ResemblesProc(AText,AOther)}
+     else Result = false;
+    return Result;
+  };
+  this.ContainsText = function (AText, ASubText) {
+    var Result = false;
+    Result = $mod.AnsiContainsText(AText,ASubText);
+    return Result;
+  };
+  this.MatchText = function (AText, AValues) {
+    var Result = false;
+    Result = $mod.AnsiMatchText(AText,AValues);
+    return Result;
+  };
+  this.IndexText = function (AText, AValues) {
+    var Result = 0;
+    Result = $mod.AnsiIndexText(AText,AValues);
+    return Result;
+  };
+  this.AnsiContainsStr = function (AText, ASubText) {
+    var Result = false;
+    Result = pas.System.Pos(ASubText,AText) > 0;
+    return Result;
+  };
+  this.AnsiStartsStr = function (ASubText, AText) {
+    var Result = false;
+    if ((AText.length >= ASubText.length) && (ASubText !== "")) {
+      Result = ASubText === pas.System.Copy(AText,1,ASubText.length)}
+     else Result = false;
+    return Result;
+  };
+  this.AnsiEndsStr = function (ASubText, AText) {
+    var Result = false;
+    if (AText.length >= ASubText.length) {
+      Result = ASubText === $mod.RightStr(AText,ASubText.length)}
+     else Result = false;
+    return Result;
+  };
+  this.AnsiReplaceStr = function (AText, AFromText, AToText) {
+    var Result = "";
+    Result = pas.SysUtils.StringReplace(AText,AFromText,AToText,rtl.createSet(pas.SysUtils.TStringReplaceFlag.rfReplaceAll));
+    return Result;
+  };
+  this.AnsiMatchStr = function (AText, AValues) {
+    var Result = false;
+    Result = $mod.AnsiIndexStr(AText,AValues) !== -1;
+    return Result;
+  };
+  this.AnsiIndexStr = function (AText, AValues) {
+    var Result = 0;
+    var i = 0;
+    Result = -1;
+    if (((rtl.length(AValues) - 1) === -1) || ((rtl.length(AValues) - 1) > 2147483647)) return Result;
+    for (var $l1 = 0, $end2 = rtl.length(AValues) - 1; $l1 <= $end2; $l1++) {
+      i = $l1;
+      if (AValues[i] === AText) return i;
+    };
+    return Result;
+  };
+  this.MatchStr = function (AText, AValues) {
+    var Result = false;
+    Result = $mod.IndexStr(AText,AValues) !== -1;
+    return Result;
+  };
+  this.IndexStr = function (AText, AValues) {
+    var Result = 0;
+    var i = 0;
+    Result = -1;
+    if (((rtl.length(AValues) - 1) === -1) || ((rtl.length(AValues) - 1) > 2147483647)) return Result;
+    for (var $l1 = 0, $end2 = rtl.length(AValues) - 1; $l1 <= $end2; $l1++) {
+      i = $l1;
+      if (AValues[i] === AText) return i;
+    };
+    return Result;
+  };
+  this.ContainsStr = function (AText, ASubText) {
+    var Result = false;
+    Result = $mod.AnsiContainsStr(AText,ASubText);
+    return Result;
+  };
+  this.StartsStr = function (ASubText, AText) {
+    var Result = false;
+    Result = $mod.AnsiStartsStr(AText,ASubText);
+    return Result;
+  };
+  this.EndsStr = function (ASubText, AText) {
+    var Result = false;
+    Result = $mod.AnsiEndsStr(AText,ASubText);
+    return Result;
+  };
+  this.DupeString = function (AText, ACount) {
+    var Result = "";
+    var i = 0;
+    Result = "";
+    for (var $l1 = 1, $end2 = ACount; $l1 <= $end2; $l1++) {
+      i = $l1;
+      Result = Result + AText;
+    };
+    return Result;
+  };
+  this.ReverseString = function (AText) {
+    var Result = "";
+    var i = 0;
+    var j = 0;
+    Result = rtl.strSetLength(Result,AText.length);
+    i = 1;
+    j = AText.length;
+    while (i <= j) {
+      Result = rtl.setCharAt(Result,i - 1,AText.charAt(((j - i) + 1) - 1));
+      i += 1;
+    };
+    return Result;
+  };
+  this.AnsiReverseString = function (AText) {
+    var Result = "";
+    Result = $mod.ReverseString(AText);
+    return Result;
+  };
+  this.StuffString = function (AText, AStart, ALength, ASubText) {
+    var Result = "";
+    var i = 0;
+    var j = 0;
+    var k = 0;
+    j = ASubText.length;
+    i = AText.length;
+    if (AStart > i) AStart = i + 1;
+    k = (i + 1) - AStart;
+    if (ALength > k) ALength = k;
+    Result = rtl.strSetLength(Result,(i + j) - ALength);
+    Result = pas.System.Copy(AText,1,AStart - 1) + pas.System.Copy(ASubText,1,j) + pas.System.Copy(AText,AStart + ALength,(i + 1) - AStart - ALength);
+    return Result;
+  };
+  this.RandomFrom = function (AValues) {
+    var Result = "";
+    if ((rtl.length(AValues) - 1) === -1) return "";
+    Result = AValues[pas.System.Random((rtl.length(AValues) - 1) + 1)];
+    return Result;
+  };
+  this.IfThen = function (AValue, ATrue, AFalse) {
+    var Result = "";
+    if (AValue) {
+      Result = ATrue}
+     else Result = AFalse;
+    return Result;
+  };
+  this.NaturalCompareText = function (S1, S2) {
+    var Result = 0;
+    Result = $mod.NaturalCompareText$1(S1,S2,pas.SysUtils.DecimalSeparator,pas.SysUtils.ThousandSeparator);
+    return Result;
+  };
+  this.NaturalCompareText$1 = function (Str1, Str2, ADecSeparator, AThousandSeparator) {
+    var Result = 0;
+    var Num1 = 0.0;
+    var Num2 = 0.0;
+    var pStr1 = 0;
+    var pStr2 = 0;
+    var Len1 = 0;
+    var Len2 = 0;
+    var TextLen1 = 0;
+    var TextLen2 = 0;
+    var TextStr1 = "";
+    var TextStr2 = "";
+    var i = 0;
+    var j = 0;
+    function Sign(AValue) {
+      var Result = 0;
+      if (AValue < 0) {
+        Result = -1}
+       else if (AValue > 0) {
+        Result = 1}
+       else Result = 0;
+      return Result;
+    };
+    function IsNumber(ch) {
+      var Result = false;
+      Result = ch.charCodeAt() in rtl.createSet(null,48,57);
+      return Result;
+    };
+    function GetInteger(aString, pch, Len) {
+      var Result = 0.0;
+      Result = 0;
+      while ((pch.get() <= aString.length) && IsNumber(aString.charAt(pch.get() - 1))) {
+        Result = ((Result * 10) + aString.charCodeAt(pch.get() - 1)) - "0".charCodeAt();
+        Len.set(Len.get() + 1);
+        pch.set(pch.get() + 1);
+      };
+      return Result;
+    };
+    function GetChars() {
+      TextLen1 = 0;
+      while (!(Str1.charCodeAt((pStr1 + TextLen1) - 1) in rtl.createSet(null,48,57)) && ((pStr1 + TextLen1) <= Str1.length)) TextLen1 += 1;
+      TextStr1 = "";
+      i = 1;
+      j = 0;
+      while (i <= TextLen1) {
+        TextStr1 = TextStr1 + Str1.charAt((pStr1 + j) - 1);
+        i += 1;
+        j += 1;
+      };
+      TextLen2 = 0;
+      while (!(Str2.charCodeAt((pStr2 + TextLen2) - 1) in rtl.createSet(null,48,57)) && ((pStr2 + TextLen2) <= Str2.length)) TextLen2 += 1;
+      i = 1;
+      j = 0;
+      while (i <= TextLen2) {
+        TextStr2 = TextStr2 + Str2.charAt((pStr2 + j) - 1);
+        i += 1;
+        j += 1;
+      };
+    };
+    if ((Str1 !== "") && (Str2 !== "")) {
+      pStr1 = 1;
+      pStr2 = 1;
+      Result = 0;
+      while ((pStr1 <= Str1.length) && (pStr2 <= Str2.length)) {
+        TextLen1 = 1;
+        TextLen2 = 1;
+        Len1 = 0;
+        Len2 = 0;
+        while (Str1.charAt(pStr1 - 1) === " ") {
+          pStr1 += 1;
+          Len1 += 1;
+        };
+        while (Str2.charAt(pStr2 - 1) === " ") {
+          pStr2 += 1;
+          Len2 += 1;
+        };
+        if (IsNumber(Str1.charAt(pStr1 - 1)) && IsNumber(Str2.charAt(pStr2 - 1))) {
+          Num1 = GetInteger(Str1,{get: function () {
+              return pStr1;
+            }, set: function (v) {
+              pStr1 = v;
+            }},{get: function () {
+              return Len1;
+            }, set: function (v) {
+              Len1 = v;
+            }});
+          Num2 = GetInteger(Str2,{get: function () {
+              return pStr2;
+            }, set: function (v) {
+              pStr2 = v;
+            }},{get: function () {
+              return Len2;
+            }, set: function (v) {
+              Len2 = v;
+            }});
+          if (Num1 < Num2) {
+            Result = -1}
+           else if (Num1 > Num2) {
+            Result = 1}
+           else {
+            Result = Sign(Len1 - Len2);
+          };
+          pStr1 -= 1;
+          pStr2 -= 1;
+        } else {
+          GetChars();
+          if (TextStr1 !== TextStr2) {
+            Result = pas.SysUtils.CompareText(TextStr1,TextStr2)}
+           else Result = 0;
+        };
+        if (Result !== 0) break;
+        pStr1 += TextLen1;
+        pStr2 += TextLen2;
+      };
+    };
+    Num1 = Str1.length;
+    Num2 = Str2.length;
+    if ((Result === 0) && (Num1 !== Num2)) {
+      if (Num1 < Num2) {
+        Result = -1}
+       else Result = 1;
+    };
+    if (ADecSeparator === "") ;
+    if (AThousandSeparator === "") ;
+    return Result;
+  };
+  this.LeftStr = function (AText, ACount) {
+    var Result = "";
+    Result = pas.System.Copy(AText,1,ACount);
+    return Result;
+  };
+  this.RightStr = function (AText, ACount) {
+    var Result = "";
+    var j = 0;
+    var l = 0;
+    l = AText.length;
+    j = ACount;
+    if (j > l) j = l;
+    Result = pas.System.Copy(AText,(l - j) + 1,j);
+    return Result;
+  };
+  this.MidStr = function (AText, AStart, ACount) {
+    var Result = "";
+    if ((ACount === 0) || (AStart > AText.length)) return "";
+    Result = pas.System.Copy(AText,AStart,ACount);
+    return Result;
+  };
+  this.RightBStr = function (AText, AByteCount) {
+    var Result = "";
+    Result = $mod.RightStr(AText,AByteCount);
+    return Result;
+  };
+  this.MidBStr = function (AText, AByteStart, AByteCount) {
+    var Result = "";
+    Result = $mod.MidStr(AText,AByteStart,AByteCount);
+    return Result;
+  };
+  this.AnsiLeftStr = function (AText, ACount) {
+    var Result = "";
+    Result = pas.System.Copy(AText,1,ACount);
+    return Result;
+  };
+  this.AnsiRightStr = function (AText, ACount) {
+    var Result = "";
+    Result = pas.System.Copy(AText,(AText.length - ACount) + 1,ACount);
+    return Result;
+  };
+  this.AnsiMidStr = function (AText, AStart, ACount) {
+    var Result = "";
+    Result = pas.System.Copy(AText,AStart,ACount);
+    return Result;
+  };
+  this.LeftBStr = function (AText, AByteCount) {
+    var Result = "";
+    Result = $mod.LeftStr(AText,AByteCount);
+    return Result;
+  };
+  this.WordDelimiters = [];
+  this.SErrAmountStrings = "Amount of search and replace strings don't match";
+  this.SInvalidRomanNumeral = "%s is not a valid Roman numeral";
+  this.TStringSearchOption = {"0": "soDown", soDown: 0, "1": "soMatchCase", soMatchCase: 1, "2": "soWholeWord", soWholeWord: 2};
+  $mod.$rtti.$Enum("TStringSearchOption",{minvalue: 0, maxvalue: 2, ordtype: 1, enumtype: this.TStringSearchOption});
+  $mod.$rtti.$Set("TStringSearchOptions",{comptype: $mod.$rtti["TStringSearchOption"]});
+  this.PosEx = function (SubStr, S, Offset) {
+    var Result = 0;
+    Result = (new String(S)).indexOf(SubStr,Offset - 1) + 1;
+    return Result;
+  };
+  this.PosEx$1 = function (SubStr, S) {
+    var Result = 0;
+    Result = $mod.PosEx(SubStr,S,1);
+    return Result;
+  };
+  this.PosEx$2 = function (c, S, Offset) {
+    var Result = 0;
+    Result = (new String(S)).indexOf(c,Offset - 1) + 1;
+    return Result;
+  };
+  this.StringsReplace = function (S, OldPattern, NewPattern, Flags) {
+    var Result = "";
+    var pc = 0;
+    var pcc = 0;
+    var lastpc = 0;
+    var strcount = 0;
+    var ResStr = "";
+    var CompStr = "";
+    var Found = false;
+    var sc = 0;
+    sc = rtl.length(OldPattern);
+    if (sc !== rtl.length(NewPattern)) throw pas.SysUtils.Exception.$create("Create$1",[$mod.SErrAmountStrings]);
+    sc -= 1;
+    if (pas.SysUtils.TStringReplaceFlag.rfIgnoreCase in Flags) {
+      CompStr = pas.SysUtils.UpperCase(S);
+      for (var $l1 = 0, $end2 = sc; $l1 <= $end2; $l1++) {
+        strcount = $l1;
+        OldPattern[strcount] = pas.SysUtils.UpperCase(OldPattern[strcount]);
+      };
+    } else CompStr = S;
+    ResStr = "";
+    pc = 1;
+    pcc = 1;
+    lastpc = pc + S.length;
+    while (pc < lastpc) {
+      Found = false;
+      for (var $l3 = 0, $end4 = sc; $l3 <= $end4; $l3++) {
+        strcount = $l3;
+        if (pas.System.Copy(CompStr,pc,OldPattern[strcount].length) === OldPattern[strcount]) {
+          ResStr = ResStr + NewPattern[strcount];
+          pc = pc + OldPattern[strcount].length;
+          pcc = pcc + OldPattern[strcount].length;
+          Found = true;
+        };
+      };
+      if (!Found) {
+        ResStr = ResStr + S.charAt(pcc - 1);
+        pc += 1;
+        pcc += 1;
+      } else if (!(pas.SysUtils.TStringReplaceFlag.rfReplaceAll in Flags)) {
+        ResStr = ResStr + pas.System.Copy(S,pcc,(S.length - pcc) + 1);
+        break;
+      };
+    };
+    Result = ResStr;
+    return Result;
+  };
+  this.ReplaceStr = function (AText, AFromText, AToText) {
+    var Result = "";
+    Result = $mod.AnsiReplaceStr(AText,AFromText,AToText);
+    return Result;
+  };
+  this.ReplaceText = function (AText, AFromText, AToText) {
+    var Result = "";
+    Result = $mod.AnsiReplaceText(AText,AFromText,AToText);
+    return Result;
+  };
+  $mod.$rtti.$Int("TSoundexLength",{minvalue: 1, maxvalue: 2147483647, ordtype: 5});
+  this.Soundex = function (AText, ALength) {
+    var Result = "";
+    var S = "";
+    var PS = "";
+    var I = 0;
+    var L = 0;
+    Result = "";
+    PS = "\x00";
+    if (AText.length > 0) {
+      Result = pas.System.upcase(AText.charAt(0));
+      I = 2;
+      L = AText.length;
+      while ((I <= L) && (Result.length < ALength)) {
+        S = $impl.SScore.charAt(AText.charCodeAt(I - 1) - 1);
+        if (!(S.charCodeAt() in rtl.createSet(48,105,PS.charCodeAt()))) Result = Result + S;
+        if (S !== "i") PS = S;
+        I += 1;
+      };
+    };
+    L = Result.length;
+    if (L < ALength) Result = Result + pas.System.StringOfChar("0",ALength - L);
+    return Result;
+  };
+  this.Soundex$1 = function (AText) {
+    var Result = "";
+    Result = $mod.Soundex(AText,4);
+    return Result;
+  };
+  $mod.$rtti.$Int("TSoundexIntLength",{minvalue: 1, maxvalue: 8, ordtype: 1});
+  this.SoundexInt = function (AText, ALength) {
+    var Result = 0;
+    var SE = "";
+    var I = 0;
+    Result = -1;
+    SE = $mod.Soundex(AText,ALength);
+    if (SE.length > 0) {
+      Result = SE.charCodeAt(1 - 1) - 65;
+      if (ALength > 1) {
+        Result = (Result * 26) + (SE.charCodeAt(2 - 1) - 48);
+        for (var $l1 = 3, $end2 = ALength; $l1 <= $end2; $l1++) {
+          I = $l1;
+          Result = (SE.charCodeAt(I - 1) - 48) + (Result * 7);
+        };
+      };
+      Result = ALength + (Result * 9);
+    };
+    return Result;
+  };
+  this.SoundexInt$1 = function (AText) {
+    var Result = 0;
+    Result = $mod.SoundexInt(AText,4);
+    return Result;
+  };
+  this.DecodeSoundexInt = function (AValue) {
+    var Result = "";
+    var I = 0;
+    var Len = 0;
+    Result = "";
+    Len = AValue % 9;
+    AValue = Math.floor(AValue / 9);
+    for (var $l1 = Len; $l1 >= 3; $l1--) {
+      I = $l1;
+      Result = String.fromCharCode(48 + (AValue % 7)) + Result;
+      AValue = Math.floor(AValue / 7);
+    };
+    if (Len > 1) {
+      Result = String.fromCharCode(48 + (AValue % 26)) + Result;
+      AValue = Math.floor(AValue / 26);
+    };
+    Result = String.fromCharCode(65 + AValue) + Result;
+    return Result;
+  };
+  this.SoundexWord = function (AText) {
+    var Result = 0;
+    var S = "";
+    S = $mod.Soundex(AText,4);
+    Result = S.charCodeAt(1 - 1) - 65;
+    Result = ((Result * 26) + S.charCodeAt(2 - 1)) - 48;
+    Result = ((Result * 7) + S.charCodeAt(3 - 1)) - 48;
+    Result = ((Result * 7) + S.charCodeAt(4 - 1)) - 48;
+    return Result;
+  };
+  this.DecodeSoundexWord = function (AValue) {
+    var Result = "";
+    Result = String.fromCharCode(48 + (AValue % 7));
+    AValue = Math.floor(AValue / 7);
+    Result = String.fromCharCode(48 + (AValue % 7)) + Result;
+    AValue = Math.floor(AValue / 7);
+    Result = pas.SysUtils.IntToStr(AValue % 26) + Result;
+    AValue = Math.floor(AValue / 26);
+    Result = String.fromCharCode(65 + AValue) + Result;
+    return Result;
+  };
+  this.SoundexSimilar = function (AText, AOther, ALength) {
+    var Result = false;
+    Result = $mod.Soundex(AText,ALength) === $mod.Soundex(AOther,ALength);
+    return Result;
+  };
+  this.SoundexSimilar$1 = function (AText, AOther) {
+    var Result = false;
+    Result = $mod.SoundexSimilar(AText,AOther,4);
+    return Result;
+  };
+  this.SoundexCompare = function (AText, AOther, ALength) {
+    var Result = 0;
+    Result = pas.SysUtils.AnsiCompareStr($mod.Soundex(AText,ALength),$mod.Soundex(AOther,ALength));
+    return Result;
+  };
+  this.SoundexCompare$1 = function (AText, AOther) {
+    var Result = 0;
+    Result = $mod.SoundexCompare(AText,AOther,4);
+    return Result;
+  };
+  this.SoundexProc = function (AText, AOther) {
+    var Result = false;
+    Result = $mod.SoundexSimilar$1(AText,AOther);
+    return Result;
+  };
+  $mod.$rtti.$ProcVar("TCompareTextProc",{procsig: rtl.newTIProcSig([["AText",rtl.string,2],["AOther",rtl.string,2]],rtl.boolean)});
+  this.AnsiResemblesProc = null;
+  this.ResemblesProc = null;
+  this.TRomanConversionStrictness = {"0": "rcsStrict", rcsStrict: 0, "1": "rcsRelaxed", rcsRelaxed: 1, "2": "rcsDontCare", rcsDontCare: 2};
+  $mod.$rtti.$Enum("TRomanConversionStrictness",{minvalue: 0, maxvalue: 2, ordtype: 1, enumtype: this.TRomanConversionStrictness});
+  this.IsEmptyStr = function (S, EmptyChars) {
+    var Result = false;
+    var i = 0;
+    var l = 0;
+    l = S.length;
+    i = 1;
+    Result = true;
+    while (Result && (i <= l)) {
+      Result = pas.SysUtils.CharInSet(S.charAt(i - 1),EmptyChars);
+      i += 1;
+    };
+    return Result;
+  };
+  this.DelSpace = function (S) {
+    var Result = "";
+    Result = $mod.DelChars(S," ");
+    return Result;
+  };
+  this.DelChars = function (S, Chr) {
+    var Result = "";
+    var I = 0;
+    var J = 0;
+    Result = S;
+    I = Result.length;
+    while (I > 0) {
+      if (Result.charAt(I - 1) === Chr) {
+        J = I - 1;
+        while ((J > 0) && (Result.charAt(J - 1) === Chr)) J -= 1;
+        pas.System.Delete({get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }},J + 1,I - J);
+        I = J + 1;
+      };
+      I -= 1;
+    };
+    return Result;
+  };
+  this.DelSpace1 = function (S) {
+    var Result = "";
+    var I = 0;
+    Result = S;
+    for (var $l1 = Result.length; $l1 >= 2; $l1--) {
+      I = $l1;
+      if ((Result.charAt(I - 1) === " ") && (Result.charAt(I - 1 - 1) === " ")) pas.System.Delete({get: function () {
+          return Result;
+        }, set: function (v) {
+          Result = v;
+        }},I,1);
+    };
+    return Result;
+  };
+  this.Tab2Space = function (S, Numb) {
+    var Result = "";
+    var I = 0;
+    I = 1;
+    Result = S;
+    while (I <= Result.length) if (Result.charAt(I - 1) !== String.fromCharCode(9)) {
+      I += 1}
+     else {
+      Result = rtl.setCharAt(Result,I - 1," ");
+      if (Numb > 1) pas.System.Insert(pas.System.StringOfChar(" ",Numb - 1),{get: function () {
+          return Result;
+        }, set: function (v) {
+          Result = v;
+        }},I);
+      I += Numb;
+    };
+    return Result;
+  };
+  this.NPos = function (C, S, N) {
+    var Result = 0;
+    var i = 0;
+    var p = 0;
+    var k = 0;
+    Result = 0;
+    if (N < 1) return Result;
+    k = 0;
+    i = 1;
+    do {
+      p = pas.System.Pos(C,S);
+      k += p;
+      if (p > 0) pas.System.Delete({get: function () {
+          return S;
+        }, set: function (v) {
+          S = v;
+        }},1,p);
+      i += 1;
+    } while (!((i > N) || (p === 0)));
+    if (p > 0) Result = k;
+    return Result;
+  };
+  this.RPosEX = function (C, S, offs) {
+    var Result = 0;
+    Result = (new String(S)).lastIndexOf(C,offs - 1) + 1;
+    return Result;
+  };
+  this.RPosex$1 = function (Substr, Source, offs) {
+    var Result = 0;
+    Result = (new String(Source)).lastIndexOf(Substr,offs - 1) + 1;
+    return Result;
+  };
+  this.RPos = function (c, S) {
+    var Result = 0;
+    Result = $mod.RPosex$1(c,S,S.length);
+    return Result;
+  };
+  this.RPos$1 = function (Substr, Source) {
+    var Result = 0;
+    Result = $mod.RPosex$1(Substr,Source,Source.length);
+    return Result;
+  };
+  this.AddChar = function (C, S, N) {
+    var Result = "";
+    var l = 0;
+    Result = S;
+    l = Result.length;
+    if (l < N) Result = pas.System.StringOfChar(C,N - l) + Result;
+    return Result;
+  };
+  this.AddCharR = function (C, S, N) {
+    var Result = "";
+    var l = 0;
+    Result = S;
+    l = Result.length;
+    if (l < N) Result = Result + pas.System.StringOfChar(C,N - l);
+    return Result;
+  };
+  this.PadLeft = function (S, N) {
+    var Result = "";
+    Result = $mod.AddChar(" ",S,N);
+    return Result;
+  };
+  this.PadRight = function (S, N) {
+    var Result = "";
+    Result = $mod.AddCharR(" ",S,N);
+    return Result;
+  };
+  this.PadCenter = function (S, Len) {
+    var Result = "";
+    if (S.length < Len) {
+      Result = pas.System.StringOfChar(" ",Math.floor(Len / 2) - Math.floor(S.length / 2)) + S;
+      Result = Result + pas.System.StringOfChar(" ",Len - Result.length);
+    } else Result = S;
+    return Result;
+  };
+  this.Copy2Symb = function (S, Symb) {
+    var Result = "";
+    var p = 0;
+    p = pas.System.Pos(Symb,S);
+    if (p === 0) p = S.length + 1;
+    Result = pas.System.Copy(S,1,p - 1);
+    return Result;
+  };
+  this.Copy2SymbDel = function (S, Symb) {
+    var Result = "";
+    var p = 0;
+    p = pas.System.Pos(Symb,S.get());
+    if (p === 0) {
+      Result = S.get();
+      S.set("");
+    } else {
+      Result = pas.System.Copy(S.get(),1,p - 1);
+      pas.System.Delete(S,1,p);
+    };
+    return Result;
+  };
+  this.Copy2Space = function (S) {
+    var Result = "";
+    Result = $mod.Copy2Symb(S," ");
+    return Result;
+  };
+  this.Copy2SpaceDel = function (S) {
+    var Result = "";
+    Result = $mod.Copy2SymbDel(S," ");
+    return Result;
+  };
+  this.AnsiProperCase = function (S, WordDelims) {
+    var Result = "";
+    var P = 0;
+    var L = 0;
+    Result = pas.SysUtils.LowerCase(S);
+    P = 1;
+    L = Result.length;
+    while (P <= L) {
+      while ((P <= L) && pas.SysUtils.CharInSet(Result.charAt(P - 1),WordDelims)) P += 1;
+      if (P <= L) Result = rtl.setCharAt(Result,P - 1,pas.System.upcase(Result.charAt(P - 1)));
+      while ((P <= L) && !pas.SysUtils.CharInSet(Result.charAt(P - 1),WordDelims)) P += 1;
+    };
+    return Result;
+  };
+  this.WordCount = function (S, WordDelims) {
+    var Result = 0;
+    var P = 0;
+    var L = 0;
+    Result = 0;
+    P = 1;
+    L = S.length;
+    while (P <= L) {
+      while ((P <= L) && pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1;
+      if (P <= L) Result += 1;
+      while ((P <= L) && !pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1;
+    };
+    return Result;
+  };
+  this.WordPosition = function (N, S, WordDelims) {
+    var Result = 0;
+    var PS = 0;
+    var P = 0;
+    var PE = 0;
+    var Count = 0;
+    Result = 0;
+    Count = 0;
+    PS = 1;
+    PE = S.length;
+    P = PS;
+    while ((P <= PE) && (Count !== N)) {
+      while ((P <= PE) && pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1;
+      if (P <= PE) Count += 1;
+      if (Count !== N) {
+        while ((P <= PE) && !pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1}
+       else Result = (P - PS) + 1;
+    };
+    return Result;
+  };
+  this.ExtractWord = function (N, S, WordDelims) {
+    var Result = "";
+    var i = 0;
+    Result = $mod.ExtractWordPos(N,S,WordDelims,{get: function () {
+        return i;
+      }, set: function (v) {
+        i = v;
+      }});
+    return Result;
+  };
+  this.ExtractWordPos = function (N, S, WordDelims, Pos) {
+    var Result = "";
+    var i = 0;
+    var j = 0;
+    var l = 0;
+    j = 0;
+    i = $mod.WordPosition(N,S,WordDelims);
+    if (i > 2147483647) {
+      Result = "";
+      Pos.set(-1);
+      return Result;
+    };
+    Pos.set(i);
+    if (i !== 0) {
+      j = i;
+      l = S.length;
+      while ((j <= l) && !pas.SysUtils.CharInSet(S.charAt(j - 1),WordDelims)) j += 1;
+    };
+    Result = pas.System.Copy(S,i,j - i);
+    return Result;
+  };
+  this.ExtractDelimited = function (N, S, Delims) {
+    var Result = "";
+    var w = 0;
+    var i = 0;
+    var l = 0;
+    var len = 0;
+    w = 0;
+    i = 1;
+    l = 0;
+    len = S.length;
+    Result = rtl.strSetLength(Result,0);
+    while ((i <= len) && (w !== N)) {
+      if (pas.SysUtils.CharInSet(S.charAt(i - 1),Delims)) {
+        w += 1}
+       else {
+        if ((N - 1) === w) {
+          l += 1;
+          Result = Result + S.charAt(i - 1);
+        };
+      };
+      i += 1;
+    };
+    return Result;
+  };
+  this.ExtractSubstr = function (S, Pos, Delims) {
+    var Result = "";
+    var i = 0;
+    var l = 0;
+    i = Pos.get();
+    l = S.length;
+    while ((i <= l) && !pas.SysUtils.CharInSet(S.charAt(i - 1),Delims)) i += 1;
+    Result = pas.System.Copy(S,Pos.get(),i - Pos.get());
+    while ((i <= l) && pas.SysUtils.CharInSet(S.charAt(i - 1),Delims)) i += 1;
+    if (i > 2147483647) {
+      Pos.set(2147483647)}
+     else Pos.set(i);
+    return Result;
+  };
+  this.IsWordPresent = function (W, S, WordDelims) {
+    var Result = false;
+    var i = 0;
+    var Count = 0;
+    Result = false;
+    Count = $mod.WordCount(S,WordDelims);
+    i = 1;
+    while (!Result && (i <= Count)) {
+      Result = $mod.ExtractWord(i,S,WordDelims) === W;
+      i += 1;
+    };
+    return Result;
+  };
+  this.FindPart = function (HelpWilds, InputStr) {
+    var Result = 0;
+    var Diff = 0;
+    var i = 0;
+    var J = 0;
+    Result = 0;
+    i = pas.System.Pos("?",HelpWilds);
+    if (i === 0) {
+      Result = pas.System.Pos(HelpWilds,InputStr)}
+     else {
+      Diff = InputStr.length - HelpWilds.length;
+      for (var $l1 = 0, $end2 = Diff; $l1 <= $end2; $l1++) {
+        i = $l1;
+        for (var $l3 = 1, $end4 = HelpWilds.length; $l3 <= $end4; $l3++) {
+          J = $l3;
+          if ((InputStr.charAt((i + J) - 1) === HelpWilds.charAt(J - 1)) || (HelpWilds.charAt(J - 1) === "?")) {
+            if (J === HelpWilds.length) {
+              Result = i + 1;
+              return Result;
+            };
+          } else break;
+        };
+      };
+    };
+    return Result;
+  };
+  this.IsWild = function (InputStr, Wilds, IgnoreCase) {
+    var Result = false;
+    var i = 0;
+    var MaxinputWord = 0;
+    var MaxWilds = 0;
+    var eos = false;
+    Result = true;
+    if (Wilds === InputStr) return Result;
+    i = pas.System.Pos("**",Wilds);
+    while (i > 0) {
+      pas.System.Delete({get: function () {
+          return Wilds;
+        }, set: function (v) {
+          Wilds = v;
+        }},i,1);
+      i = pas.System.Pos("**",Wilds);
+    };
+    if (Wilds === "*") return Result;
+    MaxinputWord = InputStr.length;
+    MaxWilds = Wilds.length;
+    if ((MaxWilds === 0) || (MaxinputWord === 0)) {
+      Result = false;
+      return Result;
+    };
+    if (IgnoreCase) {
+      InputStr = pas.SysUtils.UpperCase(InputStr);
+      Wilds = pas.SysUtils.UpperCase(Wilds);
+    };
+    Result = $impl.isMatch(1,InputStr,Wilds,1,1,MaxinputWord,MaxWilds,{get: function () {
+        return eos;
+      }, set: function (v) {
+        eos = v;
+      }});
+    return Result;
+  };
+  this.XorString = function (Key, Src) {
+    var Result = "";
+    var i = 0;
+    Result = Src;
+    if (Key.length > 0) for (var $l1 = 1, $end2 = Src.length; $l1 <= $end2; $l1++) {
+      i = $l1;
+      Result = rtl.setCharAt(Result,i - 1,String.fromCharCode(Key.charCodeAt((1 + ((i - 1) % Key.length)) - 1) ^ Src.charCodeAt(i - 1)));
+    };
+    return Result;
+  };
+  this.XorEncode = function (Key, Source) {
+    var Result = "";
+    var i = 0;
+    var C = 0;
+    Result = "";
+    for (var $l1 = 1, $end2 = Source.length; $l1 <= $end2; $l1++) {
+      i = $l1;
+      if (Key.length > 0) {
+        C = Key.charCodeAt((1 + ((i - 1) % Key.length)) - 1) ^ Source.charCodeAt(i - 1)}
+       else C = Source.charCodeAt(i - 1);
+      Result = Result + pas.SysUtils.LowerCase(pas.SysUtils.IntToHex(C,2));
+    };
+    return Result;
+  };
+  this.XorDecode = function (Key, Source) {
+    var Result = "";
+    var i = 0;
+    var C = "";
+    Result = "";
+    for (var $l1 = 0, $end2 = Math.floor(Source.length / 2) - 1; $l1 <= $end2; $l1++) {
+      i = $l1;
+      C = String.fromCharCode(pas.SysUtils.StrToIntDef("$" + pas.System.Copy(Source,(i * 2) + 1,2)," ".charCodeAt()));
+      if (Key.length > 0) C = String.fromCharCode(Key.charCodeAt((1 + (i % Key.length)) - 1) ^ C.charCodeAt());
+      Result = Result + C;
+    };
+    return Result;
+  };
+  this.GetCmdLineArg = function (Switch, SwitchChars) {
+    var Result = "";
+    var i = 0;
+    var S = "";
+    i = 1;
+    Result = "";
+    while ((Result === "") && (i <= pas.System.ParamCount())) {
+      S = pas.System.ParamStr(i);
+      if ((rtl.length(SwitchChars) === 0) || (pas.SysUtils.CharInSet(S.charAt(0),SwitchChars) && (S.length > 1) && (pas.SysUtils.CompareText(pas.System.Copy(S,2,S.length - 1),Switch) === 0))) {
+        i += 1;
+        if (i <= pas.System.ParamCount()) Result = pas.System.ParamStr(i);
+      };
+      i += 1;
+    };
+    return Result;
+  };
+  this.Numb2USA = function (S) {
+    var Result = "";
+    var i = 0;
+    var NA = 0;
+    i = S.length;
+    Result = S;
+    NA = 0;
+    while (i > 0) {
+      if ((((((Result.length - i) + 1) - NA) % 3) === 0) && (i !== 1)) {
+        pas.System.Insert(",",{get: function () {
+            return Result;
+          }, set: function (v) {
+            Result = v;
+          }},i);
+        NA += 1;
+      };
+      i -= 1;
+    };
+    return Result;
+  };
+  this.Hex2Dec = function (S) {
+    var Result = 0;
+    var HexStr = "";
+    if (pas.System.Pos("$",S) === 0) {
+      HexStr = "$" + S}
+     else HexStr = S;
+    Result = pas.SysUtils.StrToInt(HexStr);
+    return Result;
+  };
+  this.Dec2Numb = function (N, Len, Base) {
+    var Result = "";
+    var C = 0;
+    var number = 0;
+    if (N === 0) {
+      Result = "0"}
+     else {
+      number = N;
+      Result = "";
+      while (number > 0) {
+        C = number % Base;
+        if (C > 9) {
+          C = C + 55}
+         else C = C + 48;
+        Result = String.fromCharCode(C) + Result;
+        number = Math.floor(number / Base);
+      };
+    };
+    if (Result !== "") Result = $mod.AddChar("0",Result,Len);
+    return Result;
+  };
+  this.Numb2Dec = function (S, Base) {
+    var Result = 0;
+    var i = 0;
+    var P = 0;
+    i = S.length;
+    Result = 0;
+    S = pas.SysUtils.UpperCase(S);
+    P = 1;
+    while (i >= 1) {
+      if (S.charAt(i - 1) > "@") {
+        Result = Result + ((S.charCodeAt(i - 1) - 55) * P)}
+       else Result = Result + ((S.charCodeAt(i - 1) - 48) * P);
+      i -= 1;
+      P = P * Base;
+    };
+    return Result;
+  };
+  this.IntToBin = function (Value, Digits, Spaces) {
+    var Result = "";
+    var endpos = 0;
+    var p = 0;
+    var p2 = 0;
+    var k = 0;
+    Result = "";
+    if (Digits > 32) Digits = 32;
+    if (Spaces === 0) {
+      Result = $mod.IntToBin$1(Value,Digits);
+      return Result;
+    };
+    endpos = Digits + Math.floor((Digits - 1) / Spaces);
+    Result = rtl.strSetLength(Result,endpos);
+    p = endpos;
+    p2 = 1;
+    k = Spaces;
+    while (p >= p2) {
+      if (k === 0) {
+        Result = rtl.setCharAt(Result,p - 1," ");
+        p -= 1;
+        k = Spaces;
+      };
+      Result = rtl.setCharAt(Result,p - 1,String.fromCharCode(48 + ((Value >>> 0) & 1)));
+      Value = rtl.lw((Value >>> 0) >>> 1);
+      p -= 1;
+      k -= 1;
+    };
+    return Result;
+  };
+  this.IntToBin$1 = function (Value, Digits) {
+    var Result = "";
+    var p = 0;
+    var p2 = 0;
+    Result = "";
+    if (Digits <= 0) return Result;
+    Result = rtl.strSetLength(Result,Digits);
+    p = Digits;
+    p2 = 1;
+    while ((p >= p2) && ((Value >>> 0) > 0)) {
+      Result = rtl.setCharAt(Result,p - 1,String.fromCharCode(48 + ((Value >>> 0) & 1)));
+      Value = rtl.lw((Value >>> 0) >>> 1);
+      p -= 1;
+    };
+    Digits = (p - p2) + 1;
+    while (Digits > 0) {
+      Result = rtl.setCharAt(Result,Digits - 1,String.fromCharCode(48));
+      Digits -= 1;
+    };
+    return Result;
+  };
+  this.IntToBin$2 = function (Value, Digits) {
+    var Result = "";
+    var p = 0;
+    var p2 = 0;
+    Result = "";
+    if (Digits <= 0) return Result;
+    Result = rtl.strSetLength(Result,Digits);
+    p = Digits;
+    p2 = 1;
+    while ((p >= p2) && (Value > 0)) {
+      Result = rtl.setCharAt(Result,p - 1,String.fromCharCode(48 + ((Value >>> 0) & 1)));
+      Value = Math.floor(Value / 2);
+      p -= 1;
+    };
+    Digits = (p - p2) + 1;
+    while (Digits > 0) Result = rtl.setCharAt(Result,Digits - 1,"0");
+    return Result;
+  };
+  var Arabics = [1,4,5,9,10,40,50,90,100,400,500,900,1000];
+  var Romans = ["I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"];
+  this.IntToRoman = function (Value) {
+    var Result = "";
+    var i = 0;
+    Result = "";
+    for (var $l1 = 13; $l1 >= 1; $l1--) {
+      i = $l1;
+      while (Value >= Arabics[i - 1]) {
+        Value = Value - Arabics[i - 1];
+        Result = Result + Romans[i - 1];
+      };
+    };
+    return Result;
+  };
+  this.TryRomanToInt = function (S, N, Strictness) {
+    var Result = false;
+    var i = 0;
+    var Len = 0;
+    var Terminated = false;
+    Result = false;
+    S = pas.SysUtils.UpperCase(S);
+    Len = S.length;
+    if (Strictness === $mod.TRomanConversionStrictness.rcsDontCare) {
+      N.set($impl.RomanToIntDontCare(S));
+      if (N.get() === 0) {
+        Result = Len === 0;
+      } else Result = true;
+      return Result;
+    };
+    if (Len === 0) return Result;
+    i = 1;
+    N.set(0);
+    Terminated = false;
+    while ((i <= Len) && ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) || (i < 4)) && (S.charAt(i - 1) === "M")) {
+      i += 1;
+      N.set(N.get() + 1000);
+    };
+    if ((i <= Len) && (S.charAt(i - 1) === "D")) {
+      i += 1;
+      N.set(N.get() + 500);
+    } else if (((i + 1) <= Len) && (S.charAt(i - 1) === "C")) {
+      if (S.charAt((i + 1) - 1) === "M") {
+        i += 2;
+        N.set(N.get() + 900);
+      } else if (S.charAt((i + 1) - 1) === "D") {
+        i += 2;
+        N.set(N.get() + 400);
+      };
+    };
+    if ((i <= Len) && (S.charAt(i - 1) === "C")) {
+      i += 1;
+      N.set(N.get() + 100);
+      if ((i <= Len) && (S.charAt(i - 1) === "C")) {
+        i += 1;
+        N.set(N.get() + 100);
+      };
+      if ((i <= Len) && (S.charAt(i - 1) === "C")) {
+        i += 1;
+        N.set(N.get() + 100);
+      };
+      if ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) && (i <= Len) && (S.charAt(i - 1) === "C")) {
+        i += 1;
+        N.set(N.get() + 100);
+      };
+    };
+    if (((i + 1) <= Len) && (S.charAt(i - 1) === "X")) {
+      if (S.charAt((i + 1) - 1) === "C") {
+        i += 2;
+        N.set(N.get() + 90);
+      } else if (S.charAt((i + 1) - 1) === "L") {
+        i += 2;
+        N.set(N.get() + 40);
+      };
+    };
+    if ((i <= Len) && (S.charAt(i - 1) === "L")) {
+      i += 1;
+      N.set(N.get() + 50);
+    };
+    if ((i <= Len) && (S.charAt(i - 1) === "X")) {
+      i += 1;
+      N.set(N.get() + 10);
+      if ((i <= Len) && (S.charAt(i - 1) === "X")) {
+        i += 1;
+        N.set(N.get() + 10);
+      };
+      if ((i <= Len) && (S.charAt(i - 1) === "X")) {
+        i += 1;
+        N.set(N.get() + 10);
+      };
+      if ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) && (i <= Len) && (S.charAt(i - 1) === "X")) {
+        i += 1;
+        N.set(N.get() + 10);
+      };
+    };
+    if (((i + 1) <= Len) && (S.charAt(i - 1) === "I")) {
+      if (S.charAt((i + 1) - 1) === "X") {
+        Terminated = true;
+        i += 2;
+        N.set(N.get() + 9);
+      } else if (S.charAt((i + 1) - 1) === "V") {
+        Terminated = true;
+        i += 2;
+        N.set(N.get() + 4);
+      };
+    };
+    if (!Terminated && (i <= Len) && (S.charAt(i - 1) === "V")) {
+      i += 1;
+      N.set(N.get() + 5);
+    };
+    if (!Terminated && (i <= Len) && (S.charAt(i - 1) === "I")) {
+      Terminated = true;
+      i += 1;
+      N.set(N.get() + 1);
+      if ((i <= Len) && (S.charAt(i - 1) === "I")) {
+        i += 1;
+        N.set(N.get() + 1);
+      };
+      if ((i <= Len) && (S.charAt(i - 1) === "I")) {
+        i += 1;
+        N.set(N.get() + 1);
+      };
+      if ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) && (i <= Len) && (S.charAt(i - 1) === "I")) {
+        i += 1;
+        N.set(N.get() + 1);
+      };
+    };
+    Result = i > Len;
+    return Result;
+  };
+  this.RomanToInt = function (S, Strictness) {
+    var Result = 0;
+    if (!$mod.TryRomanToInt(S,{get: function () {
+        return Result;
+      }, set: function (v) {
+        Result = v;
+      }},Strictness)) throw pas.SysUtils.EConvertError.$create("CreateFmt",[$mod.SInvalidRomanNumeral,[S]]);
+    return Result;
+  };
+  this.RomanToIntDef = function (S, ADefault, Strictness) {
+    var Result = 0;
+    if (!$mod.TryRomanToInt(S,{get: function () {
+        return Result;
+      }, set: function (v) {
+        Result = v;
+      }},Strictness)) Result = ADefault;
+    return Result;
+  };
+  this.DigitChars = rtl.createSet(null,48,57);
+  this.Brackets = rtl.createSet(40,41,91,93,123,125);
+  this.StdWordDelims = rtl.unionSet(rtl.createSet(null,0,32,44,46,59,47,92,58,39,34,96),$mod.Brackets);
+  this.StdSwitchChars = rtl.createSet(45,47);
+  this.PosSet = function (c, s) {
+    var Result = 0;
+    Result = $mod.PosSetEx(c,s,1);
+    return Result;
+  };
+  this.PosSet$1 = function (c, s) {
+    var Result = 0;
+    Result = $mod.PosSetEx$1(c,s,1);
+    return Result;
+  };
+  this.PosSetEx = function (c, s, count) {
+    var Result = 0;
+    var i = 0;
+    var j = 0;
+    if (s === "") {
+      j = 0}
+     else {
+      i = s.length;
+      j = count;
+      if (j > i) {
+        Result = 0;
+        return Result;
+      };
+      while ((j <= i) && !pas.SysUtils.CharInSet(s.charAt(j - 1),c)) j += 1;
+      if (j > i) j = 0;
+    };
+    Result = j;
+    return Result;
+  };
+  this.PosSetEx$1 = function (c, s, count) {
+    var Result = 0;
+    var cset = [];
+    var i = 0;
+    var l = 0;
+    l = c.length;
+    cset = rtl.arraySetLength(cset,"",l);
+    if (l > 0) for (var $l1 = 1, $end2 = l; $l1 <= $end2; $l1++) {
+      i = $l1;
+      cset[i - 1] = c.charAt(i - 1);
+    };
+    Result = $mod.PosSetEx(cset,s,count);
+    return Result;
+  };
+  this.Removeleadingchars = function (S, CSet) {
+    var I = 0;
+    var J = 0;
+    I = S.get().length;
+    if (I > 0) {
+      J = 1;
+      while ((J <= I) && pas.SysUtils.CharInSet(S.get().charAt(J - 1),CSet)) J += 1;
+      if (J > 1) pas.System.Delete(S,1,J - 1);
+    };
+  };
+  this.RemoveTrailingChars = function (S, CSet) {
+    var i = 0;
+    var j = 0;
+    i = S.get().length;
+    if (i > 0) {
+      j = i;
+      while ((j > 0) && pas.SysUtils.CharInSet(S.get().charAt(j - 1),CSet)) j -= 1;
+      if (j !== i) S.set(rtl.strSetLength(S.get(),j));
+    };
+  };
+  this.RemovePadChars = function (S, CSet) {
+    var I = 0;
+    var J = 0;
+    var K = 0;
+    I = S.get().length;
+    if (I === 0) return;
+    J = I;
+    while ((J > 0) && pas.SysUtils.CharInSet(S.get().charAt(J - 1),CSet)) J -= 1;
+    if (J === 0) {
+      S.set("");
+      return;
+    };
+    S.set(rtl.strSetLength(S.get(),J));
+    I = J;
+    K = 1;
+    while ((K <= I) && pas.SysUtils.CharInSet(S.get().charAt(K - 1),CSet)) K += 1;
+    if (K > 1) pas.System.Delete(S,1,K - 1);
+  };
+  this.TrimLeftSet = function (S, CSet) {
+    var Result = "";
+    Result = S;
+    $mod.Removeleadingchars({get: function () {
+        return Result;
+      }, set: function (v) {
+        Result = v;
+      }},CSet);
+    return Result;
+  };
+  this.TrimRightSet = function (S, CSet) {
+    var Result = "";
+    Result = S;
+    $mod.RemoveTrailingChars({get: function () {
+        return Result;
+      }, set: function (v) {
+        Result = v;
+      }},CSet);
+    return Result;
+  };
+  this.TrimSet = function (S, CSet) {
+    var Result = "";
+    Result = S;
+    $mod.RemovePadChars({get: function () {
+        return Result;
+      }, set: function (v) {
+        Result = v;
+      }},CSet);
+    return Result;
+  };
+  $mod.$rtti.$DynArray("SizeIntArray",{eltype: rtl.nativeint});
+  $mod.$init = function () {
+    $mod.AnsiResemblesProc = $mod.SoundexProc;
+    $mod.ResemblesProc = $mod.SoundexProc;
+  };
+},["JS"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  $impl.SScore = "00000000000000000000000000000000" + "00000000000000000000000000000000" + "0123012i02245501262301i2i2" + "000000" + "0123012i02245501262301i2i2" + "00000000000000000000000000000000" + "00000000000000000000000000000000" + "00000000000000000000000000000000" + "00000000000000000000000000000000" + "00000";
+  $impl.Ord0 = "0".charCodeAt();
+  $impl.OrdA = "A".charCodeAt();
+  $impl.RomanValues = function (C) {
+    var Result = 0;
+    var $tmp1 = C;
+    if ($tmp1 === "C") {
+      Result = 100}
+     else if ($tmp1 === "D") {
+      Result = 500}
+     else if ($tmp1 === "I") {
+      Result = 1}
+     else if ($tmp1 === "L") {
+      Result = 50}
+     else if ($tmp1 === "M") {
+      Result = 1000}
+     else if ($tmp1 === "V") {
+      Result = 5}
+     else if ($tmp1 === "X") {
+      Result = 10}
+     else {
+      Result = 0;
+    };
+    return Result;
+  };
+  var RomanChars = rtl.createSet(67,68,73,76,77,86,88);
+  $impl.RomanToIntDontCare = function (S) {
+    var Result = 0;
+    var index = "";
+    var Next = "";
+    var i = 0;
+    var l = 0;
+    var Negative = false;
+    Result = 0;
+    i = 0;
+    Negative = (S.length > 0) && (S.charAt(0) === "-");
+    if (Negative) i += 1;
+    l = S.length;
+    while (i < l) {
+      i += 1;
+      index = pas.System.upcase(S.charAt(i - 1));
+      if (index.charCodeAt() in RomanChars) {
+        if ((i + 1) <= l) {
+          Next = pas.System.upcase(S.charAt((i + 1) - 1))}
+         else Next = "\x00";
+        if ((Next.charCodeAt() in RomanChars) && ($impl.RomanValues(index) < $impl.RomanValues(Next))) {
+          Result += $impl.RomanValues(Next);
+          Result -= $impl.RomanValues(index);
+          i += 1;
+        } else Result += $impl.RomanValues(index);
+      } else {
+        Result = 0;
+        return Result;
+      };
+    };
+    if (Negative) Result = -Result;
+    return Result;
+  };
+  $impl.isMatch = function (level, inputstr, wilds, CWild, CinputWord, MaxInputword, maxwilds, EOS) {
+    var Result = false;
+    EOS.set(false);
+    Result = true;
+    do {
+      if (wilds.charAt(CWild - 1) === "*") {
+        CWild += 1;
+        while (wilds.charAt(CWild - 1) === "?") {
+          CWild += 1;
+          CinputWord += 1;
+        };
+        do {
+          while ((inputstr.charAt(CinputWord - 1) !== wilds.charAt(CWild - 1)) && (CinputWord <= MaxInputword)) CinputWord += 1;
+          Result = $impl.isMatch(level + 1,inputstr,wilds,CWild,CinputWord,MaxInputword,maxwilds,EOS);
+          if (!Result) CinputWord += 1;
+        } while (!(Result || (CinputWord >= MaxInputword)));
+        if (Result && EOS.get()) return Result;
+        continue;
+      };
+      if (wilds.charAt(CWild - 1) === "?") {
+        CWild += 1;
+        CinputWord += 1;
+        continue;
+      };
+      if (inputstr.charAt(CinputWord - 1) === wilds.charAt(CWild - 1)) {
+        CWild += 1;
+        CinputWord += 1;
+        continue;
+      };
+      Result = false;
+      return Result;
+    } while (!((CinputWord > MaxInputword) || (CWild > maxwilds)));
+    if ((CinputWord <= MaxInputword) || (CWild < maxwilds)) {
+      Result = false}
+     else if (CWild > maxwilds) {
+      EOS.set(false)}
+     else {
+      EOS.set(wilds.charAt(CWild - 1) === "*");
+      if (!EOS.get()) Result = false;
+    };
+    return Result;
+  };
+});
+rtl.module("WEBLib.TMSFNCPersistence",["System","contnrs","Classes","TypInfo","Variants","SysUtils","WEBLib.TMSFNCTypes","WEBLib.TMSFNCJSONReader","WEBLib.TMSFNCJSONWriter"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  rtl.createInterface($mod,"ITMSFNCPersistence","{363F04AF-B8A7-4C47-A2D6-8ED9C44CEFF6}",["SaveSettingsToFile","LoadSettingsFromFile","SaveSettingsToStream","LoadSettingsFromStream","CanSaveProperty","CanLoadProperty"],pas.System.IUnknown,function () {
+    var $r = this.$rtti;
+    $r.addMethod("SaveSettingsToFile",0,[["AFileName",rtl.string],["AAppearanceOnly",rtl.boolean]]);
+    $r.addMethod("LoadSettingsFromFile",0,[["AFileName",rtl.string]]);
+    $r.addMethod("SaveSettingsToStream",0,[["AStream",pas["WEBLib.TMSFNCTypes"].$rtti["TStream"]],["AAppearanceOnly",rtl.boolean]]);
+    $r.addMethod("LoadSettingsFromStream",0,[["AStream",pas["WEBLib.TMSFNCTypes"].$rtti["TStream"]]]);
+    $r.addMethod("CanSaveProperty",1,[["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyType",pas.TypInfo.$rtti["TTypeKind"]]],rtl.boolean);
+    $r.addMethod("CanLoadProperty",1,[["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyType",pas.TypInfo.$rtti["TTypeKind"]]],rtl.boolean);
+  });
+  rtl.createInterface($mod,"ITMSFNCBaseListIO","{FAB1D21E-D798-4CE0-B17B-9D75E4456AB4}",["GetItemClass"],pas.System.IUnknown,function () {
+    var $r = this.$rtti;
+    $r.addMethod("GetItemClass",1,null,pas.System.$rtti["TClass"]);
+  });
+  rtl.createInterface($mod,"ITMSFNCBasePersistenceIO","{91DEAFC3-8932-45F4-A3ED-5AAA0C0E9250}",["CreateObject"],pas.System.IUnknown,function () {
+    var $r = this.$rtti;
+    $r.addMethod("CreateObject",1,[["AClassName",rtl.string,2],["ABaseClass",pas.System.$rtti["TClass"],2]],pas.System.$rtti["TObject"]);
+  });
+  rtl.createInterface($mod,"ITMSFNCPersistenceIO","{11B625F8-447A-4AE5-BB88-5ECDEA979AF7}",["NeedsObjectReference","GetObjectReference","FindObject","FixOwners"],$mod.ITMSFNCBasePersistenceIO,function () {
+    var $r = this.$rtti;
+    $r.addMethod("NeedsObjectReference",1,[["AClass",pas.System.$rtti["TClass"],2]],rtl.boolean);
+    $r.addMethod("GetObjectReference",1,[["AObject",pas.System.$rtti["TObject"],2]],rtl.string);
+    $r.addMethod("FindObject",1,[["AReference",rtl.string,2]],pas.System.$rtti["TObject"]);
+    $r.addMethod("FixOwners",0,[["AObject",pas.System.$rtti["TObject"],2],["AObjectList",pas.System.$rtti["TObject"],2]]);
+  });
+  rtl.createClass($mod,"ETMSFNCReaderException",pas.SysUtils.Exception,function () {
+  });
+  rtl.createClass($mod,"TTMSFNCObjectList",pas.contnrs.TObjectList,function () {
+    this.GetItem$1 = function (Index) {
+      var Result = null;
+      Result = this.GetItem(Index);
+      return Result;
+    };
+    this.SetItem$1 = function (Index, Value) {
+      this.SetItem(Index,Value);
+    };
+  });
+  rtl.createClass($mod,"TTMSFNCStringList",pas.Classes.TList,function () {
+    this.GetItem = function (Index) {
+      var Result = "";
+      Result = "" + this.Get(Index);
+      return Result;
+    };
+    this.SetItem = function (Index, Value) {
+      this.Put(Index,Value);
+    };
+  });
+  $mod.$rtti.$DynArray("TTMSFNCObjectArray",{eltype: pas.System.$rtti["TObject"]});
+  $mod.$rtti.$MethodVar("TTMSFNCWriterCustomWritePropertyEvent",{procsig: rtl.newTIProcSig([["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyKind",pas.TypInfo.$rtti["TTypeKind"]],["AWriter",pas["WEBLib.TMSFNCJSONWriter"].$rtti["TTMSFNCJSONWriter"]],["ACanWrite",rtl.boolean,1]]), methodkind: 0});
+  $mod.$rtti.$MethodVar("TTMSFNCWriterCustomIsAssignablePropertyEvent",{procsig: rtl.newTIProcSig([["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["AIsAssignable",rtl.boolean,1]]), methodkind: 0});
+  $mod.$rtti.$DynArray("TTMSFNCExcludePropertyListArray",{eltype: rtl.string});
+  rtl.createClass($mod,"TTMSFNCWriter",pas.System.TObject,function () {
+    this.$init = function () {
+      pas.System.TObject.$init.call(this);
+      this.FWriter = null;
+      this.FIOReference = null;
+      this.FOnCustomWriteProperty = null;
+      this.FRootObject = null;
+      this.FExcludeProperties = [];
+      this.FOnCustomIsAssignableProperty = null;
+    };
+    this.$final = function () {
+      this.FWriter = undefined;
+      this.FIOReference = undefined;
+      this.FOnCustomWriteProperty = undefined;
+      this.FRootObject = undefined;
+      this.FExcludeProperties = undefined;
+      this.FOnCustomIsAssignableProperty = undefined;
+      pas.System.TObject.$final.call(this);
+    };
+    this.SetRootObject = function (Value) {
+      this.FRootObject = Value;
+      $mod.TTMSFNCPersistence.FRootObject = this.FRootObject;
+    };
+    this.SetExcludeProperties = function (Value) {
+      this.FExcludeProperties = Value;
+      $mod.TTMSFNCPersistence.FExcludeProperties = this.FExcludeProperties;
+    };
+    this.SetIOReference = function (Value) {
+      this.FIOReference = Value;
+      $mod.TTMSFNCPersistence.FIOReference = this.FIOReference;
+    };
+    this.WritePropInfoValue = function (AInstance, APropInfo) {
+      var cn = "";
+      var pName = "";
+      var en = "";
+      var k = 0;
+      var p = null;
+      var o = null;
+      var v = pas.System.TMethod.$new();
+      if ($mod.TTMSFNCPersistence.IsWriteOnly(APropInfo)) {
+        this.FWriter.WriteNull();
+        return;
+      };
+      o = AInstance;
+      p = APropInfo;
+      k = $mod.TTMSFNCPersistence.GetPropInfoType(p);
+      pName = $mod.TTMSFNCPersistence.GetPropInfoName(p);
+      var $tmp1 = k;
+      if ($tmp1 === pas.TypInfo.TTypeKind.tkInteger) {
+        cn = $mod.TTMSFNCPersistence.GetPropInfoTypeName(p);
+        if ((cn === "TAlphaColor") || (cn === "TColor") || (cn === "TGraphicsColor")) {
+          if (pas.TypInfo.GetOrdProp$1(o,p) === -1) {
+            this.FWriter.WriteString("gcNull")}
+           else this.FWriter.WriteString($impl.ColorToHTMLEx(pas.TypInfo.GetOrdProp$1(o,p)));
+        } else this.FWriter.WriteInteger(pas.TypInfo.GetOrdProp$1(o,p));
+      } else if (($tmp1 === pas.TypInfo.TTypeKind.tkChar) || ($tmp1 === pas.TypInfo.TTypeKind.tkString)) {
+        this.FWriter.WriteString(pas.TypInfo.GetStrProp$1(o,p))}
+       else if ($tmp1 === pas.TypInfo.TTypeKind.tkEnumeration) {
+        if ($mod.TTMSFNCPersistence.GetPropInfoDataTypeInfo(p) === rtl.boolean) {
+          this.FWriter.WriteBoolean(pas.TypInfo.GetOrdProp$1(o,p) != 0)}
+         else this.FWriter.WriteInteger(pas.TypInfo.GetOrdProp$1(o,p))}
+       else if ($tmp1 === pas.TypInfo.TTypeKind.tkBool) {
+        this.FWriter.WriteBoolean(pas.TypInfo.GetOrdProp$1(o,p) != 0)}
+       else if ($tmp1 === pas.TypInfo.TTypeKind.tkDouble) {
+        this.FWriter.WriteDouble(pas.TypInfo.GetFloatProp$1(o,p))}
+       else if ($tmp1 === pas.TypInfo.TTypeKind.tkSet) {
+        this.FWriter.WriteInteger(pas.TypInfo.GetOrdProp$1(o,p))}
+       else if ($tmp1 === pas.TypInfo.TTypeKind.tkMethod) {
+        v.$assign(pas.TypInfo.GetMethodProp(o,p));
+        if (v.Code === null) {
+          this.FWriter.WriteNull()}
+         else {
+          if ($mod.TTMSFNCPersistence.FRootObject != null) {
+            this.FWriter.WriteString($mod.TTMSFNCPersistence.FRootObject.$class.MethodName(v.Code))}
+           else this.FWriter.WriteNull();
+        };
+      } else {
+        en = $mod.TTMSFNCPersistence.GetEnumName(pas.TypInfo.$rtti["TTypeKind"],k);
+        this.FWriter.WriteNull();
+      };
+    };
+    this.WriteProperties = function (AObject) {
+      var ci = null;
+      var p = null;
+      var a = [];
+      var I = 0;
+      if (AObject != null) {
+        ci = AObject.$rtti;
+        try {
+          a = pas.TypInfo.GetPropList(ci,pas.TypInfo.tkAny,true);
+          for (var $l1 = 0, $end2 = rtl.length(a) - 1; $l1 <= $end2; $l1++) {
+            I = $l1;
+            this.WriteProperty(AObject,a[I]);
+          };
+        } finally {
+        };
+      };
+    };
+    this.WriteProperty = function (AObject, AProp) {
+      var pName = "";
+      var k = 0;
+      var b = false;
+      var a = false;
+      var ap = false;
+      var p = null;
+      var o = null;
+      try {
+        if (!(AProp != null)) return;
+        pName = $mod.TTMSFNCPersistence.GetPropInfoName(AProp);
+        k = $mod.TTMSFNCPersistence.GetPropInfoType(AProp);
+        b = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(pName,$mod.TTMSFNCPersistence.FExcludeProperties) === -1;
+        if (pas.SysUtils.Supports$3(AObject,$mod.ITMSFNCPersistence.$guid,{get: function () {
+            return p;
+          }, set: function (v) {
+            p = v;
+          }})) b = p.CanSaveProperty(AObject,pName,k);
+        if (b) {
+          a = true;
+          if (this.FOnCustomWriteProperty != null) this.FOnCustomWriteProperty(AObject,pName,k,this.FWriter,{get: function () {
+              return a;
+            }, set: function (v) {
+              a = v;
+            }});
+          if (a) {
+            this.FWriter.WriteName(pName);
+            if (k in rtl.createSet(pas.TypInfo.TTypeKind.tkClass)) {
+              o = pas.TypInfo.GetObjectProp(AObject,pName);
+              ap = $mod.TTMSFNCPersistence.IsAssignableProperty(AObject,AProp);
+              if (this.FOnCustomIsAssignableProperty != null) this.FOnCustomIsAssignableProperty(AObject,pName,{get: function () {
+                  return ap;
+                }, set: function (v) {
+                  ap = v;
+                }});
+              if (ap) {
+                if (pas.Classes.TComponent.isPrototypeOf(o)) {
+                  this.FWriter.WriteString(rtl.as(o,pas.Classes.TComponent).FName)}
+                 else this.FWriter.WriteString("");
+              } else this.WriteObject(o);
+            } else this.WritePropInfoValue(AObject,AProp);
+          };
+        };
+      } finally {
+        rtl._Release(p);
+      };
+    };
+    this.WriteGenericObjectList = function (AList) {
+      var I = 0;
+      this.FWriter.WriteBeginArray();
+      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
+        I = $l1;
+        this.WriteSingleObject(AList.GetItem$1(I));
+      };
+      this.FWriter.WriteEndArray();
+    };
+    this.WriteGenericStringList = function (AList) {
+      var I = 0;
+      this.FWriter.WriteBeginArray();
+      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
+        I = $l1;
+        this.FWriter.WriteString(AList.GetItem(I));
+      };
+      this.FWriter.WriteEndArray();
+    };
+    this.WriteStrings = function (AList) {
+      var I = 0;
+      this.FWriter.WriteBeginArray();
+      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
+        I = $l1;
+        this.FWriter.WriteString(AList.Get(I));
+      };
+      this.FWriter.WriteEndArray();
+    };
+    this.WriteCollection = function (ACollection) {
+      var I = 0;
+      this.FWriter.WriteBeginArray();
+      for (var $l1 = 0, $end2 = ACollection.GetCount() - 1; $l1 <= $end2; $l1++) {
+        I = $l1;
+        this.WriteSingleObject(ACollection.GetItem(I));
+      };
+      this.FWriter.WriteEndArray();
+    };
+    this.WriteList = function (AList) {
+      var I = 0;
+      this.FWriter.WriteBeginArray();
+      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
+        I = $l1;
+        this.WriteSingleObject(rtl.getObject(AList.Get(I)));
+      };
+      this.FWriter.WriteEndArray();
+    };
+    this.WriteBitmap = function (ABitmap) {
+      var ms = null;
+      if (pas["WEBLib.TMSFNCTypes"].IsBitmapEmpty(ABitmap)) {
+        this.FWriter.WriteString("");
+        return;
+      };
+      ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
+      try {
+        throw pas.SysUtils.Exception.$create("Create$1",["Implement SaveToStream on TTMSFNCBitmap"]);
+        ms.FPosition = 0;
+        this.FWriter.WriteString(pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.SaveStreamToHexStr(ms));
+      } finally {
+        ms = rtl.freeLoc(ms);
+      };
+    };
+    this.WriteSingleObject = function (AObject) {
+      this.FWriter.WriteBeginObject();
+      if ($mod.TTMSFNCPersistence.ClassTypeVariable !== "") {
+        this.FWriter.WriteName($mod.TTMSFNCPersistence.ClassTypeVariable);
+        this.FWriter.WriteString(AObject.$classname);
+      };
+      this.WriteProperties(AObject);
+      this.FWriter.WriteEndObject();
+    };
+    this.WriteObject = function (AObject) {
+      var b = null;
+      try {
+        if (AObject === null) {
+          this.FWriter.WriteNull()}
+         else {
+          if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"String")) {
+            this.WriteGenericStringList(AObject)}
+           else if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"")) {
+            this.WriteGenericObjectList(AObject)}
+           else if ($mod.TTMSFNCPersistence.IsList(AObject.$class.ClassType())) {
+            this.WriteList(AObject)}
+           else if ($mod.TTMSFNCPersistence.IsCollection(AObject.$class.ClassType())) {
+            this.WriteCollection(AObject)}
+           else if ($mod.TTMSFNCPersistence.IsBitmap(AObject.$class.ClassType())) {
+            this.WriteBitmap(AObject)}
+           else if ($mod.TTMSFNCPersistence.IsDescendingClass(AObject.$class.ClassType(),["TStrings"])) {
+            this.WriteStrings(AObject)}
+           else {
+            if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
+                return b;
+              }, set: function (v) {
+                b = v;
+              }})) {
+              if (b.NeedsObjectReference(AObject.$class.ClassType())) {
+                this.FWriter.WriteString(b.GetObjectReference(AObject))}
+               else this.WriteSingleObject(AObject);
+            } else this.WriteSingleObject(AObject);
+          };
+        };
+      } finally {
+        rtl._Release(b);
+      };
+    };
+    this.Create$1 = function (AStream) {
+      this.FWriter = pas["WEBLib.TMSFNCJSONWriter"].TTMSFNCJSONWriter.$create("Create$1",[AStream]);
+      return this;
+    };
+    this.Destroy = function () {
+      rtl.free(this,"FWriter");
+      pas.System.TObject.Destroy.call(this);
+    };
+    this.Write = function (AObject) {
+      this.WriteObject(AObject);
+    };
+    this.WriteArray = function (AName, AArray) {
+      var I = 0;
+      this.FWriter.WriteBeginObject();
+      this.FWriter.WriteName(AName);
+      this.FWriter.WriteBeginArray();
+      for (var $l1 = 0, $end2 = rtl.length(AArray) - 1; $l1 <= $end2; $l1++) {
+        I = $l1;
+        this.WriteSingleObject(AArray[I]);
+      };
+      this.FWriter.WriteEndArray();
+      this.FWriter.WriteEndObject();
+    };
+  });
+  $mod.$rtti.$MethodVar("TTMSFNCReaderCustomReadPropertyEvent",{procsig: rtl.newTIProcSig([["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyKind",pas.TypInfo.$rtti["TTypeKind"]],["AReader",pas["WEBLib.TMSFNCJSONReader"].$rtti["TTMSFNCJSONReader"]],["ACanRead",rtl.boolean,1]]), methodkind: 0});
+  rtl.createClass($mod,"TTMSFNCReader",pas.System.TObject,function () {
+    rtl.createClass(this,"TTMSFNCObjectReference",pas.System.TObject,function () {
+      this.$init = function () {
+        pas.System.TObject.$init.call(this);
+        this.Instance = null;
+        this.Prop = null;
+        this.Id = "";
+      };
+      this.$final = function () {
+        this.Instance = undefined;
+        this.Prop = undefined;
+        pas.System.TObject.$final.call(this);
+      };
+      this.Create$1 = function (AInstance, AProp, AId) {
+        this.Instance = AInstance;
+        this.Prop = AProp;
+        this.Id = AId;
+        return this;
+      };
+    });
+    rtl.createClass(this,"TTMSFNCObjectReferences",pas.contnrs.TObjectList,function () {
+      this.GetItem$1 = function (Index) {
+        var Result = null;
+        Result = this.GetItem(Index);
+        return Result;
+      };
+      this.SetItem$1 = function (Index, Value) {
+        this.SetItem(Index,Value);
+      };
+    });
+    this.$init = function () {
+      pas.System.TObject.$init.call(this);
+      this.FReferences = null;
+      this.FReader = null;
+      this.FIOReference = null;
+      this.FOnCustomReadProperty = null;
+      this.FRootObject = null;
+      this.FExcludeProperties = [];
+      this.FOnCustomIsAssignableProperty = null;
+    };
+    this.$final = function () {
+      this.FReferences = undefined;
+      this.FReader = undefined;
+      this.FIOReference = undefined;
+      this.FOnCustomReadProperty = undefined;
+      this.FRootObject = undefined;
+      this.FExcludeProperties = undefined;
+      this.FOnCustomIsAssignableProperty = undefined;
+      pas.System.TObject.$final.call(this);
+    };
+    this.ReadSingleObject = function (ABaseClass) {
+      var Result = null;
+      var cn = "";
+      var b = null;
+      try {
+        this.FReader.ReadBeginObject();
+        if ($mod.TTMSFNCPersistence.ClassTypeVariable !== "") {
+          if (!this.FReader.HasNext() || (this.FReader.ReadName() !== $mod.TTMSFNCPersistence.ClassTypeVariable)) throw $mod.ETMSFNCReaderException.$create("Create$1",['"' + $mod.TTMSFNCPersistence.ClassTypeVariable + '" property not found in Object descriptor.']);
+          cn = this.FReader.ReadString();
+        };
+        if (cn === "") cn = ABaseClass.$classname;
+        if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCBasePersistenceIO.$guid,{get: function () {
+            return b;
+          }, set: function (v) {
+            b = v;
+          }})) {
+          Result = b.CreateObject(cn,ABaseClass)}
+         else Result = $mod.TTMSFNCPersistence.CreateObject(cn,ABaseClass);
+        try {
+          this.ReadProperties(Result);
+          this.FReader.ReadEndObject();
+        } catch ($e) {
+          Result = rtl.freeLoc(Result);
+          throw $e;
+        };
+      } finally {
+        rtl._Release(b);
+      };
+      return Result;
+    };
+    this.SetRootObject = function (Value) {
+      this.FRootObject = Value;
+      $mod.TTMSFNCPersistence.FRootObject = this.FRootObject;
+    };
+    this.SetExcludeProperties = function (Value) {
+      this.FExcludeProperties = Value;
+      $mod.TTMSFNCPersistence.FExcludeProperties = this.FExcludeProperties;
+    };
+    this.SetIOReference = function (Value) {
+      this.FIOReference = Value;
+      $mod.TTMSFNCPersistence.FIOReference = this.FIOReference;
+    };
+    this.ReadSingleObject$1 = function (AObject) {
+      this.FReader.ReadBeginObject();
+      if ($mod.TTMSFNCPersistence.ClassTypeVariable !== "") {
+        if (!this.FReader.HasNext() || (this.FReader.ReadName() !== $mod.TTMSFNCPersistence.ClassTypeVariable)) throw $mod.ETMSFNCReaderException.$create("Create$1",['"' + $mod.TTMSFNCPersistence.ClassTypeVariable + '" property not found in Object descriptor.']);
+        this.FReader.ReadString();
+      };
+      try {
+        this.ReadProperties(AObject);
+        this.FReader.ReadEndObject();
+      } catch ($e) {
+        throw $e;
+      };
+    };
+    this.ReadProperties = function (AObject) {
+      var Prop = null;
+      while (this.FReader.HasNext()) {
+        if (!this.FReader.IsNull()) {
+          Prop = pas.TypInfo.GetPropInfo$2(AObject,this.FReader.ReadName());
+          if (Prop != null) {
+            this.ReadProperty(AObject,Prop)}
+           else this.FReader.SkipValue();
+        } else this.FReader.SkipValue();
+      };
+    };
+    this.ReadProperty = function (AObject, AProp) {
+      var pName = "";
+      var ct = null;
+      var b = false;
+      var p = null;
+      var pio = null;
+      var k = 0;
+      var a = false;
+      var ap = false;
+      var o = null;
+      var n = "";
+      try {
+        if (!(AProp != null)) return;
+        k = $mod.TTMSFNCPersistence.GetPropInfoType(AProp);
+        pName = $mod.TTMSFNCPersistence.GetPropInfoName(AProp);
+        b = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(pName,$mod.TTMSFNCPersistence.FExcludeProperties) === -1;
+        if (pas.SysUtils.Supports$3(AObject,$mod.ITMSFNCPersistence.$guid,{get: function () {
+            return p;
+          }, set: function (v) {
+            p = v;
+          }})) b = p.CanLoadProperty(AObject,pName,k);
+        if (b) {
+          a = true;
+          if (this.FOnCustomReadProperty != null) this.FOnCustomReadProperty(AObject,pName,k,this.FReader,{get: function () {
+              return a;
+            }, set: function (v) {
+              a = v;
+            }});
+          if (a) {
+            if (k in rtl.createSet(pas.TypInfo.TTypeKind.tkClass)) {
+              ct = $mod.TTMSFNCPersistence.GetPropInfoDataTypeInfoClassType(AProp);
+              if ($mod.TTMSFNCPersistence.IsGenericList(ct,"String")) {
+                this.ReadGenericStringList(pas.TypInfo.GetObjectProp(AObject,pName))}
+               else if ($mod.TTMSFNCPersistence.IsGenericList(ct,"")) {
+                this.ReadGenericObjectList(pas.TypInfo.GetObjectProp(AObject,pName))}
+               else if ($mod.TTMSFNCPersistence.IsList(ct)) {
+                this.ReadList(pas.TypInfo.GetObjectProp(AObject,pName))}
+               else if ($mod.TTMSFNCPersistence.IsCollection(ct)) {
+                this.ReadCollection(pas.TypInfo.GetObjectProp(AObject,pName))}
+               else if ($mod.TTMSFNCPersistence.IsBitmap(ct)) {
+                this.ReadBitmap(pas.TypInfo.GetObjectProp(AObject,pName))}
+               else if ($mod.TTMSFNCPersistence.IsDescendingClass(ct,["TStrings"])) {
+                this.ReadStrings(pas.TypInfo.GetObjectProp(AObject,pName))}
+               else {
+                a = false;
+                if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
+                    return pio;
+                  }, set: function (v) {
+                    pio = v;
+                  }})) a = pio.NeedsObjectReference(ct);
+                if (a) {
+                  if (this.FReader.IsNull()) {
+                    this.FReader.ReadNull();
+                    pas.TypInfo.SetObjectProp(AObject,pName,null);
+                  } else this.FReferences.Add$1(this.TTMSFNCObjectReference.$create("Create$1",[AObject,AProp,this.FReader.ReadString()]));
+                } else {
+                  o = pas.TypInfo.GetObjectProp(AObject,pName);
+                  ap = $mod.TTMSFNCPersistence.IsAssignableProperty(AObject,AProp);
+                  if (this.FOnCustomIsAssignableProperty != null) this.FOnCustomIsAssignableProperty(AObject,pName,{get: function () {
+                      return ap;
+                    }, set: function (v) {
+                      ap = v;
+                    }});
+                  if (ap) {
+                    n = this.FReader.ReadString();
+                    if ((this.FRootObject != null) && pas.Classes.TComponent.isPrototypeOf(this.FRootObject)) pas.TypInfo.SetObjectProp(AObject,pName,rtl.as(this.FRootObject,pas.Classes.TComponent).FindComponent(n));
+                  } else this.ReadExistingObject(o);
+                };
+              };
+            } else this.ReadPropInfoValue(AObject,AProp);
+          };
+        };
+      } finally {
+        rtl._Release(p);
+        rtl._Release(pio);
+      };
+    };
+    this.ReadPropInfoValue = function (AInstance, APropInfo) {
+      var pName = "";
+      var cn = "";
+      var cnv = "";
+      var en = "";
+      var k = 0;
+      var p = null;
+      var o = null;
+      var i = 0;
+      var s = "";
+      var b = false;
+      var d = 0.0;
+      var ii = 0;
+      var v = "";
+      var m = pas.System.TMethod.$new();
+      if ($mod.TTMSFNCPersistence.IsWriteOnly(APropInfo)) {
+        this.FReader.ReadNull();
+        return;
+      };
+      o = AInstance;
+      p = APropInfo;
+      pName = $mod.TTMSFNCPersistence.GetPropInfoName(p);
+      k = $mod.TTMSFNCPersistence.GetPropInfoType(p);
+      var $tmp1 = k;
+      if ($tmp1 === pas.TypInfo.TTypeKind.tkInteger) {
+        cn = $mod.TTMSFNCPersistence.GetPropInfoTypeName(p);
+        if ((cn === "TAlphaColor") || (cn === "TColor") || (cn === "TGraphicsColor")) {
+          cnv = this.FReader.ReadString();
+          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) {
+            if (cnv === "gcNull") {
+              pas.TypInfo.SetOrdProp(o,pName,-1)}
+             else pas.TypInfo.SetOrdProp(o,pName,$impl.HTMLToColorEx(cnv));
+          };
+        } else {
+          i = this.FReader.ReadInteger();
+          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,i);
+        };
+      } else if (($tmp1 === pas.TypInfo.TTypeKind.tkChar) || ($tmp1 === pas.TypInfo.TTypeKind.tkString)) {
+        s = this.FReader.ReadString();
+        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetStrProp$1(o,p,s);
+      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkEnumeration) {
+        if ($mod.TTMSFNCPersistence.GetPropInfoDataTypeInfo(p) === rtl.boolean) {
+          b = this.FReader.ReadBoolean();
+          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,(b ? 1 : 0));
+        } else {
+          i = this.FReader.ReadInteger();
+          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,i);
+        }}
+       else if ($tmp1 === pas.TypInfo.TTypeKind.tkBool) {
+        b = this.FReader.ReadBoolean();
+        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,(b ? 1 : 0));
+      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkDouble) {
+        d = this.FReader.ReadDouble();
+        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetFloatProp$1(o,p,d);
+      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkSet) {
+        i = this.FReader.ReadInteger();
+        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,i);
+      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkMethod) {
+        m.Data = null;
+        m.Code = null;
+        if (this.FReader.IsNull()) {
+          this.FReader.ReadNull()}
+         else {
+          if ($mod.TTMSFNCPersistence.FRootObject != null) {
+            v = this.FReader.ReadString();
+            m.Code = $mod.TTMSFNCPersistence.FRootObject.$class.MethodAddress(v);
+            if (m.Code !== null) m.Data = $mod.TTMSFNCPersistence.FRootObject;
+          } else this.FReader.ReadNull();
+        };
+        pas.TypInfo.SetMethodProp(o,p,m);
+      } else {
+        en = $mod.TTMSFNCPersistence.GetEnumName(pas.TypInfo.$rtti["TTypeKind"],k);
+        this.FReader.ReadNull();
+      };
+    };
+    this.ReadExistingObject = function (AObject) {
+      if (AObject != null) {
+        this.FReader.ReadBeginObject();
+        if ($mod.TTMSFNCPersistence.ClassTypeVariable !== "") {
+          if (!this.FReader.HasNext() || (this.FReader.ReadName() !== $mod.TTMSFNCPersistence.ClassTypeVariable)) throw $mod.ETMSFNCReaderException.$create("Create$1",['"' + $mod.TTMSFNCPersistence.ClassTypeVariable + '" property not found in Object descriptor.']);
+          this.FReader.ReadString();
+        };
+        this.ReadProperties(AObject);
+        this.FReader.ReadEndObject();
+      } else this.FReader.ReadNull();
+    };
+    this.ReadGenericStringList = function (AList) {
+      var obj = "";
+      AList.Clear();
+      this.FReader.ReadBeginArray();
+      while (this.FReader.HasNext()) {
+        if (!this.FReader.IsNull()) {
+          obj = this.FReader.ReadString();
+          AList.Add(obj);
+        } else this.FReader.SkipValue();
+      };
+      this.FReader.ReadEndArray();
+    };
+    this.ReadStrings = function (AList) {
+      var obj = "";
+      AList.Clear();
+      this.FReader.ReadBeginArray();
+      while (this.FReader.HasNext()) {
+        if (!this.FReader.IsNull()) {
+          obj = this.FReader.ReadString();
+          AList.Add(obj);
+        } else this.FReader.SkipValue();
+      };
+      this.FReader.ReadEndArray();
+    };
+    this.ReadGenericObjectList = function (AList) {
+      var obj = null;
+      var b = null;
+      var c = null;
+      var i = null;
+      try {
+        c = pas.System.TObject;
+        if (pas.SysUtils.Supports$3(AList,$mod.ITMSFNCBaseListIO.$guid,{get: function () {
+            return i;
+          }, set: function (v) {
+            i = v;
+          }})) c = i.GetItemClass();
+        AList.Clear();
+        this.FReader.ReadBeginArray();
+        while (this.FReader.HasNext()) {
+          if (!this.FReader.IsNull()) {
+            obj = this.ReadSingleObject(c);
+            if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
+                return b;
+              }, set: function (v) {
+                b = v;
+              }})) b.FixOwners(obj,AList);
+            AList.Add$1(obj);
+          } else this.FReader.SkipValue();
+        };
+        this.FReader.ReadEndArray();
+      } finally {
+        rtl._Release(i);
+        rtl._Release(b);
+      };
+    };
+    this.ReadCollection = function (ACollection) {
+      var obj = null;
+      var c = null;
+      var i = null;
+      try {
+        c = pas.System.TObject;
+        if (pas.SysUtils.Supports$3(ACollection,$mod.ITMSFNCBaseListIO.$guid,{get: function () {
+            return i;
+          }, set: function (v) {
+            i = v;
+          }})) c = i.GetItemClass();
+        ACollection.Clear();
+        this.FReader.ReadBeginArray();
+        while (this.FReader.HasNext()) {
+          if (!this.FReader.IsNull()) {
+            obj = this.ReadSingleObject(c);
+            if (obj != null) {
+              try {
+                if (pas.Classes.TPersistent.isPrototypeOf(obj)) ACollection.Add().Assign(rtl.as(obj,pas.Classes.TPersistent));
+              } finally {
+                obj = rtl.freeLoc(obj);
+              };
+            };
+          } else this.FReader.SkipValue();
+        };
+        this.FReader.ReadEndArray();
+      } finally {
+        rtl._Release(i);
+      };
+    };
+    this.ReadList = function (AList) {
+      var obj = null;
+      var b = null;
+      var c = null;
+      var i = null;
+      try {
+        c = pas.System.TObject;
+        if (pas.SysUtils.Supports$3(AList,$mod.ITMSFNCBaseListIO.$guid,{get: function () {
+            return i;
+          }, set: function (v) {
+            i = v;
+          }})) c = i.GetItemClass();
+        AList.Clear();
+        this.FReader.ReadBeginArray();
+        while (this.FReader.HasNext()) {
+          if (!this.FReader.IsNull()) {
+            obj = this.ReadSingleObject(c);
+            if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
+                return b;
+              }, set: function (v) {
+                b = v;
+              }})) b.FixOwners(obj,AList);
+            AList.Add(obj);
+          } else this.FReader.SkipValue();
+        };
+        this.FReader.ReadEndArray();
+      } finally {
+        rtl._Release(i);
+        rtl._Release(b);
+      };
+    };
+    this.ReadBitmap = function (ABitmap) {
+      var s = "";
+      var ms = null;
+      s = this.FReader.ReadString();
+      if (s !== "") {
+        ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
+        try {
+          pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.LoadStreamFromHexStr(s,ms);
+          ms.FPosition = 0;
+          ABitmap.LoadFromStream(ms);
+        } finally {
+          ms = rtl.freeLoc(ms);
+        };
+      };
+    };
+    this.ReadObject = function (AObject) {
+      if (AObject === null) {
+        this.FReader.ReadNull()}
+       else {
+        if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"String")) {
+          this.ReadGenericStringList(AObject)}
+         else if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"")) {
+          this.ReadGenericObjectList(AObject)}
+         else if ($mod.TTMSFNCPersistence.IsList(AObject.$class.ClassType())) {
+          this.ReadList(AObject)}
+         else if ($mod.TTMSFNCPersistence.IsCollection(AObject.$class.ClassType())) {
+          this.ReadCollection(AObject)}
+         else if ($mod.TTMSFNCPersistence.IsBitmap(AObject.$class.ClassType())) {
+          this.ReadBitmap(AObject)}
+         else if ($mod.TTMSFNCPersistence.IsDescendingClass(AObject.$class.ClassType(),["TStrings"])) {
+          this.ReadStrings(AObject)}
+         else this.ReadSingleObject$1(AObject);
+      };
+    };
+    this.Create$1 = function (AStream) {
+      this.FReader = pas["WEBLib.TMSFNCJSONReader"].TTMSFNCJSONReader.$create("Create$1",[AStream]);
+      this.FReferences = this.TTMSFNCObjectReferences.$create("Create$3",[true]);
+      return this;
+    };
+    this.Destroy = function () {
+      rtl.free(this,"FReader");
+      rtl.free(this,"FReferences");
+      pas.System.TObject.Destroy.call(this);
+    };
+    this.Read = function (AClass) {
+      var Result = null;
+      Result = this.ReadSingleObject(AClass);
+      return Result;
+    };
+    this.Read$1 = function (AObject) {
+      this.ReadObject(AObject);
+    };
+    this.ReadArray = function (AName) {
+      var Result = [];
+      var Name = "";
+      this.FReader.ReadBeginObject();
+      while (this.FReader.HasNext()) {
+        if (!this.FReader.IsNull()) {
+          Name = this.FReader.ReadName();
+          if (Name === AName) {
+            this.FReader.ReadBeginArray();
+            while (this.FReader.HasNext()) {
+              Result = rtl.arraySetLength(Result,null,rtl.length(Result) + 1);
+              Result[rtl.length(Result) - 1] = this.ReadSingleObject(pas.System.TObject);
+            };
+            this.FReader.ReadEndArray();
+          } else this.FReader.SkipValue();
+        } else this.FReader.SkipValue();
+      };
+      return Result;
+    };
+    this.SolveReferences = function () {
+      var b = null;
+      var r = 0;
+      var rf = null;
+      var o = null;
+      try {
+        if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
+            return b;
+          }, set: function (v) {
+            b = v;
+          }})) {
+          for (var $l1 = 0, $end2 = this.FReferences.GetCount() - 1; $l1 <= $end2; $l1++) {
+            r = $l1;
+            rf = this.FReferences.GetItem$1(r);
+            o = b.FindObject(rf.Id);
+            pas.TypInfo.SetObjectProp$1(rf.Instance,rf.Prop,o);
+          };
+        };
+      } finally {
+        rtl._Release(b);
+      };
+    };
+  });
+  rtl.createClass($mod,"TTMSFNCObjectPersistence",pas.System.TObject,function () {
+    this.SaveObjectToString = function (AObject) {
+      var Result = "";
+      var ss = null;
+      ss = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[""]);
+      try {
+        $mod.TTMSFNCPersistence.SaveSettingsToStream(AObject,ss);
+        ss.FPosition = 0;
+        Result = ss.GetDataString();
+      } finally {
+        ss = rtl.freeLoc(ss);
+      };
+      return Result;
+    };
+    this.LoadObjectFromString = function (AObject, AString) {
+      var ms = null;
+      ms = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[AString]);
+      try {
+        $mod.TTMSFNCPersistence.LoadSettingsFromStream(AObject,ms);
+      } finally {
+        ms = rtl.freeLoc(ms);
+      };
+    };
+  });
+  rtl.createClass($mod,"TTMSFNCPersistence",pas.System.TObject,function () {
+    this.ClassTypeVariable = "";
+    this.FOnCustomReadProperty = null;
+    this.FOnCustomWriteProperty = null;
+    this.FRootObject = null;
+    this.FExcludeProperties = [];
+    this.FIOReference = null;
+    this.DoCustomReadProperty = function (AObject, APropertyName, APropertyKind, AReader, ACanRead) {
+      if (this.FOnCustomReadProperty != null) this.FOnCustomReadProperty(AObject,APropertyName,APropertyKind,AReader,ACanRead);
+    };
+    this.DoCustomWriteProperty = function (AObject, APropertyName, APropertyKind, AWriter, ACanWrite) {
+      if (this.FOnCustomWriteProperty != null) this.FOnCustomWriteProperty(AObject,APropertyName,APropertyKind,AWriter,ACanWrite);
+    };
+    this.SaveSettingsToFile = function (AObject, AFileName) {
+      var ms = null;
+      ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
+      try {
+        this.SaveSettingsToStream(AObject,ms);
+        ms.SaveToFile(AFileName);
+      } finally {
+        ms = rtl.freeLoc(ms);
+      };
+    };
+    this.LoadSettingsFromFile = function (AObject, AFileName) {
+      var ms = null;
+      ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
+      try {
+        this.LoadSettingsFromStream(AObject,ms);
+      } finally {
+        ms = rtl.freeLoc(ms);
+      };
+    };
+    this.SaveSettingsToStream = function (AObject, AStream) {
+      var Writer = null;
+      var d = "";
+      var t = "";
+      Writer = $mod.TTMSFNCWriter.$create("Create$1",[AStream]);
+      try {
+        Writer.SetIOReference($mod.TTMSFNCPersistence.FIOReference);
+        Writer.SetRootObject($mod.TTMSFNCPersistence.FRootObject);
+        Writer.FOnCustomWriteProperty = rtl.createCallback(this,"DoCustomWriteProperty");
+        t = pas.SysUtils.FormatSettings.GetThousandSeparator();
+        d = pas.SysUtils.FormatSettings.GetDecimalSeparator();
+        pas.SysUtils.FormatSettings.SetDecimalSeparator(".");
+        pas.SysUtils.FormatSettings.SetThousandSeparator(",");
+        Writer.Write(AObject);
+        pas.SysUtils.FormatSettings.SetDecimalSeparator(d);
+        pas.SysUtils.FormatSettings.SetThousandSeparator(t);
+      } finally {
+        Writer = rtl.freeLoc(Writer);
+      };
+    };
+    this.LoadSettingsFromStream = function (AObject, AStream) {
+      var Reader = null;
+      var d = "";
+      var t = "";
+      AStream.FPosition = 0;
+      Reader = $mod.TTMSFNCReader.$create("Create$1",[AStream]);
+      try {
+        Reader.SetIOReference($mod.TTMSFNCPersistence.FIOReference);
+        Reader.SetRootObject($mod.TTMSFNCPersistence.FRootObject);
+        Reader.FOnCustomReadProperty = rtl.createCallback(this,"DoCustomReadProperty");
+        t = pas.SysUtils.FormatSettings.GetThousandSeparator();
+        d = pas.SysUtils.FormatSettings.GetDecimalSeparator();
+        pas.SysUtils.FormatSettings.SetDecimalSeparator(".");
+        pas.SysUtils.FormatSettings.SetThousandSeparator(",");
+        Reader.Read$1(AObject);
+        pas.SysUtils.FormatSettings.SetDecimalSeparator(d);
+        pas.SysUtils.FormatSettings.SetThousandSeparator(t);
+      } finally {
+        Reader = rtl.freeLoc(Reader);
+      };
+    };
+    this.GetEnumValues = function (AValues, APropInfo) {
+      var p = null;
+      var pi = null;
+      var ps = null;
+      var I = 0;
+      var k = 0;
+      p = $impl.GetTypeInfoEx(APropInfo);
+      if ((p != null) && rtl.isExt(p,rtl.tTypeInfoSet)) p = p.comptype;
+      if ((p != null) && rtl.isExt(p,rtl.tTypeInfoInteger)) {
+        pi = p;
+        for (var $l1 = pi.minvalue, $end2 = pi.maxvalue; $l1 <= $end2; $l1++) {
+          I = $l1;
+          AValues.Add($mod.TTMSFNCPersistence.GetEnumName(p,I));
+        };
+      };
+    };
+    this.CreateObject = function (AClassName, BaseClass) {
+      var Result = null;
+      var ObjType = null;
+      ObjType = pas.Classes.GetClass(AClassName);
+      if (ObjType === null) throw $mod.ETMSFNCReaderException.$create("CreateFmt",['Type "%s" not found',[AClassName]]);
+      if (!ObjType.InheritsFrom(pas.System.TObject)) throw $mod.ETMSFNCReaderException.$create("Create$1",['Type "%s" is not an class type']);
+      if (BaseClass !== null) if (!ObjType.InheritsFrom(BaseClass)) throw $mod.ETMSFNCReaderException.$create("CreateFmt",['Type "%s" does not inherit from %s',[AClassName,BaseClass.$classname]]);
+      if (ObjType.InheritsFrom(pas["WEBLib.Controls"].TCustomControl)) {
+        Result = ObjType.$create("Create$1",[null])}
+       else if (ObjType.InheritsFrom(pas.Classes.TComponent)) {
+        Result = ObjType.$create("Create$1",[null])}
+       else if (ObjType.InheritsFrom(pas.Classes.TCollectionItem)) {
+        Result = ObjType.$create("Create$1",[null])}
+       else if (ObjType.InheritsFrom(pas.Classes.TPersistent)) {
+        Result = ObjType.$create("Create")}
+       else throw $mod.ETMSFNCReaderException.$create("CreateFmt",['Type "%s" not supported',[AClassName]]);
+      return Result;
+    };
+    this.GetPropInfoDataTypeInfo = function (APropInfo) {
+      var Result = null;
+      Result = null;
+      if (APropInfo != null) Result = APropInfo.typeinfo;
+      return Result;
+    };
+    this.GetPropInfoDataTypeInfoClassType = function (APropInfo) {
+      var Result = null;
+      var t = null;
+      Result = null;
+      if ((APropInfo != null) && (APropInfo.typeinfo != null)) {
+        t = APropInfo.typeinfo;
+        if (t.class){
+          return t.class.ClassType();
+        };
+      };
+      return Result;
+    };
+    this.GetPropInfoType = function (APropInfo) {
+      var Result = 0;
+      if (APropInfo.typeinfo != null) {
+        Result = APropInfo.typeinfo.kind}
+       else Result = pas.TypInfo.TTypeKind.tkUnknown;
+      return Result;
+    };
+    this.GetPropInfoName = function (APropInfo) {
+      var Result = "";
+      Result = APropInfo.name;
+      return Result;
+    };
+    this.GetPropInfoTypeName = function (APropInfo) {
+      var Result = "";
+      Result = "";
+      if (APropInfo.typeinfo != null) Result = APropInfo.typeinfo.name;
+      return Result;
+    };
+    this.GetEnumName = function (ATypeInfo, AValue) {
+      var Result = "";
+      Result = ATypeInfo.enumtype[AValue];
+      return Result;
+    };
+    this.IsWriteOnly = function (APropInfo) {
+      var Result = false;
+      Result = APropInfo.getter === "";
+      return Result;
+    };
+    this.IsReadOnly = function (APropInfo) {
+      var Result = false;
+      Result = APropInfo.setter === "";
+      return Result;
+    };
+    this.IsAssignableProperty = function (AObject, APropInfo) {
+      var Result = false;
+      var oProp = null;
+      var k = 0;
+      var pName = "";
+      Result = false;
+      k = this.GetPropInfoType(APropInfo);
+      if (k in rtl.createSet(pas.TypInfo.TTypeKind.tkClass)) {
+        pName = this.GetPropInfoName(APropInfo);
+        oProp = pas.TypInfo.GetObjectProp(AObject,pName);
+        Result = ((oProp != null) && this.IsComponent(oProp.$class.ClassType())) || !(oProp != null);
+      };
+      return Result;
+    };
+    this.IsColor = function (APropertyName) {
+      var Result = false;
+      Result = (APropertyName === "TAlphaColor") || (APropertyName === "TColor") || (APropertyName === "TGraphicsColor");
+      return Result;
+    };
+    this.IsStrokeKind = function (APropertyName) {
+      var Result = false;
+      Result = APropertyName === "TTMSFNCGraphicsStrokeKind";
+      return Result;
+    };
+    this.IsFillKind = function (APropertyName) {
+      var Result = false;
+      Result = APropertyName === "TTMSFNCGraphicsFillKind";
+      return Result;
+    };
+    this.IsDate = function (APropertyName) {
+      var Result = false;
+      Result = APropertyName === "TDate";
+      return Result;
+    };
+    this.IsDateTime = function (APropertyName) {
+      var Result = false;
+      Result = APropertyName === "TDateTime";
+      return Result;
+    };
+    this.IsTime = function (APropertyName) {
+      var Result = false;
+      Result = APropertyName === "TTime";
+      return Result;
+    };
+    this.IsGenericList = function (AClass, AType) {
+      var Result = false;
+      var cn = "";
+      if (!(AClass != null)) return false;
+      do {
+        cn = AClass.$classname;
+        if (pas.strutils.AnsiStartsStr("TList<",cn) || pas.strutils.AnsiStartsStr("TObjectList<",cn)) {
+          if ((AType === "") || ((AType !== "") && (pas.System.Pos(pas.SysUtils.LowerCase(AType),pas.SysUtils.LowerCase(cn)) > 0)) || (pas.System.Pos(pas.SysUtils.LowerCase(AType),pas.SysUtils.LowerCase(cn)) > 0)) return true;
+        };
+        AClass = AClass.$ancestor;
+      } while (AClass != null);
+      Result = false;
+      return Result;
+    };
+    this.IsCollection = function (AClass) {
+      var Result = false;
+      Result = this.IsDescendingClass(AClass,["TCollection"]);
+      return Result;
+    };
+    this.IsComponent = function (AClass) {
+      var Result = false;
+      Result = this.IsDescendingClass(AClass,["TComponent","TTMSFNCCustomComponent"]);
+      return Result;
+    };
+    this.IsControl = function (AClass) {
+      var Result = false;
+      Result = this.IsDescendingClass(AClass,["TControl"]);
+      return Result;
+    };
+    this.IsList = function (AClass) {
+      var Result = false;
+      Result = this.IsDescendingClass(AClass,["TList"]);
+      return Result;
+    };
+    this.IsDescendingClass = function (AClass, AClassParentList) {
+      var Result = false;
+      var cn = "";
+      var I = 0;
+      if (!(AClass != null)) return false;
+      do {
+        cn = AClass.$classname;
+        for (var $l1 = 0, $end2 = rtl.length(AClassParentList) - 1; $l1 <= $end2; $l1++) {
+          I = $l1;
+          if (cn === AClassParentList[I]) return true;
+        };
+        AClass = AClass.$ancestor;
+      } while (AClass != null);
+      Result = false;
+      return Result;
+    };
+    this.IsBitmap = function (AClass) {
+      var Result = false;
+      Result = this.IsDescendingClass(AClass,["TBitmap","TPicture","TTMSFNCBitmap"]);
+      return Result;
+    };
+    this.IsStrings = function (AClass) {
+      var Result = false;
+      Result = this.IsDescendingClass(AClass,["TStrings"]);
+      return Result;
+    };
+  });
+  this.ExcludePropertyList = ["Align","AllowFocus","Anchors","BevelEdges","BevelInner","BevelKind","BevelOuter","BevelWidth","BiDiMode","BitmapContainer","BorderSpacing","CanParentFocus","ClipChildren","ClipParent","Constraints","Ctl3D","DisableFocusEffect","DoubleBuffered","DragCursor","DragKind","DragMode","Enabled","EnableDragHighLight","Height","Hint","HitTest","Locked","Margins","Name","Opacity","Padding","ParentBiDiMode","ParentColor","ParentCtl3D","ParentDoubleBuffered","ParentFont","ParentShowHint","PopupMenu","Position","RotationAngle","RotationCenter","Scale","ShowHint","Size","StyleElements","StyleName","TabOrder","TabStop","Tag","Touch","TouchTargetExpansion","Visible","Width"];
+  $mod.$init = function () {
+    $mod.TTMSFNCPersistence.ClassTypeVariable = "$type";
+  };
+},["strutils","WEBLib.Controls","WEBLib.Graphics","WEBLib.TMSFNCUtils"],function () {
+  "use strict";
+  var $mod = this;
+  var $impl = $mod.$impl;
+  $impl.gcNull = -1;
+  $mod.$rtti.$ClassRef("TCustomControlClass",{instancetype: pas["WEBLib.Controls"].$rtti["TCustomControl"]});
+  $impl.GetTypeInfoEx = function (APropInfo) {
+    var Result = null;
+    Result = APropInfo.typeinfo;
+    return Result;
+  };
+  $impl.GetColorRed = function (AColor) {
+    var Result = 0;
+    AColor = pas["WEBLib.Graphics"].ColorToRGB(AColor);
+    Result = pas["WEBLib.Graphics"].GetRValue(AColor);
+    return Result;
+  };
+  $impl.GetColorGreen = function (AColor) {
+    var Result = 0;
+    AColor = pas["WEBLib.Graphics"].ColorToRGB(AColor);
+    Result = pas["WEBLib.Graphics"].GetGValue(AColor);
+    return Result;
+  };
+  $impl.GetColorBlue = function (AColor) {
+    var Result = 0;
+    AColor = pas["WEBLib.Graphics"].ColorToRGB(AColor);
+    Result = pas["WEBLib.Graphics"].GetBValue(AColor);
+    return Result;
+  };
+  $impl.HTMLToColorEx = function (AHTML) {
+    var Result = 0;
+    function HexVal(s) {
+      var Result = 0;
+      var i = 0;
+      var j = 0;
+      var i1 = 0;
+      var i2 = 0;
+      if (s.length < 2) {
+        Result = 0;
+        return Result;
+      };
+      i1 = 1;
+      i2 = 2;
+      if (s.charAt(i1 - 1) >= "A") {
+        i = (s.charCodeAt(i1 - 1) - "A".charCodeAt()) + 10}
+       else i = s.charCodeAt(i1 - 1) - "0".charCodeAt();
+      if (s.charAt(i2 - 1) >= "A") {
+        j = (s.charCodeAt(i2 - 1) - "A".charCodeAt()) + 10}
+       else j = s.charCodeAt(i2 - 1) - "0".charCodeAt();
+      Result = (i << 4) + j;
+      return Result;
+    };
+    var r = 0;
+    var g = 0;
+    var b = 0;
+    r = HexVal(pas.System.Copy(AHTML,2,2));
+    g = HexVal(pas.System.Copy(AHTML,4,2)) << 8;
+    b = HexVal(pas.System.Copy(AHTML,6,2)) << 16;
+    Result = b + g + r;
+    return Result;
+  };
+  var HTMLHexColor = "#RRGGBB";
+  var HexDigit = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+  $impl.ColorToHTMLEx = function (AColor) {
+    var Result = "";
+    var c = 0;
+    var i = 0;
+    i = 1;
+    c = pas["WEBLib.Graphics"].ColorToRGB(AColor);
+    Result = HTMLHexColor;
+    Result = rtl.setCharAt(Result,(1 + i) - 1,HexDigit[$impl.GetColorRed(c) >>> 4]);
+    Result = rtl.setCharAt(Result,(2 + i) - 1,HexDigit[$impl.GetColorRed(c) & 0xF]);
+    Result = rtl.setCharAt(Result,(3 + i) - 1,HexDigit[$impl.GetColorGreen(c) >>> 4]);
+    Result = rtl.setCharAt(Result,(4 + i) - 1,HexDigit[$impl.GetColorGreen(c) & 0xF]);
+    Result = rtl.setCharAt(Result,(5 + i) - 1,HexDigit[$impl.GetColorBlue(c) >>> 4]);
+    Result = rtl.setCharAt(Result,(6 + i) - 1,HexDigit[$impl.GetColorBlue(c) & 0xF]);
+    return Result;
+  };
+});
 rtl.module("WEBLib.DesignIntf",["System","Classes","Web","JS","TypInfo","WEBLib.Forms"],function () {
   "use strict";
   var $mod = this;
@@ -41378,6 +45489,15 @@ rtl.module("WEBLib.DesignIntf",["System","Classes","Web","JS","TypInfo","WEBLib.
     };
     this.GetValues = function (Proc) {
     };
+    this.SetValue = function (Value) {
+      var tmp = null;
+      if (this.FComponent != null) {
+        tmp = pas.TypInfo.FindPropInfo(this.FComponent,this.FPropertyName);
+        if (tmp != null) {
+          pas.TypInfo.SetStrProp(this.FComponent,this.FPropertyName,Value);
+        };
+      };
+    };
   });
   $mod.$rtti.$ClassRef("TPropertyEditorClass",{instancetype: $mod.$rtti["TPropertyEditor"]});
   rtl.createClass($mod,"TRegisteredPropertyEditor",pas.System.TObject,function () {
@@ -41457,6 +45577,11 @@ rtl.module("WEBLib.DesignIntf",["System","Classes","Web","JS","TypInfo","WEBLib.
     this.GetComponent = function () {
       var Result = null;
       Result = null;
+      return Result;
+    };
+    this.GetDefaultProperty = function () {
+      var Result = "";
+      Result = "";
       return Result;
     };
   });
@@ -41733,28 +45858,65 @@ rtl.module("WEBLib.DesignIntf",["System","Classes","Web","JS","TypInfo","WEBLib.
         });
   };
 });
-rtl.module("WEBLib.TMSFNCCustomComponent",["System","Classes","WEBLib.Controls","WEBLib.TMSFNCTypes","TypInfo"],function () {
+rtl.module("WEBLib.TMSFNCCustomComponent",["System","Classes","WEBLib.Controls","WEBLib.TMSFNCTypes","WEBLib.TMSFNCPersistence","TypInfo"],function () {
   "use strict";
   var $mod = this;
+  $mod.$rtti.$MethodVar("TTMSFNCCustomComponentCanSavePropertyEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyType",pas.TypInfo.$rtti["TTypeKind"]],["ACanSave",rtl.boolean,1]]), methodkind: 0});
+  $mod.$rtti.$MethodVar("TTMSFNCCustomComponentCanLoadPropertyEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyType",pas.TypInfo.$rtti["TTypeKind"]],["ACanLoad",rtl.boolean,1]]), methodkind: 0});
   rtl.createClass($mod,"TTMSFNCCustomComponent",pas["WEBLib.Controls"].TCustomControl,function () {
+    this.FBlockPersistenceInterface = false;
     this.$init = function () {
       pas["WEBLib.Controls"].TCustomControl.$init.call(this);
       this.FStored = false;
+      this.FAppearancePersisting = false;
       this.FAdaptToStyle = false;
+      this.FOnCanSaveProperty = null;
+      this.FOnCanLoadProperty = null;
+    };
+    this.$final = function () {
+      this.FOnCanSaveProperty = undefined;
+      this.FOnCanLoadProperty = undefined;
+      pas["WEBLib.Controls"].TCustomControl.$final.call(this);
     };
     this.GetVersionNumber = function (AMaj, AMin, ARel, ABld) {
       var Result = "";
       Result = "";
       return Result;
     };
+    this.DoCanSaveProperty = function (AObject, APropertyName, APropertyType, ACanSave) {
+      if (this.FOnCanSaveProperty != null) this.FOnCanSaveProperty(this,AObject,APropertyName,APropertyType,ACanSave);
+    };
+    this.DoCanLoadProperty = function (AObject, APropertyName, APropertyType, ACanLoad) {
+      if (this.FOnCanLoadProperty != null) this.FOnCanLoadProperty(this,AObject,APropertyName,APropertyType,ACanLoad);
+    };
+    this.IsAppearanceProperty = function (AObject, APropertyName, APropertyType) {
+      var Result = false;
+      Result = false;
+      return Result;
+    };
     this.CanSaveProperty = function (AObject, APropertyName, APropertyType) {
       var Result = false;
-      Result = true;
+      if ((AObject === this) && !this.FBlockPersistenceInterface) {
+        Result = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(APropertyName,pas["WEBLib.TMSFNCPersistence"].ExcludePropertyList) === -1}
+       else Result = true;
+      if (this.FAppearancePersisting) Result = Result && this.IsAppearanceProperty(AObject,APropertyName,APropertyType);
+      this.DoCanSaveProperty(AObject,APropertyName,APropertyType,{get: function () {
+          return Result;
+        }, set: function (v) {
+          Result = v;
+        }});
       return Result;
     };
     this.CanLoadProperty = function (AObject, APropertyName, APropertyType) {
       var Result = false;
-      Result = true;
+      if ((AObject === this) && !this.FBlockPersistenceInterface) {
+        Result = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(APropertyName,pas["WEBLib.TMSFNCPersistence"].ExcludePropertyList) === -1}
+       else Result = true;
+      this.DoCanLoadProperty(AObject,APropertyName,APropertyType,{get: function () {
+          return Result;
+        }, set: function (v) {
+          Result = v;
+        }});
       return Result;
     };
     this.GetVersion = function () {
@@ -41844,12 +46006,31 @@ rtl.module("WEBLib.TMSFNCCustomComponent",["System","Classes","WEBLib.Controls",
       Result = pas.Classes.TComponentStateItem.csDestroying in this.FComponentState;
       return Result;
     };
+    this.SaveSettingsToFile = function (AFileName, AAppearanceOnly) {
+      this.FAppearancePersisting = AAppearanceOnly;
+      pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.SaveSettingsToFile(this,AFileName);
+      this.FAppearancePersisting = false;
+    };
+    this.LoadSettingsFromFile = function (AFileName) {
+      pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.LoadSettingsFromFile(this,AFileName);
+    };
+    this.SaveSettingsToStream = function (AStream, AAppearanceOnly) {
+      this.FAppearancePersisting = AAppearanceOnly;
+      pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.SaveSettingsToStream(this,AStream);
+      this.FAppearancePersisting = false;
+    };
+    this.LoadSettingsFromStream = function (AStream) {
+      pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.LoadSettingsFromStream(this,AStream);
+    };
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
     $r.addProperty("Visible",2,rtl.boolean,"FVisible","SetVisible",{Default: true});
     $r.addProperty("Width",3,rtl.longint,"GetWidth","SetWidth");
     $r.addProperty("Height",3,rtl.longint,"GetHeight","SetHeight");
+    $r.addProperty("OnCanSaveProperty",0,$mod.$rtti["TTMSFNCCustomComponentCanSavePropertyEvent"],"FOnCanSaveProperty","FOnCanSaveProperty");
+    $r.addProperty("OnCanLoadProperty",0,$mod.$rtti["TTMSFNCCustomComponentCanLoadPropertyEvent"],"FOnCanLoadProperty","FOnCanLoadProperty");
   });
   $mod.$rtti.$ClassRef("TTMSFNCCustomComponentClass",{instancetype: $mod.$rtti["TTMSFNCCustomComponent"]});
 },["WEBLib.TMSFNCUtils","SysUtils","WEBLib.TMSFNCGraphics","WEBLib.Graphics","WEBLib.TMSFNCGraphicsTypes","Types","WEBLib.DesignIntf"]);
@@ -42130,6 +46311,7 @@ rtl.module("WEBLib.TMSFNCBitmapContainer",["System","Classes","WEBLib.TMSFNCType
     };
     rtl.addIntf(this,$mod.ITMSFNCBitmapContainerGetItem);
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
     $r.addProperty("Items",3,$mod.$rtti["TTMSFNCBitmapCollection"],"GetItems","SetItems");
@@ -47471,3687 +51653,6 @@ rtl.module("WEBLib.TMSFNCGraphics",["System","Classes","WEBLib.TMSFNCGraphicsTyp
     pas["WEBLib.TMSFNCTypes"].TTMSFNCBitmap.CreateFromResource($mod.TMSFNCGRAPHICSUP2);
   };
 },["SysUtils","Math","WEBLib.TMSFNCUtils","WEBLib.TMSFNCHTMLEngine","WEBLib.TMSFNCGraphics.General","WEBLib.TMSFNCGraphics.WEB"]);
-rtl.module("WEBLib.TMSFNCJSONReader",["System","Classes","SysUtils","WEBLib.TMSFNCTypes"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  rtl.createClass($mod,"TTMSFNCJSONStreamReader",pas.System.TObject,function () {
-    rtl.createClass(this,"EInvalidJsonInput",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Invalid JSON Input");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EInternalError",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"JSON stream reader internal error");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EEndOfInputReached",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"End of JSON input reached.");
-        return this;
-      };
-    });
-    this.$init = function () {
-      pas.System.TObject.$init.call(this);
-      this.FStream = null;
-      this.FReadStream = null;
-    };
-    this.$final = function () {
-      this.FStream = undefined;
-      this.FReadStream = undefined;
-      pas.System.TObject.$final.call(this);
-    };
-    this.Create$1 = function (aStream) {
-      this.FStream = aStream;
-      this.FReadStream = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[""]);
-      this.FReadStream.CopyFrom(this.FStream,this.FStream.FSize);
-      this.FReadStream.FPosition = 0;
-      return this;
-    };
-    this.Destroy = function () {
-      rtl.free(this,"FReadStream");
-      pas.System.TObject.Destroy.call(this);
-    };
-    this.NextChar = function () {
-      var Result = "";
-      if (this.Eof()) throw this.EEndOfInputReached.$create("Create$2");
-      Result = this.ReadChar();
-      return Result;
-    };
-    this.PeekChar = function () {
-      var Result = "";
-      var p = 0;
-      p = this.FReadStream.FPosition;
-      Result = this.ReadChar();
-      this.FReadStream.FPosition = p;
-      return Result;
-    };
-    this.ReadChar = function () {
-      var Result = "";
-      var i = 0;
-      i = 1;
-      if (this.FReadStream.FPosition < this.FReadStream.FSize) {
-        Result = this.FReadStream.ReadString(1).charAt(i - 1)}
-       else Result = "\x00";
-      return Result;
-    };
-    this.Backup = function (c) {
-      this.FReadStream.FPosition = this.FReadStream.FPosition - 1;
-    };
-    this.MoveNext = function (Count) {
-      this.FReadStream.FPosition = this.FReadStream.FPosition + Count;
-    };
-    this.Eof = function () {
-      var Result = false;
-      Result = this.FReadStream.FPosition === this.FReadStream.FSize;
-      return Result;
-    };
-  });
-  this.TTMSFNCJSONToken = {"0": "jstoBeginObject", jstoBeginObject: 0, "1": "jstoEndObject", jstoEndObject: 1, "2": "jstoBeginArray", jstoBeginArray: 2, "3": "jstoEndArray", jstoEndArray: 3, "4": "jstoName", jstoName: 4, "5": "jstoBoolean", jstoBoolean: 5, "6": "jstoNull", jstoNull: 6, "7": "jstoText", jstoText: 7, "8": "jstoNumber", jstoNumber: 8, "9": "jstoEOF", jstoEOF: 9};
-  $mod.$rtti.$Enum("TTMSFNCJSONToken",{minvalue: 0, maxvalue: 9, ordtype: 1, enumtype: this.TTMSFNCJSONToken});
-  rtl.createClass($mod,"TTMSFNCJSONReader",pas.System.TObject,function () {
-    this.TTMSFNCJSONState = {"0": "jstNone", jstNone: 0, "1": "jstBeginObject", jstBeginObject: 1, "2": "jstEndObject", jstEndObject: 2, "3": "jstBeginArray", jstBeginArray: 3, "4": "jstEndArray", jstEndArray: 4, "5": "jstTrue", jstTrue: 5, "6": "jstFalse", jstFalse: 6, "7": "jstNull", jstNull: 7, "8": "jstDoubleQuoted", jstDoubleQuoted: 8, "9": "jstBuffered", jstBuffered: 9, "10": "jstDoubleQuotedName", jstDoubleQuotedName: 10, "11": "jstInt64", jstInt64: 11, "12": "jstNumber", jstNumber: 12, "13": "jstEOF", jstEOF: 13};
-    $mod.$rtti.$Enum("TTMSFNCJSONReader.TTMSFNCJSONState",{minvalue: 0, maxvalue: 13, ordtype: 1, enumtype: this.TTMSFNCJSONState});
-    this.TTMSFNCJSONNumberState = {"0": "jnstNone", jnstNone: 0, "1": "jnstSign", jnstSign: 1, "2": "jnstDigit", jnstDigit: 2, "3": "jnstDecimal", jnstDecimal: 3, "4": "jnstFraction", jnstFraction: 4, "5": "jnstExpE", jnstExpE: 5, "6": "jnstExpSign", jnstExpSign: 6, "7": "jnstExpDigit", jnstExpDigit: 7};
-    $mod.$rtti.$Enum("TTMSFNCJSONReader.TTMSFNCJSONNumberState",{minvalue: 0, maxvalue: 7, ordtype: 1, enumtype: this.TTMSFNCJSONNumberState});
-    this.TTMSFNCJSONScope = {"0": "jscEmptyDocument", jscEmptyDocument: 0, "1": "jscEmptyArray", jscEmptyArray: 1, "2": "jscEmptyObject", jscEmptyObject: 2, "3": "jscNonEmptyDocument", jscNonEmptyDocument: 3, "4": "jscNonEmptyArray", jscNonEmptyArray: 4, "5": "jscNonEmptyObject", jscNonEmptyObject: 5, "6": "jscDanglingName", jscDanglingName: 6};
-    $mod.$rtti.$Enum("TTMSFNCJSONReader.TTMSFNCJSONScope",{minvalue: 0, maxvalue: 6, ordtype: 1, enumtype: this.TTMSFNCJSONScope});
-    rtl.createClass(this,"EInvalidStateException",pas.SysUtils.Exception,function () {
-      this.Create$2 = function (AState) {
-        pas.SysUtils.Exception.CreateFmt.call(this,"Invalid Json parser state. Expected state: %d",[AState]);
-        return this;
-      };
-    });
-    rtl.createClass(this,"EUnterminatedArray",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Unterminated array");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EUnterminatedObject",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Unterminated object");
-        return this;
-      };
-    });
-    rtl.createClass(this,"ENameExpected",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Name expected");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EColonExpected",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Colon expected");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EReaderClosed",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Reader already closed");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EMultipleRootNotAllowed",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Multiple root values not allowed");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EExpectedValue",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Value expected but invalid character found");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EObjectOrArrayExpected",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Object or array expected as top-level value");
-        return this;
-      };
-    });
-    rtl.createClass(this,"ETooManyDepthLevels",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Maximum level of nested structured reached.");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EInvalidEscaped",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Invalid escaped sequence");
-        return this;
-      };
-    });
-    this.MaxNumberBuffer = 255;
-    this.MaxStackSize = 255;
-    this.$init = function () {
-      pas.System.TObject.$init.call(this);
-      this.FReader = null;
-      this.FStack = rtl.arraySetLength(null,0,256);
-      this.FStackSize = 0;
-      this.FPeeked = 0;
-      this.FPeekedInt64 = 0;
-      this.FPeekedNumber = rtl.arraySetLength(null,"",256);
-      this.FPeekedString = "";
-    };
-    this.$final = function () {
-      this.FReader = undefined;
-      this.FStack = undefined;
-      this.FPeekedNumber = undefined;
-      pas.System.TObject.$final.call(this);
-    };
-    this.NextPeek = function () {
-      var Result = 0;
-      if (this.FPeeked === this.TTMSFNCJSONState.jstNone) this.FPeeked = this.DoPeek();
-      Result = this.FPeeked;
-      return Result;
-    };
-    this.CheckState = function (State) {
-      if (this.NextPeek() !== State) throw this.EInvalidStateException.$create("Create$2",[State]);
-    };
-    this.SkipChar = function () {
-      this.FReader.MoveNext(1);
-      while (this.FReader.PeekChar().charCodeAt() in $impl.Wspace) this.FReader.MoveNext(1);
-    };
-    this.IsLiteral = function (C) {
-      var Result = false;
-      Result = !pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.CharInSet(C,pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.CreateCharSet("\/\\;#{}[]:,' \r\n\f\t"));
-      return Result;
-    };
-    this.IsDigit = function (C) {
-      var Result = false;
-      Result = (C <= "ÿ") && pas["WEBLib.TMSFNCTypes"].CharIsNumber(C);
-      return Result;
-    };
-    this.DoPeek = function () {
-      var Result = 0;
-      var FPeekStack = 0;
-      var C = "";
-      FPeekStack = this.FStack[this.FStackSize - 1];
-      if (FPeekStack === this.TTMSFNCJSONScope.jscEmptyArray) {
-        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscNonEmptyArray}
-       else if (FPeekStack === this.TTMSFNCJSONScope.jscNonEmptyArray) {
-        C = this.NextNonWhitespace();
-        var $tmp1 = C;
-        if ($tmp1 === "]") {
-          this.SkipChar();
-          this.FPeeked = this.TTMSFNCJSONState.jstEndArray;
-          return this.FPeeked;
-        } else if ($tmp1 === ",") {
-          this.SkipChar()}
-         else {
-          throw this.EUnterminatedArray.$create("Create$2");
-        };
-      } else if (FPeekStack in rtl.createSet(this.TTMSFNCJSONScope.jscEmptyObject,this.TTMSFNCJSONScope.jscNonEmptyObject)) {
-        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscDanglingName;
-        if (FPeekStack === this.TTMSFNCJSONScope.jscNonEmptyObject) {
-          C = this.NextNonWhitespace();
-          var $tmp2 = C;
-          if ($tmp2 === "}") {
-            this.SkipChar();
-            this.FPeeked = this.TTMSFNCJSONState.jstEndObject;
-            return this.FPeeked;
-          } else if ($tmp2 === ",") {
-            this.SkipChar()}
-           else {
-            throw this.EUnterminatedObject.$create("Create$2");
-          };
-        };
-        C = this.NextNonWhitespace();
-        var $tmp3 = C;
-        if ($tmp3 === '"') {
-          this.SkipChar();
-          this.FPeeked = this.TTMSFNCJSONState.jstDoubleQuotedName;
-          return this.FPeeked;
-        } else if ($tmp3 === "}") {
-          if (FPeekStack !== this.TTMSFNCJSONScope.jscNonEmptyObject) {
-            this.SkipChar();
-            this.FPeeked = this.TTMSFNCJSONState.jstEndObject;
-            return this.FPeeked;
-          } else throw this.ENameExpected.$create("Create$2")}
-         else {
-          throw this.ENameExpected.$create("Create$2");
-        };
-      } else if (FPeekStack === this.TTMSFNCJSONScope.jscDanglingName) {
-        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscNonEmptyObject;
-        C = this.NextNonWhitespace();
-        if (C === ":") {
-          this.SkipChar()}
-         else throw this.EColonExpected.$create("Create$2");
-      } else if (FPeekStack === this.TTMSFNCJSONScope.jscEmptyDocument) {
-        this.FStack[this.FStackSize - 1] = this.TTMSFNCJSONScope.jscNonEmptyDocument}
-       else if (FPeekStack === this.TTMSFNCJSONScope.jscNonEmptyDocument) {
-        if (this.SkipWhitespaceUntilEnd()) {
-          this.FPeeked = this.TTMSFNCJSONState.jstEOF;
-          return this.FPeeked;
-        } else throw this.EMultipleRootNotAllowed.$create("Create$2");
-      };
-      C = this.NextNonWhitespace();
-      var $tmp4 = C;
-      if ($tmp4 === "]") {
-        if (FPeekStack === this.TTMSFNCJSONScope.jscEmptyArray) {
-          this.SkipChar();
-          this.FPeeked = this.TTMSFNCJSONState.jstEndArray;
-          return this.FPeeked;
-        } else throw this.EExpectedValue.$create("Create$2")}
-       else if ($tmp4 === '"') {
-        if (this.FStackSize === 1) throw this.EObjectOrArrayExpected.$create("Create$2");
-        this.SkipChar();
-        this.FPeeked = this.TTMSFNCJSONState.jstDoubleQuoted;
-        return this.FPeeked;
-      } else if ($tmp4 === "[") {
-        this.SkipChar();
-        this.FPeeked = this.TTMSFNCJSONState.jstBeginArray;
-        return this.FPeeked;
-      } else if ($tmp4 === "{") {
-        this.SkipChar();
-        this.FPeeked = this.TTMSFNCJSONState.jstBeginObject;
-        return this.FPeeked;
-      };
-      if (this.FStackSize === 1) throw this.EObjectOrArrayExpected.$create("Create$2");
-      Result = this.PeekKeyword();
-      if (Result !== this.TTMSFNCJSONState.jstNone) return Result;
-      Result = this.PeekNumber();
-      if (Result !== this.TTMSFNCJSONState.jstNone) return Result;
-      throw this.EExpectedValue.$create("Create$2");
-      return Result;
-    };
-    this.PushScope = function (Scope) {
-      if (this.FStackSize > 255) throw this.ETooManyDepthLevels.$create("Create$2");
-      this.FStack[this.FStackSize] = Scope;
-      this.FStackSize += 1;
-    };
-    this.NextNonWhitespace = function () {
-      var Result = "";
-      var s = "";
-      var p = 0;
-      p = this.FReader.FReadStream.FPosition;
-      Result = "\x00";
-      s = this.ReadChar();
-      do {
-        if ((s > " ") || !(s.charCodeAt() in $impl.Wspace)) {
-          this.FReader.FReadStream.FPosition = p;
-          return s;
-        };
-        s = this.ReadChar();
-      } while (!this.FReader.Eof());
-      this.FReader.FReadStream.FPosition = p;
-      return Result;
-    };
-    this.ReadChar = function () {
-      var Result = "";
-      Result = this.FReader.ReadChar();
-      return Result;
-    };
-    this.PeekKeyword = function () {
-      var Result = 0;
-      var $tmp1 = this.FReader.PeekChar();
-      if (($tmp1 === "t") || ($tmp1 === "T")) {
-        this.FReader.MoveNext(1);
-        var $tmp2 = this.FReader.NextChar();
-        if (($tmp2 === "r") || ($tmp2 === "R")) {
-          var $tmp3 = this.FReader.NextChar();
-          if (($tmp3 === "u") || ($tmp3 === "U")) {
-            var $tmp4 = this.FReader.NextChar();
-            if (($tmp4 === "e") || ($tmp4 === "E")) if (this.FReader.Eof() || !this.IsLiteral(this.FReader.PeekChar())) return this.TTMSFNCJSONState.jstTrue;
-          };
-        };
-      } else if (($tmp1 === "f") || ($tmp1 === "F")) {
-        this.FReader.MoveNext(1);
-        var $tmp5 = this.FReader.NextChar();
-        if (($tmp5 === "a") || ($tmp5 === "A")) {
-          var $tmp6 = this.FReader.NextChar();
-          if (($tmp6 === "l") || ($tmp6 === "L")) {
-            var $tmp7 = this.FReader.NextChar();
-            if (($tmp7 === "s") || ($tmp7 === "S")) {
-              var $tmp8 = this.FReader.NextChar();
-              if (($tmp8 === "e") || ($tmp8 === "E")) if (this.FReader.Eof() || !this.IsLiteral(this.FReader.PeekChar())) return this.TTMSFNCJSONState.jstFalse;
-            };
-          };
-        };
-      } else if (($tmp1 === "n") || ($tmp1 === "N")) {
-        this.FReader.MoveNext(1);
-        var $tmp9 = this.FReader.NextChar();
-        if (($tmp9 === "u") || ($tmp9 === "U")) {
-          var $tmp10 = this.FReader.NextChar();
-          if (($tmp10 === "l") || ($tmp10 === "L")) {
-            var $tmp11 = this.FReader.NextChar();
-            if (($tmp11 === "l") || ($tmp11 === "L")) if (this.FReader.Eof() || !this.IsLiteral(this.FReader.PeekChar())) return this.TTMSFNCJSONState.jstNull;
-          };
-        };
-      } else {
-        return this.TTMSFNCJSONState.jstNone;
-      };
-      throw this.EExpectedValue.$create("Create$2");
-      return Result;
-    };
-    var MinIncompleteInteger = Math.floor(-4503599627370496 / 10);
-    this.PeekNumber = function () {
-      var Result = 0;
-      var Last = 0;
-      var Negative = false;
-      var FitsInInt64 = false;
-      var Value = 0;
-      var NewValue = 0;
-      var C = "";
-      var BufIndex = 0;
-      C = this.FReader.PeekChar();
-      if ((C !== "-") && !this.IsDigit(C)) return this.TTMSFNCJSONState.jstNone;
-      Negative = false;
-      FitsInInt64 = true;
-      Last = this.TTMSFNCJSONNumberState.jnstNone;
-      BufIndex = 0;
-      Value = -1;
-      do {
-        if (BufIndex >= 255) throw this.EExpectedValue.$create("Create$2");
-        C = this.FReader.NextChar();
-        this.FPeekedNumber[BufIndex] = C;
-        BufIndex += 1;
-        var $tmp1 = C;
-        if ($tmp1 === "-") {
-          if (Last === this.TTMSFNCJSONNumberState.jnstNone) {
-            Negative = true;
-            Last = this.TTMSFNCJSONNumberState.jnstSign;
-            continue;
-          } else if (Last === this.TTMSFNCJSONNumberState.jnstExpE) {
-            Last = this.TTMSFNCJSONNumberState.jnstExpSign;
-            continue;
-          } else throw this.EExpectedValue.$create("Create$2")}
-         else if ($tmp1 === "+") {
-          if (Last === this.TTMSFNCJSONNumberState.jnstExpE) {
-            Last = this.TTMSFNCJSONNumberState.jnstExpSign;
-            continue;
-          } else throw this.EExpectedValue.$create("Create$2")}
-         else if (($tmp1 === "e") || ($tmp1 === "E")) {
-          if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstDigit,this.TTMSFNCJSONNumberState.jnstFraction)) {
-            Last = this.TTMSFNCJSONNumberState.jnstExpE;
-            continue;
-          } else throw this.EExpectedValue.$create("Create$2")}
-         else if ($tmp1 === ".") {
-          if (Last === this.TTMSFNCJSONNumberState.jnstDigit) {
-            Last = this.TTMSFNCJSONNumberState.jnstDecimal;
-            continue;
-          } else throw this.EExpectedValue.$create("Create$2")}
-         else {
-          if (!this.IsDigit(C)) if (!this.IsLiteral(C)) {
-            this.FReader.Backup(C);
-            BufIndex -= 1;
-            break;
-          } else throw this.EExpectedValue.$create("Create$2");
-          if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstSign,this.TTMSFNCJSONNumberState.jnstNone)) {
-            Value = -(C.charCodeAt() - 48);
-            Last = this.TTMSFNCJSONNumberState.jnstDigit;
-          } else if (Last === this.TTMSFNCJSONNumberState.jnstDigit) {
-            if (Value === 0) throw this.EExpectedValue.$create("Create$2");
-            NewValue = (Value * 10) - (C.charCodeAt() - 48);
-            FitsInInt64 = FitsInInt64 && ((Value > -450359962737049) || ((Value === -450359962737049) && (NewValue < Value)));
-            Value = NewValue;
-          } else if (Last === this.TTMSFNCJSONNumberState.jnstDecimal) {
-            Last = this.TTMSFNCJSONNumberState.jnstFraction}
-           else if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstExpE,this.TTMSFNCJSONNumberState.jnstExpSign)) Last = this.TTMSFNCJSONNumberState.jnstExpDigit;
-        };
-      } while (!false);
-      if ((Last === this.TTMSFNCJSONNumberState.jnstDigit) && FitsInInt64 && ((Value !== -4503599627370496) || Negative)) {
-        if (Negative) {
-          this.FPeekedInt64 = Value}
-         else this.FPeekedInt64 = -Value;
-        return this.TTMSFNCJSONState.jstInt64;
-      } else if (Last in rtl.createSet(this.TTMSFNCJSONNumberState.jnstDigit,this.TTMSFNCJSONNumberState.jnstFraction,this.TTMSFNCJSONNumberState.jnstExpDigit)) {
-        this.FPeekedNumber[BufIndex] = "\x00";
-        return this.TTMSFNCJSONState.jstNumber;
-      } else throw this.EExpectedValue.$create("Create$2");
-      return Result;
-    };
-    this.InternalReadQuoted = function (BuildString) {
-      var Result = "";
-      var c = "";
-      var s = "";
-      Result = "";
-      s = "";
-      while (!this.FReader.Eof()) {
-        c = this.ReadChar();
-        if (c === '"') {
-          break}
-         else s = s + c;
-      };
-      if (BuildString) Result = s;
-      return Result;
-    };
-    this.ReadQuoted = function () {
-      var Result = "";
-      Result = this.InternalReadQuoted(true);
-      return Result;
-    };
-    this.SkipQuoted = function () {
-      this.InternalReadQuoted(false);
-    };
-    this.SkipWhitespaceUntilEnd = function () {
-      var Result = false;
-      var s = "";
-      var p = 0;
-      p = this.FReader.FReadStream.FPosition;
-      Result = true;
-      s = this.ReadChar();
-      do {
-        if ((s > " ") || !(s.charCodeAt() in $impl.Wspace)) {
-          this.FReader.FReadStream.FPosition = p;
-          return false;
-        };
-        s = this.ReadChar();
-      } while (!this.FReader.Eof());
-      this.FReader.FReadStream.FPosition = p;
-      return Result;
-    };
-    this.Create$1 = function (AStream) {
-      pas.System.TObject.Create.call(this);
-      this.FReader = $mod.TTMSFNCJSONStreamReader.$create("Create$1",[AStream]);
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      this.FStack[0] = this.TTMSFNCJSONScope.jscEmptyDocument;
-      this.FStackSize = 1;
-      return this;
-    };
-    this.Destroy = function () {
-      rtl.free(this,"FReader");
-      pas.System.TObject.Destroy.call(this);
-    };
-    this.ReadBeginArray = function () {
-      this.CheckState(this.TTMSFNCJSONState.jstBeginArray);
-      this.PushScope(this.TTMSFNCJSONScope.jscEmptyArray);
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-    };
-    this.ReadEndArray = function () {
-      this.CheckState(this.TTMSFNCJSONState.jstEndArray);
-      this.FStackSize -= 1;
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-    };
-    this.ReadBeginObject = function () {
-      this.CheckState(this.TTMSFNCJSONState.jstBeginObject);
-      this.PushScope(this.TTMSFNCJSONScope.jscEmptyObject);
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-    };
-    this.ReadEndObject = function () {
-      this.CheckState(this.TTMSFNCJSONState.jstEndObject);
-      this.FStackSize -= 1;
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-    };
-    this.ReadName = function () {
-      var Result = "";
-      this.CheckState(this.TTMSFNCJSONState.jstDoubleQuotedName);
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      Result = this.ReadQuoted();
-      return Result;
-    };
-    this.ReadString = function () {
-      var Result = "";
-      var $tmp1 = this.NextPeek();
-      if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
-        Result = this.ReadQuoted()}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
-        Result = pas.SysUtils.IntToStr(this.FPeekedInt64)}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
-        Result = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0))}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {
-        Result = this.FPeekedString}
-       else {
-        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstDoubleQuoted]);
-      };
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      Result = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.UnescapeString(Result);
-      return Result;
-    };
-    this.ReadBoolean = function () {
-      var Result = false;
-      var $tmp1 = this.NextPeek();
-      if ($tmp1 === this.TTMSFNCJSONState.jstTrue) {
-        Result = true}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstFalse) {
-        Result = false}
-       else {
-        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstTrue]);
-      };
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      return Result;
-    };
-    this.ReadDouble = function () {
-      var Result = 0.0;
-      var $tmp1 = this.NextPeek();
-      if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
-        this.FPeeked = this.TTMSFNCJSONState.jstNone;
-        return this.FPeekedInt64;
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
-        if (pas.SysUtils.TryStrToFloat($impl.ArrayOfCharToString(this.FPeekedNumber.slice(0)),{get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }})) {
-          this.FPeeked = this.TTMSFNCJSONState.jstNone;
-          return Result;
-        } else this.FPeekedString = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0));
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
-        this.FPeekedString = this.ReadQuoted()}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {}
-      else {
-        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstNumber]);
-      };
-      this.FPeeked = this.TTMSFNCJSONState.jstBuffered;
-      Result = pas.SysUtils.StrToFloat(this.FPeekedString);
-      this.FPeekedString = "";
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      return Result;
-    };
-    this.ReadInt64 = function () {
-      var Result = 0;
-      var AsDouble = 0.0;
-      var $tmp1 = this.NextPeek();
-      if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
-        this.FPeeked = this.TTMSFNCJSONState.jstNone;
-        return this.FPeekedInt64;
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
-        if (pas.SysUtils.TryStrToInt64($impl.ArrayOfCharToString(this.FPeekedNumber.slice(0)),{get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }})) {
-          this.FPeeked = this.TTMSFNCJSONState.jstNone;
-          return Result;
-        } else this.FPeekedString = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0));
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
-        this.FPeekedString = this.ReadQuoted();
-        if (pas.SysUtils.TryStrToInt64(this.FPeekedString,{get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }})) {
-          this.FPeeked = this.TTMSFNCJSONState.jstNone;
-          return Result;
-        };
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {}
-      else {
-        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
-      };
-      this.FPeeked = this.TTMSFNCJSONState.jstBuffered;
-      AsDouble = pas.SysUtils.StrToFloat(this.FPeekedString);
-      Result = Math.round(AsDouble);
-      if (AsDouble !== Result) throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
-      this.FPeekedString = "";
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      return Result;
-    };
-    this.ReadInteger = function () {
-      var Result = 0;
-      var AsDouble = 0.0;
-      var $tmp1 = this.NextPeek();
-      if ($tmp1 === this.TTMSFNCJSONState.jstInt64) {
-        Result = this.FPeekedInt64 & 0xFFFFFFFF;
-        if (Result !== this.FPeekedInt64) throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
-        this.FPeeked = this.TTMSFNCJSONState.jstNone;
-        return Result;
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstNumber) {
-        if (pas.SysUtils.TryStrToInt($impl.ArrayOfCharToString(this.FPeekedNumber.slice(0)),{get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }})) {
-          this.FPeeked = this.TTMSFNCJSONState.jstNone;
-          return Result;
-        } else this.FPeekedString = $impl.ArrayOfCharToString(this.FPeekedNumber.slice(0));
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) {
-        this.FPeekedString = this.ReadQuoted();
-        if (pas.SysUtils.TryStrToInt(this.FPeekedString,{get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }})) {
-          this.FPeeked = this.TTMSFNCJSONState.jstNone;
-          return Result;
-        };
-      } else if ($tmp1 === this.TTMSFNCJSONState.jstBuffered) {}
-      else {
-        throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
-      };
-      this.FPeeked = this.TTMSFNCJSONState.jstBuffered;
-      AsDouble = pas.SysUtils.StrToFloat(this.FPeekedString);
-      Result = Math.round(AsDouble);
-      if (AsDouble !== Result) throw this.EInvalidStateException.$create("Create$2",[this.TTMSFNCJSONState.jstInt64]);
-      this.FPeekedString = "";
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      return Result;
-    };
-    this.SkipValue = function () {
-      var Count = 0;
-      Count = 0;
-      do {
-        var $tmp1 = this.NextPeek();
-        if ($tmp1 === this.TTMSFNCJSONState.jstBeginArray) {
-          this.PushScope(this.TTMSFNCJSONScope.jscEmptyArray);
-          Count += 1;
-        } else if ($tmp1 === this.TTMSFNCJSONState.jstBeginObject) {
-          this.PushScope(this.TTMSFNCJSONScope.jscEmptyObject);
-          Count += 1;
-        } else if (($tmp1 === this.TTMSFNCJSONState.jstEndArray) || ($tmp1 === this.TTMSFNCJSONState.jstEndObject)) {
-          this.FStackSize -= 1;
-          Count -= 1;
-        } else if (($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) || ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuotedName)) this.SkipQuoted();
-        this.FPeeked = this.TTMSFNCJSONState.jstNone;
-      } while (!(Count <= 0));
-    };
-    this.ReadNull = function () {
-      this.CheckState(this.TTMSFNCJSONState.jstNull);
-      this.FPeeked = this.TTMSFNCJSONState.jstNone;
-    };
-    this.HasNext = function () {
-      var Result = false;
-      Result = !(this.NextPeek() in rtl.createSet(this.TTMSFNCJSONState.jstEndObject,this.TTMSFNCJSONState.jstEndArray));
-      return Result;
-    };
-    this.Peek = function () {
-      var Result = 0;
-      var $tmp1 = this.NextPeek();
-      if ($tmp1 === this.TTMSFNCJSONState.jstBeginObject) {
-        Result = $mod.TTMSFNCJSONToken.jstoBeginObject}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstEndObject) {
-        Result = $mod.TTMSFNCJSONToken.jstoEndObject}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstBeginArray) {
-        Result = $mod.TTMSFNCJSONToken.jstoBeginArray}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstEndArray) {
-        Result = $mod.TTMSFNCJSONToken.jstoEndArray}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstDoubleQuotedName) {
-        Result = $mod.TTMSFNCJSONToken.jstoName}
-       else if (($tmp1 === this.TTMSFNCJSONState.jstTrue) || ($tmp1 === this.TTMSFNCJSONState.jstFalse)) {
-        Result = $mod.TTMSFNCJSONToken.jstoBoolean}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstNull) {
-        Result = $mod.TTMSFNCJSONToken.jstoNull}
-       else if (($tmp1 === this.TTMSFNCJSONState.jstDoubleQuoted) || ($tmp1 === this.TTMSFNCJSONState.jstBuffered)) {
-        Result = $mod.TTMSFNCJSONToken.jstoText}
-       else if (($tmp1 === this.TTMSFNCJSONState.jstInt64) || ($tmp1 === this.TTMSFNCJSONState.jstNumber)) {
-        Result = $mod.TTMSFNCJSONToken.jstoNumber}
-       else if ($tmp1 === this.TTMSFNCJSONState.jstEOF) {
-        Result = $mod.TTMSFNCJSONToken.jstoEOF}
-       else {
-        Result = $mod.TTMSFNCJSONToken.jstoEOF;
-      };
-      return Result;
-    };
-    this.IsNull = function () {
-      var Result = false;
-      Result = this.Peek() === $mod.TTMSFNCJSONToken.jstoNull;
-      return Result;
-    };
-    this.Eof = function () {
-      var Result = false;
-      Result = this.Peek() === $mod.TTMSFNCJSONToken.jstoEOF;
-      return Result;
-    };
-  });
-},["WEBLib.TMSFNCUtils"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  $impl.Wspace = rtl.createSet(0x20,0xA,0xD,0x9,0xC);
-  $impl.ArrayOfCharToString = function (AArray) {
-    var Result = "";
-    var I = 0;
-    Result = "";
-    for (var $l1 = 0, $end2 = rtl.length(AArray) - 1; $l1 <= $end2; $l1++) {
-      I = $l1;
-      if (AArray[I] === "\x00") break;
-      Result = Result + AArray[I];
-    };
-    return Result;
-  };
-});
-rtl.module("WEBLib.TMSFNCJSONWriter",["System","Classes","SysUtils","WEBLib.TMSFNCTypes"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  rtl.createClass($mod,"TTMSFNCJSONStreamWriter",pas.System.TObject,function () {
-    this.$init = function () {
-      pas.System.TObject.$init.call(this);
-      this.FStream = null;
-      this.FWriteStream = null;
-    };
-    this.$final = function () {
-      this.FStream = undefined;
-      this.FWriteStream = undefined;
-      pas.System.TObject.$final.call(this);
-    };
-    this.Create$1 = function (AStream) {
-      this.FStream = AStream;
-      this.FWriteStream = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[""]);
-      return this;
-    };
-    this.Destroy = function () {
-      try {
-        this.FWriteStream.FPosition = 0;
-        this.FStream.CopyFrom(this.FWriteStream,this.FWriteStream.FSize);
-      } finally {
-        rtl.free(this,"FWriteStream");
-      };
-      pas.System.TObject.Destroy.call(this);
-    };
-    this.Write = function (Value) {
-      this.FWriteStream.WriteString(Value);
-    };
-  });
-  rtl.createClass($mod,"TTMSFNCJSONWriter",pas.System.TObject,function () {
-    rtl.createClass(this,"ECannotWriteName",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Cannot write name in current Json scope");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EMultipleRootNotAllowed",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Multiple root values not allowed");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EObjectOrArrayExpected",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Object or array expected as top-level value");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EInvalidNesting",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Invalid nesting. Not all arrays\/objects were properly closed.");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EMissingValue",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Json value missing");
-        return this;
-      };
-    });
-    rtl.createClass(this,"ETooManyDepthLevels",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Maximum level of nested structured reached.");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EEmptyJson",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Json is still empty. Cannot perform operation.");
-        return this;
-      };
-    });
-    rtl.createClass(this,"EEmptyName",pas.SysUtils.Exception,function () {
-      this.Create$2 = function () {
-        pas.SysUtils.Exception.Create$1.call(this,"Cannot write empty name");
-        return this;
-      };
-    });
-    this.TTMSFNCJSONScope = {"0": "jscEmptyDocument", jscEmptyDocument: 0, "1": "jscEmptyArray", jscEmptyArray: 1, "2": "jscEmptyObject", jscEmptyObject: 2, "3": "jscNonEmptyDocument", jscNonEmptyDocument: 3, "4": "jscNonEmptyArray", jscNonEmptyArray: 4, "5": "jscNonEmptyObject", jscNonEmptyObject: 5, "6": "jscDanglingName", jscDanglingName: 6};
-    $mod.$rtti.$Enum("TTMSFNCJSONWriter.TTMSFNCJSONScope",{minvalue: 0, maxvalue: 6, ordtype: 1, enumtype: this.TTMSFNCJSONScope});
-    this.MaxStackSize = 255;
-    this.$init = function () {
-      pas.System.TObject.$init.call(this);
-      this.FWriter = null;
-      this.FStack = rtl.arraySetLength(null,0,256);
-      this.FStackSize = 0;
-      this.FIndent = "";
-      this.FSeparator = "";
-      this.FDeferredName = "";
-      this.FClosed = false;
-    };
-    this.$final = function () {
-      this.FWriter = undefined;
-      this.FStack = undefined;
-      pas.System.TObject.$final.call(this);
-    };
-    this.SetIndentLength = function (Value) {
-      if (Value <= 0) {
-        this.FIndent = "";
-        this.FSeparator = ":";
-      } else {
-        this.FIndent = pas.System.StringOfChar(" ",Value);
-        this.FSeparator = ": ";
-      };
-    };
-    this.GetIndentLength = function () {
-      var Result = 0;
-      Result = this.FIndent.length;
-      return Result;
-    };
-    this.OpenItem = function (Empty, OpenBracket) {
-      var Result = null;
-      this.BeforeValue(true);
-      this.PushScope(Empty);
-      this.FWriter.Write(OpenBracket);
-      Result = this;
-      return Result;
-    };
-    this.CloseItem = function (Empty, NonEmpty, CloseBracket) {
-      var Result = null;
-      var Context = 0;
-      Context = this.PeekScope();
-      if (!(Context in rtl.createSet(Empty,NonEmpty))) throw this.EInvalidNesting.$create("Create$2");
-      if (this.FDeferredName !== "") throw this.EMissingValue.$create("Create$2");
-      this.FStackSize -= 1;
-      if (Context === NonEmpty) this.NewLine();
-      this.FWriter.Write(CloseBracket);
-      Result = this;
-      return Result;
-    };
-    this.PushScope = function (Scope) {
-      if (this.FStackSize > 255) throw this.ETooManyDepthLevels.$create("Create$2");
-      this.FStack[this.FStackSize] = Scope;
-      this.FStackSize += 1;
-    };
-    this.PeekScope = function () {
-      var Result = 0;
-      if (this.FStackSize === 0) throw this.EEmptyJson.$create("Create$2");
-      Result = this.FStack[this.FStackSize - 1];
-      return Result;
-    };
-    this.ReplaceTop = function (Scope) {
-      if (this.FStackSize === 0) throw this.EEmptyJson.$create("Create$2");
-      this.FStack[this.FStackSize - 1] = Scope;
-    };
-    this.WriteDeferredName = function () {
-      if (this.FDeferredName !== "") {
-        this.BeforeName();
-        this.InternalWriteString(this.FDeferredName);
-        this.FDeferredName = "";
-      };
-    };
-    this.InternalWriteString = function (Value) {
-      this.FWriter.Write('"');
-      this.FWriter.Write(pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.EscapeString(Value));
-      this.FWriter.Write('"');
-    };
-    this.NewLine = function () {
-      var I = 0;
-      if (this.FIndent !== "") {
-        this.FWriter.Write("\r\n");
-        for (var $l1 = 1, $end2 = this.FStackSize - 1; $l1 <= $end2; $l1++) {
-          I = $l1;
-          this.FWriter.Write(this.FIndent);
-        };
-      };
-    };
-    this.BeforeName = function () {
-      var $tmp1 = this.PeekScope();
-      if ($tmp1 === this.TTMSFNCJSONScope.jscNonEmptyObject) {
-        this.FWriter.Write(",")}
-       else if ($tmp1 === this.TTMSFNCJSONScope.jscEmptyObject) {}
-      else {
-        throw this.ECannotWriteName.$create("Create$2");
-      };
-      this.NewLine();
-      this.ReplaceTop(this.TTMSFNCJSONScope.jscDanglingName);
-    };
-    this.BeforeValue = function (Root) {
-      var $tmp1 = this.PeekScope();
-      if ($tmp1 === this.TTMSFNCJSONScope.jscNonEmptyDocument) {
-        throw this.EMultipleRootNotAllowed.$create("Create$2")}
-       else if ($tmp1 === this.TTMSFNCJSONScope.jscEmptyDocument) {
-        if (!Root) throw this.EObjectOrArrayExpected.$create("Create$2");
-        this.ReplaceTop(this.TTMSFNCJSONScope.jscNonEmptyDocument);
-      } else if ($tmp1 === this.TTMSFNCJSONScope.jscEmptyArray) {
-        this.ReplaceTop(this.TTMSFNCJSONScope.jscNonEmptyArray);
-        this.NewLine();
-      } else if ($tmp1 === this.TTMSFNCJSONScope.jscNonEmptyArray) {
-        this.FWriter.Write(",");
-        this.NewLine();
-      } else if ($tmp1 === this.TTMSFNCJSONScope.jscDanglingName) {
-        this.FWriter.Write(this.FSeparator);
-        this.ReplaceTop(this.TTMSFNCJSONScope.jscNonEmptyObject);
-      } else {
-        throw this.EInvalidNesting.$create("Create$2");
-      };
-    };
-    this.Create$1 = function (AStream) {
-      pas.System.TObject.Create.call(this);
-      this.FWriter = $mod.TTMSFNCJSONStreamWriter.$create("Create$1",[AStream]);
-      this.FSeparator = ":";
-      this.PushScope(this.TTMSFNCJSONScope.jscEmptyDocument);
-      return this;
-    };
-    this.Destroy = function () {
-      rtl.free(this,"FWriter");
-      pas.System.TObject.Destroy.call(this);
-    };
-    this.WriteBeginArray = function () {
-      var Result = null;
-      this.WriteDeferredName();
-      Result = this.OpenItem(this.TTMSFNCJSONScope.jscEmptyArray,"[");
-      return Result;
-    };
-    this.WriteEndArray = function () {
-      var Result = null;
-      Result = this.CloseItem(this.TTMSFNCJSONScope.jscEmptyArray,this.TTMSFNCJSONScope.jscNonEmptyArray,"]");
-      return Result;
-    };
-    this.WriteBeginObject = function () {
-      var Result = null;
-      this.WriteDeferredName();
-      Result = this.OpenItem(this.TTMSFNCJSONScope.jscEmptyObject,"{");
-      return Result;
-    };
-    this.WriteEndObject = function () {
-      var Result = null;
-      Result = this.CloseItem(this.TTMSFNCJSONScope.jscEmptyObject,this.TTMSFNCJSONScope.jscNonEmptyObject,"}");
-      return Result;
-    };
-    this.WriteName = function (Name) {
-      var Result = null;
-      if (Name === "") throw this.EEmptyName.$create("Create$2");
-      if (this.FDeferredName !== "") throw this.EMissingValue.$create("Create$2");
-      if (this.FStackSize === 0) throw this.EEmptyJson.$create("Create$2");
-      this.FDeferredName = Name;
-      Result = this;
-      return Result;
-    };
-    this.WriteString = function (Value) {
-      var Result = null;
-      this.WriteDeferredName();
-      this.BeforeValue(false);
-      this.InternalWriteString(Value);
-      Result = this;
-      return Result;
-    };
-    this.WriteRawString = function (Value) {
-      var Result = null;
-      this.WriteDeferredName();
-      this.BeforeValue(false);
-      this.FWriter.Write('"');
-      this.FWriter.Write(Value);
-      this.FWriter.Write('"');
-      Result = this;
-      return Result;
-    };
-    this.WriteBoolean = function (Value) {
-      var Result = null;
-      this.WriteDeferredName();
-      this.BeforeValue(false);
-      if (Value) {
-        this.FWriter.Write("true")}
-       else this.FWriter.Write("false");
-      Result = this;
-      return Result;
-    };
-    this.WriteNull = function () {
-      var Result = null;
-      this.WriteDeferredName();
-      this.BeforeValue(false);
-      this.FWriter.Write("null");
-      Result = this;
-      return Result;
-    };
-    this.WriteDouble = function (Value) {
-      var Result = null;
-      this.WriteDeferredName();
-      this.BeforeValue(false);
-      this.FWriter.Write(pas.SysUtils.FloatToStr(Value));
-      Result = this;
-      return Result;
-    };
-    this.WriteInteger = function (Value) {
-      var Result = null;
-      this.WriteDeferredName();
-      this.BeforeValue(false);
-      this.FWriter.Write(pas.SysUtils.IntToStr(Value));
-      Result = this;
-      return Result;
-    };
-    this.Close = function () {
-      if ((this.FStackSize > 1) || ((this.FStackSize === 1) && (this.PeekScope() !== this.TTMSFNCJSONScope.jscNonEmptyDocument))) throw this.EInvalidNesting.$create("Create$2");
-      this.FClosed = true;
-    };
-  });
-},["WEBLib.TMSFNCUtils"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  $impl.RaiseErrInvalidString = function () {
-    throw pas.SysUtils.Exception.$create("Create$1",[rtl.getResStr(pas["WEBLib.TMSFNCJSONWriter"],"ErrInvalidString")]);
-  };
-  $mod.$resourcestrings = {ErrInvalidString: {org: "The file contains a string that can't be encoded in UTF-8"}};
-});
-rtl.module("strutils",["System","SysUtils"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  this.AnsiResemblesText = function (AText, AOther) {
-    var Result = false;
-    if ($mod.AnsiResemblesProc != null) {
-      Result = $mod.AnsiResemblesProc(AText,AOther)}
-     else Result = false;
-    return Result;
-  };
-  this.AnsiContainsText = function (AText, ASubText) {
-    var Result = false;
-    Result = pas.System.Pos(pas.SysUtils.UpperCase(ASubText),pas.SysUtils.UpperCase(AText)) > 0;
-    return Result;
-  };
-  this.AnsiStartsText = function (ASubText, AText) {
-    var Result = false;
-    if ((AText.length >= ASubText.length) && (ASubText !== "")) {
-      Result = pas.SysUtils.SameText(ASubText,pas.System.Copy(AText,1,ASubText.length))}
-     else Result = false;
-    return Result;
-  };
-  this.AnsiEndsText = function (ASubText, AText) {
-    var Result = false;
-    if (AText.length >= ASubText.length) {
-      Result = pas.SysUtils.SameText(ASubText,$mod.RightStr(AText,ASubText.length))}
-     else Result = false;
-    return Result;
-  };
-  this.AnsiReplaceText = function (AText, AFromText, AToText) {
-    var Result = "";
-    Result = pas.SysUtils.StringReplace(AText,AFromText,AToText,rtl.createSet(pas.SysUtils.TStringReplaceFlag.rfReplaceAll,pas.SysUtils.TStringReplaceFlag.rfIgnoreCase));
-    return Result;
-  };
-  this.AnsiMatchText = function (AText, AValues) {
-    var Result = false;
-    Result = $mod.AnsiIndexText(AText,AValues) !== -1;
-    return Result;
-  };
-  this.AnsiIndexText = function (AText, AValues) {
-    var Result = 0;
-    var i = 0;
-    Result = -1;
-    if (((rtl.length(AValues) - 1) === -1) || ((rtl.length(AValues) - 1) > 2147483647)) return Result;
-    for (var $l1 = 0, $end2 = rtl.length(AValues) - 1; $l1 <= $end2; $l1++) {
-      i = $l1;
-      if (pas.SysUtils.CompareText(AValues[i],AText) === 0) return i;
-    };
-    return Result;
-  };
-  this.StartsText = function (ASubText, AText) {
-    var Result = false;
-    Result = $mod.AnsiStartsText(ASubText,AText);
-    return Result;
-  };
-  this.EndsText = function (ASubText, AText) {
-    var Result = false;
-    Result = $mod.AnsiEndsText(ASubText,AText);
-    return Result;
-  };
-  this.ResemblesText = function (AText, AOther) {
-    var Result = false;
-    if ($mod.ResemblesProc != null) {
-      Result = $mod.ResemblesProc(AText,AOther)}
-     else Result = false;
-    return Result;
-  };
-  this.ContainsText = function (AText, ASubText) {
-    var Result = false;
-    Result = $mod.AnsiContainsText(AText,ASubText);
-    return Result;
-  };
-  this.MatchText = function (AText, AValues) {
-    var Result = false;
-    Result = $mod.AnsiMatchText(AText,AValues);
-    return Result;
-  };
-  this.IndexText = function (AText, AValues) {
-    var Result = 0;
-    Result = $mod.AnsiIndexText(AText,AValues);
-    return Result;
-  };
-  this.AnsiContainsStr = function (AText, ASubText) {
-    var Result = false;
-    Result = pas.System.Pos(ASubText,AText) > 0;
-    return Result;
-  };
-  this.AnsiStartsStr = function (ASubText, AText) {
-    var Result = false;
-    if ((AText.length >= ASubText.length) && (ASubText !== "")) {
-      Result = ASubText === pas.System.Copy(AText,1,ASubText.length)}
-     else Result = false;
-    return Result;
-  };
-  this.AnsiEndsStr = function (ASubText, AText) {
-    var Result = false;
-    if (AText.length >= ASubText.length) {
-      Result = ASubText === $mod.RightStr(AText,ASubText.length)}
-     else Result = false;
-    return Result;
-  };
-  this.AnsiReplaceStr = function (AText, AFromText, AToText) {
-    var Result = "";
-    Result = pas.SysUtils.StringReplace(AText,AFromText,AToText,rtl.createSet(pas.SysUtils.TStringReplaceFlag.rfReplaceAll));
-    return Result;
-  };
-  this.AnsiMatchStr = function (AText, AValues) {
-    var Result = false;
-    Result = $mod.AnsiIndexStr(AText,AValues) !== -1;
-    return Result;
-  };
-  this.AnsiIndexStr = function (AText, AValues) {
-    var Result = 0;
-    var i = 0;
-    Result = -1;
-    if (((rtl.length(AValues) - 1) === -1) || ((rtl.length(AValues) - 1) > 2147483647)) return Result;
-    for (var $l1 = 0, $end2 = rtl.length(AValues) - 1; $l1 <= $end2; $l1++) {
-      i = $l1;
-      if (AValues[i] === AText) return i;
-    };
-    return Result;
-  };
-  this.MatchStr = function (AText, AValues) {
-    var Result = false;
-    Result = $mod.IndexStr(AText,AValues) !== -1;
-    return Result;
-  };
-  this.IndexStr = function (AText, AValues) {
-    var Result = 0;
-    var i = 0;
-    Result = -1;
-    if (((rtl.length(AValues) - 1) === -1) || ((rtl.length(AValues) - 1) > 2147483647)) return Result;
-    for (var $l1 = 0, $end2 = rtl.length(AValues) - 1; $l1 <= $end2; $l1++) {
-      i = $l1;
-      if (AValues[i] === AText) return i;
-    };
-    return Result;
-  };
-  this.ContainsStr = function (AText, ASubText) {
-    var Result = false;
-    Result = $mod.AnsiContainsStr(AText,ASubText);
-    return Result;
-  };
-  this.StartsStr = function (ASubText, AText) {
-    var Result = false;
-    Result = $mod.AnsiStartsStr(AText,ASubText);
-    return Result;
-  };
-  this.EndsStr = function (ASubText, AText) {
-    var Result = false;
-    Result = $mod.AnsiEndsStr(AText,ASubText);
-    return Result;
-  };
-  this.DupeString = function (AText, ACount) {
-    var Result = "";
-    var i = 0;
-    Result = "";
-    for (var $l1 = 1, $end2 = ACount; $l1 <= $end2; $l1++) {
-      i = $l1;
-      Result = Result + AText;
-    };
-    return Result;
-  };
-  this.ReverseString = function (AText) {
-    var Result = "";
-    var i = 0;
-    var j = 0;
-    Result = rtl.strSetLength(Result,AText.length);
-    i = 1;
-    j = AText.length;
-    while (i <= j) {
-      Result = rtl.setCharAt(Result,i - 1,AText.charAt(((j - i) + 1) - 1));
-      i += 1;
-    };
-    return Result;
-  };
-  this.AnsiReverseString = function (AText) {
-    var Result = "";
-    Result = $mod.ReverseString(AText);
-    return Result;
-  };
-  this.StuffString = function (AText, AStart, ALength, ASubText) {
-    var Result = "";
-    var i = 0;
-    var j = 0;
-    var k = 0;
-    j = ASubText.length;
-    i = AText.length;
-    if (AStart > i) AStart = i + 1;
-    k = (i + 1) - AStart;
-    if (ALength > k) ALength = k;
-    Result = rtl.strSetLength(Result,(i + j) - ALength);
-    Result = pas.System.Copy(AText,1,AStart - 1) + pas.System.Copy(ASubText,1,j) + pas.System.Copy(AText,AStart + ALength,(i + 1) - AStart - ALength);
-    return Result;
-  };
-  this.RandomFrom = function (AValues) {
-    var Result = "";
-    if ((rtl.length(AValues) - 1) === -1) return "";
-    Result = AValues[pas.System.Random((rtl.length(AValues) - 1) + 1)];
-    return Result;
-  };
-  this.IfThen = function (AValue, ATrue, AFalse) {
-    var Result = "";
-    if (AValue) {
-      Result = ATrue}
-     else Result = AFalse;
-    return Result;
-  };
-  this.NaturalCompareText = function (S1, S2) {
-    var Result = 0;
-    Result = $mod.NaturalCompareText$1(S1,S2,pas.SysUtils.DecimalSeparator,pas.SysUtils.ThousandSeparator);
-    return Result;
-  };
-  this.NaturalCompareText$1 = function (Str1, Str2, ADecSeparator, AThousandSeparator) {
-    var Result = 0;
-    var Num1 = 0.0;
-    var Num2 = 0.0;
-    var pStr1 = 0;
-    var pStr2 = 0;
-    var Len1 = 0;
-    var Len2 = 0;
-    var TextLen1 = 0;
-    var TextLen2 = 0;
-    var TextStr1 = "";
-    var TextStr2 = "";
-    var i = 0;
-    var j = 0;
-    function Sign(AValue) {
-      var Result = 0;
-      if (AValue < 0) {
-        Result = -1}
-       else if (AValue > 0) {
-        Result = 1}
-       else Result = 0;
-      return Result;
-    };
-    function IsNumber(ch) {
-      var Result = false;
-      Result = ch.charCodeAt() in rtl.createSet(null,48,57);
-      return Result;
-    };
-    function GetInteger(aString, pch, Len) {
-      var Result = 0.0;
-      Result = 0;
-      while ((pch.get() <= aString.length) && IsNumber(aString.charAt(pch.get() - 1))) {
-        Result = ((Result * 10) + aString.charCodeAt(pch.get() - 1)) - "0".charCodeAt();
-        Len.set(Len.get() + 1);
-        pch.set(pch.get() + 1);
-      };
-      return Result;
-    };
-    function GetChars() {
-      TextLen1 = 0;
-      while (!(Str1.charCodeAt((pStr1 + TextLen1) - 1) in rtl.createSet(null,48,57)) && ((pStr1 + TextLen1) <= Str1.length)) TextLen1 += 1;
-      TextStr1 = "";
-      i = 1;
-      j = 0;
-      while (i <= TextLen1) {
-        TextStr1 = TextStr1 + Str1.charAt((pStr1 + j) - 1);
-        i += 1;
-        j += 1;
-      };
-      TextLen2 = 0;
-      while (!(Str2.charCodeAt((pStr2 + TextLen2) - 1) in rtl.createSet(null,48,57)) && ((pStr2 + TextLen2) <= Str2.length)) TextLen2 += 1;
-      i = 1;
-      j = 0;
-      while (i <= TextLen2) {
-        TextStr2 = TextStr2 + Str2.charAt((pStr2 + j) - 1);
-        i += 1;
-        j += 1;
-      };
-    };
-    if ((Str1 !== "") && (Str2 !== "")) {
-      pStr1 = 1;
-      pStr2 = 1;
-      Result = 0;
-      while ((pStr1 <= Str1.length) && (pStr2 <= Str2.length)) {
-        TextLen1 = 1;
-        TextLen2 = 1;
-        Len1 = 0;
-        Len2 = 0;
-        while (Str1.charAt(pStr1 - 1) === " ") {
-          pStr1 += 1;
-          Len1 += 1;
-        };
-        while (Str2.charAt(pStr2 - 1) === " ") {
-          pStr2 += 1;
-          Len2 += 1;
-        };
-        if (IsNumber(Str1.charAt(pStr1 - 1)) && IsNumber(Str2.charAt(pStr2 - 1))) {
-          Num1 = GetInteger(Str1,{get: function () {
-              return pStr1;
-            }, set: function (v) {
-              pStr1 = v;
-            }},{get: function () {
-              return Len1;
-            }, set: function (v) {
-              Len1 = v;
-            }});
-          Num2 = GetInteger(Str2,{get: function () {
-              return pStr2;
-            }, set: function (v) {
-              pStr2 = v;
-            }},{get: function () {
-              return Len2;
-            }, set: function (v) {
-              Len2 = v;
-            }});
-          if (Num1 < Num2) {
-            Result = -1}
-           else if (Num1 > Num2) {
-            Result = 1}
-           else {
-            Result = Sign(Len1 - Len2);
-          };
-          pStr1 -= 1;
-          pStr2 -= 1;
-        } else {
-          GetChars();
-          if (TextStr1 !== TextStr2) {
-            Result = pas.SysUtils.CompareText(TextStr1,TextStr2)}
-           else Result = 0;
-        };
-        if (Result !== 0) break;
-        pStr1 += TextLen1;
-        pStr2 += TextLen2;
-      };
-    };
-    Num1 = Str1.length;
-    Num2 = Str2.length;
-    if ((Result === 0) && (Num1 !== Num2)) {
-      if (Num1 < Num2) {
-        Result = -1}
-       else Result = 1;
-    };
-    if (ADecSeparator === "") ;
-    if (AThousandSeparator === "") ;
-    return Result;
-  };
-  this.LeftStr = function (AText, ACount) {
-    var Result = "";
-    Result = pas.System.Copy(AText,1,ACount);
-    return Result;
-  };
-  this.RightStr = function (AText, ACount) {
-    var Result = "";
-    var j = 0;
-    var l = 0;
-    l = AText.length;
-    j = ACount;
-    if (j > l) j = l;
-    Result = pas.System.Copy(AText,(l - j) + 1,j);
-    return Result;
-  };
-  this.MidStr = function (AText, AStart, ACount) {
-    var Result = "";
-    if ((ACount === 0) || (AStart > AText.length)) return "";
-    Result = pas.System.Copy(AText,AStart,ACount);
-    return Result;
-  };
-  this.RightBStr = function (AText, AByteCount) {
-    var Result = "";
-    Result = $mod.RightStr(AText,AByteCount);
-    return Result;
-  };
-  this.MidBStr = function (AText, AByteStart, AByteCount) {
-    var Result = "";
-    Result = $mod.MidStr(AText,AByteStart,AByteCount);
-    return Result;
-  };
-  this.AnsiLeftStr = function (AText, ACount) {
-    var Result = "";
-    Result = pas.System.Copy(AText,1,ACount);
-    return Result;
-  };
-  this.AnsiRightStr = function (AText, ACount) {
-    var Result = "";
-    Result = pas.System.Copy(AText,(AText.length - ACount) + 1,ACount);
-    return Result;
-  };
-  this.AnsiMidStr = function (AText, AStart, ACount) {
-    var Result = "";
-    Result = pas.System.Copy(AText,AStart,ACount);
-    return Result;
-  };
-  this.LeftBStr = function (AText, AByteCount) {
-    var Result = "";
-    Result = $mod.LeftStr(AText,AByteCount);
-    return Result;
-  };
-  this.WordDelimiters = [];
-  this.SErrAmountStrings = "Amount of search and replace strings don't match";
-  this.SInvalidRomanNumeral = "%s is not a valid Roman numeral";
-  this.TStringSearchOption = {"0": "soDown", soDown: 0, "1": "soMatchCase", soMatchCase: 1, "2": "soWholeWord", soWholeWord: 2};
-  $mod.$rtti.$Enum("TStringSearchOption",{minvalue: 0, maxvalue: 2, ordtype: 1, enumtype: this.TStringSearchOption});
-  $mod.$rtti.$Set("TStringSearchOptions",{comptype: $mod.$rtti["TStringSearchOption"]});
-  this.PosEx = function (SubStr, S, Offset) {
-    var Result = 0;
-    Result = (new String(S)).indexOf(SubStr,Offset - 1) + 1;
-    return Result;
-  };
-  this.PosEx$1 = function (SubStr, S) {
-    var Result = 0;
-    Result = $mod.PosEx(SubStr,S,1);
-    return Result;
-  };
-  this.PosEx$2 = function (c, S, Offset) {
-    var Result = 0;
-    Result = (new String(S)).indexOf(c,Offset - 1) + 1;
-    return Result;
-  };
-  this.StringsReplace = function (S, OldPattern, NewPattern, Flags) {
-    var Result = "";
-    var pc = 0;
-    var pcc = 0;
-    var lastpc = 0;
-    var strcount = 0;
-    var ResStr = "";
-    var CompStr = "";
-    var Found = false;
-    var sc = 0;
-    sc = rtl.length(OldPattern);
-    if (sc !== rtl.length(NewPattern)) throw pas.SysUtils.Exception.$create("Create$1",[$mod.SErrAmountStrings]);
-    sc -= 1;
-    if (pas.SysUtils.TStringReplaceFlag.rfIgnoreCase in Flags) {
-      CompStr = pas.SysUtils.UpperCase(S);
-      for (var $l1 = 0, $end2 = sc; $l1 <= $end2; $l1++) {
-        strcount = $l1;
-        OldPattern[strcount] = pas.SysUtils.UpperCase(OldPattern[strcount]);
-      };
-    } else CompStr = S;
-    ResStr = "";
-    pc = 1;
-    pcc = 1;
-    lastpc = pc + S.length;
-    while (pc < lastpc) {
-      Found = false;
-      for (var $l3 = 0, $end4 = sc; $l3 <= $end4; $l3++) {
-        strcount = $l3;
-        if (pas.System.Copy(CompStr,pc,OldPattern[strcount].length) === OldPattern[strcount]) {
-          ResStr = ResStr + NewPattern[strcount];
-          pc = pc + OldPattern[strcount].length;
-          pcc = pcc + OldPattern[strcount].length;
-          Found = true;
-        };
-      };
-      if (!Found) {
-        ResStr = ResStr + S.charAt(pcc - 1);
-        pc += 1;
-        pcc += 1;
-      } else if (!(pas.SysUtils.TStringReplaceFlag.rfReplaceAll in Flags)) {
-        ResStr = ResStr + pas.System.Copy(S,pcc,(S.length - pcc) + 1);
-        break;
-      };
-    };
-    Result = ResStr;
-    return Result;
-  };
-  this.ReplaceStr = function (AText, AFromText, AToText) {
-    var Result = "";
-    Result = $mod.AnsiReplaceStr(AText,AFromText,AToText);
-    return Result;
-  };
-  this.ReplaceText = function (AText, AFromText, AToText) {
-    var Result = "";
-    Result = $mod.AnsiReplaceText(AText,AFromText,AToText);
-    return Result;
-  };
-  $mod.$rtti.$Int("TSoundexLength",{minvalue: 1, maxvalue: 2147483647, ordtype: 5});
-  this.Soundex = function (AText, ALength) {
-    var Result = "";
-    var S = "";
-    var PS = "";
-    var I = 0;
-    var L = 0;
-    Result = "";
-    PS = "\x00";
-    if (AText.length > 0) {
-      Result = pas.System.upcase(AText.charAt(0));
-      I = 2;
-      L = AText.length;
-      while ((I <= L) && (Result.length < ALength)) {
-        S = $impl.SScore.charAt(AText.charCodeAt(I - 1) - 1);
-        if (!(S.charCodeAt() in rtl.createSet(48,105,PS.charCodeAt()))) Result = Result + S;
-        if (S !== "i") PS = S;
-        I += 1;
-      };
-    };
-    L = Result.length;
-    if (L < ALength) Result = Result + pas.System.StringOfChar("0",ALength - L);
-    return Result;
-  };
-  this.Soundex$1 = function (AText) {
-    var Result = "";
-    Result = $mod.Soundex(AText,4);
-    return Result;
-  };
-  $mod.$rtti.$Int("TSoundexIntLength",{minvalue: 1, maxvalue: 8, ordtype: 1});
-  this.SoundexInt = function (AText, ALength) {
-    var Result = 0;
-    var SE = "";
-    var I = 0;
-    Result = -1;
-    SE = $mod.Soundex(AText,ALength);
-    if (SE.length > 0) {
-      Result = SE.charCodeAt(1 - 1) - 65;
-      if (ALength > 1) {
-        Result = (Result * 26) + (SE.charCodeAt(2 - 1) - 48);
-        for (var $l1 = 3, $end2 = ALength; $l1 <= $end2; $l1++) {
-          I = $l1;
-          Result = (SE.charCodeAt(I - 1) - 48) + (Result * 7);
-        };
-      };
-      Result = ALength + (Result * 9);
-    };
-    return Result;
-  };
-  this.SoundexInt$1 = function (AText) {
-    var Result = 0;
-    Result = $mod.SoundexInt(AText,4);
-    return Result;
-  };
-  this.DecodeSoundexInt = function (AValue) {
-    var Result = "";
-    var I = 0;
-    var Len = 0;
-    Result = "";
-    Len = AValue % 9;
-    AValue = Math.floor(AValue / 9);
-    for (var $l1 = Len; $l1 >= 3; $l1--) {
-      I = $l1;
-      Result = String.fromCharCode(48 + (AValue % 7)) + Result;
-      AValue = Math.floor(AValue / 7);
-    };
-    if (Len > 1) {
-      Result = String.fromCharCode(48 + (AValue % 26)) + Result;
-      AValue = Math.floor(AValue / 26);
-    };
-    Result = String.fromCharCode(65 + AValue) + Result;
-    return Result;
-  };
-  this.SoundexWord = function (AText) {
-    var Result = 0;
-    var S = "";
-    S = $mod.Soundex(AText,4);
-    Result = S.charCodeAt(1 - 1) - 65;
-    Result = ((Result * 26) + S.charCodeAt(2 - 1)) - 48;
-    Result = ((Result * 7) + S.charCodeAt(3 - 1)) - 48;
-    Result = ((Result * 7) + S.charCodeAt(4 - 1)) - 48;
-    return Result;
-  };
-  this.DecodeSoundexWord = function (AValue) {
-    var Result = "";
-    Result = String.fromCharCode(48 + (AValue % 7));
-    AValue = Math.floor(AValue / 7);
-    Result = String.fromCharCode(48 + (AValue % 7)) + Result;
-    AValue = Math.floor(AValue / 7);
-    Result = pas.SysUtils.IntToStr(AValue % 26) + Result;
-    AValue = Math.floor(AValue / 26);
-    Result = String.fromCharCode(65 + AValue) + Result;
-    return Result;
-  };
-  this.SoundexSimilar = function (AText, AOther, ALength) {
-    var Result = false;
-    Result = $mod.Soundex(AText,ALength) === $mod.Soundex(AOther,ALength);
-    return Result;
-  };
-  this.SoundexSimilar$1 = function (AText, AOther) {
-    var Result = false;
-    Result = $mod.SoundexSimilar(AText,AOther,4);
-    return Result;
-  };
-  this.SoundexCompare = function (AText, AOther, ALength) {
-    var Result = 0;
-    Result = pas.SysUtils.AnsiCompareStr($mod.Soundex(AText,ALength),$mod.Soundex(AOther,ALength));
-    return Result;
-  };
-  this.SoundexCompare$1 = function (AText, AOther) {
-    var Result = 0;
-    Result = $mod.SoundexCompare(AText,AOther,4);
-    return Result;
-  };
-  this.SoundexProc = function (AText, AOther) {
-    var Result = false;
-    Result = $mod.SoundexSimilar$1(AText,AOther);
-    return Result;
-  };
-  $mod.$rtti.$ProcVar("TCompareTextProc",{procsig: rtl.newTIProcSig([["AText",rtl.string,2],["AOther",rtl.string,2]],rtl.boolean)});
-  this.AnsiResemblesProc = null;
-  this.ResemblesProc = null;
-  this.TRomanConversionStrictness = {"0": "rcsStrict", rcsStrict: 0, "1": "rcsRelaxed", rcsRelaxed: 1, "2": "rcsDontCare", rcsDontCare: 2};
-  $mod.$rtti.$Enum("TRomanConversionStrictness",{minvalue: 0, maxvalue: 2, ordtype: 1, enumtype: this.TRomanConversionStrictness});
-  this.IsEmptyStr = function (S, EmptyChars) {
-    var Result = false;
-    var i = 0;
-    var l = 0;
-    l = S.length;
-    i = 1;
-    Result = true;
-    while (Result && (i <= l)) {
-      Result = pas.SysUtils.CharInSet(S.charAt(i - 1),EmptyChars);
-      i += 1;
-    };
-    return Result;
-  };
-  this.DelSpace = function (S) {
-    var Result = "";
-    Result = $mod.DelChars(S," ");
-    return Result;
-  };
-  this.DelChars = function (S, Chr) {
-    var Result = "";
-    var I = 0;
-    var J = 0;
-    Result = S;
-    I = Result.length;
-    while (I > 0) {
-      if (Result.charAt(I - 1) === Chr) {
-        J = I - 1;
-        while ((J > 0) && (Result.charAt(J - 1) === Chr)) J -= 1;
-        pas.System.Delete({get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }},J + 1,I - J);
-        I = J + 1;
-      };
-      I -= 1;
-    };
-    return Result;
-  };
-  this.DelSpace1 = function (S) {
-    var Result = "";
-    var I = 0;
-    Result = S;
-    for (var $l1 = Result.length; $l1 >= 2; $l1--) {
-      I = $l1;
-      if ((Result.charAt(I - 1) === " ") && (Result.charAt(I - 1 - 1) === " ")) pas.System.Delete({get: function () {
-          return Result;
-        }, set: function (v) {
-          Result = v;
-        }},I,1);
-    };
-    return Result;
-  };
-  this.Tab2Space = function (S, Numb) {
-    var Result = "";
-    var I = 0;
-    I = 1;
-    Result = S;
-    while (I <= Result.length) if (Result.charAt(I - 1) !== String.fromCharCode(9)) {
-      I += 1}
-     else {
-      Result = rtl.setCharAt(Result,I - 1," ");
-      if (Numb > 1) pas.System.Insert(pas.System.StringOfChar(" ",Numb - 1),{get: function () {
-          return Result;
-        }, set: function (v) {
-          Result = v;
-        }},I);
-      I += Numb;
-    };
-    return Result;
-  };
-  this.NPos = function (C, S, N) {
-    var Result = 0;
-    var i = 0;
-    var p = 0;
-    var k = 0;
-    Result = 0;
-    if (N < 1) return Result;
-    k = 0;
-    i = 1;
-    do {
-      p = pas.System.Pos(C,S);
-      k += p;
-      if (p > 0) pas.System.Delete({get: function () {
-          return S;
-        }, set: function (v) {
-          S = v;
-        }},1,p);
-      i += 1;
-    } while (!((i > N) || (p === 0)));
-    if (p > 0) Result = k;
-    return Result;
-  };
-  this.RPosEX = function (C, S, offs) {
-    var Result = 0;
-    Result = (new String(S)).lastIndexOf(C,offs - 1) + 1;
-    return Result;
-  };
-  this.RPosex$1 = function (Substr, Source, offs) {
-    var Result = 0;
-    Result = (new String(Source)).lastIndexOf(Substr,offs - 1) + 1;
-    return Result;
-  };
-  this.RPos = function (c, S) {
-    var Result = 0;
-    Result = $mod.RPosex$1(c,S,S.length);
-    return Result;
-  };
-  this.RPos$1 = function (Substr, Source) {
-    var Result = 0;
-    Result = $mod.RPosex$1(Substr,Source,Source.length);
-    return Result;
-  };
-  this.AddChar = function (C, S, N) {
-    var Result = "";
-    var l = 0;
-    Result = S;
-    l = Result.length;
-    if (l < N) Result = pas.System.StringOfChar(C,N - l) + Result;
-    return Result;
-  };
-  this.AddCharR = function (C, S, N) {
-    var Result = "";
-    var l = 0;
-    Result = S;
-    l = Result.length;
-    if (l < N) Result = Result + pas.System.StringOfChar(C,N - l);
-    return Result;
-  };
-  this.PadLeft = function (S, N) {
-    var Result = "";
-    Result = $mod.AddChar(" ",S,N);
-    return Result;
-  };
-  this.PadRight = function (S, N) {
-    var Result = "";
-    Result = $mod.AddCharR(" ",S,N);
-    return Result;
-  };
-  this.PadCenter = function (S, Len) {
-    var Result = "";
-    if (S.length < Len) {
-      Result = pas.System.StringOfChar(" ",Math.floor(Len / 2) - Math.floor(S.length / 2)) + S;
-      Result = Result + pas.System.StringOfChar(" ",Len - Result.length);
-    } else Result = S;
-    return Result;
-  };
-  this.Copy2Symb = function (S, Symb) {
-    var Result = "";
-    var p = 0;
-    p = pas.System.Pos(Symb,S);
-    if (p === 0) p = S.length + 1;
-    Result = pas.System.Copy(S,1,p - 1);
-    return Result;
-  };
-  this.Copy2SymbDel = function (S, Symb) {
-    var Result = "";
-    var p = 0;
-    p = pas.System.Pos(Symb,S.get());
-    if (p === 0) {
-      Result = S.get();
-      S.set("");
-    } else {
-      Result = pas.System.Copy(S.get(),1,p - 1);
-      pas.System.Delete(S,1,p);
-    };
-    return Result;
-  };
-  this.Copy2Space = function (S) {
-    var Result = "";
-    Result = $mod.Copy2Symb(S," ");
-    return Result;
-  };
-  this.Copy2SpaceDel = function (S) {
-    var Result = "";
-    Result = $mod.Copy2SymbDel(S," ");
-    return Result;
-  };
-  this.AnsiProperCase = function (S, WordDelims) {
-    var Result = "";
-    var P = 0;
-    var L = 0;
-    Result = pas.SysUtils.LowerCase(S);
-    P = 1;
-    L = Result.length;
-    while (P <= L) {
-      while ((P <= L) && pas.SysUtils.CharInSet(Result.charAt(P - 1),WordDelims)) P += 1;
-      if (P <= L) Result = rtl.setCharAt(Result,P - 1,pas.System.upcase(Result.charAt(P - 1)));
-      while ((P <= L) && !pas.SysUtils.CharInSet(Result.charAt(P - 1),WordDelims)) P += 1;
-    };
-    return Result;
-  };
-  this.WordCount = function (S, WordDelims) {
-    var Result = 0;
-    var P = 0;
-    var L = 0;
-    Result = 0;
-    P = 1;
-    L = S.length;
-    while (P <= L) {
-      while ((P <= L) && pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1;
-      if (P <= L) Result += 1;
-      while ((P <= L) && !pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1;
-    };
-    return Result;
-  };
-  this.WordPosition = function (N, S, WordDelims) {
-    var Result = 0;
-    var PS = 0;
-    var P = 0;
-    var PE = 0;
-    var Count = 0;
-    Result = 0;
-    Count = 0;
-    PS = 1;
-    PE = S.length;
-    P = PS;
-    while ((P <= PE) && (Count !== N)) {
-      while ((P <= PE) && pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1;
-      if (P <= PE) Count += 1;
-      if (Count !== N) {
-        while ((P <= PE) && !pas.SysUtils.CharInSet(S.charAt(P - 1),WordDelims)) P += 1}
-       else Result = (P - PS) + 1;
-    };
-    return Result;
-  };
-  this.ExtractWord = function (N, S, WordDelims) {
-    var Result = "";
-    var i = 0;
-    Result = $mod.ExtractWordPos(N,S,WordDelims,{get: function () {
-        return i;
-      }, set: function (v) {
-        i = v;
-      }});
-    return Result;
-  };
-  this.ExtractWordPos = function (N, S, WordDelims, Pos) {
-    var Result = "";
-    var i = 0;
-    var j = 0;
-    var l = 0;
-    j = 0;
-    i = $mod.WordPosition(N,S,WordDelims);
-    if (i > 2147483647) {
-      Result = "";
-      Pos.set(-1);
-      return Result;
-    };
-    Pos.set(i);
-    if (i !== 0) {
-      j = i;
-      l = S.length;
-      while ((j <= l) && !pas.SysUtils.CharInSet(S.charAt(j - 1),WordDelims)) j += 1;
-    };
-    Result = pas.System.Copy(S,i,j - i);
-    return Result;
-  };
-  this.ExtractDelimited = function (N, S, Delims) {
-    var Result = "";
-    var w = 0;
-    var i = 0;
-    var l = 0;
-    var len = 0;
-    w = 0;
-    i = 1;
-    l = 0;
-    len = S.length;
-    Result = rtl.strSetLength(Result,0);
-    while ((i <= len) && (w !== N)) {
-      if (pas.SysUtils.CharInSet(S.charAt(i - 1),Delims)) {
-        w += 1}
-       else {
-        if ((N - 1) === w) {
-          l += 1;
-          Result = Result + S.charAt(i - 1);
-        };
-      };
-      i += 1;
-    };
-    return Result;
-  };
-  this.ExtractSubstr = function (S, Pos, Delims) {
-    var Result = "";
-    var i = 0;
-    var l = 0;
-    i = Pos.get();
-    l = S.length;
-    while ((i <= l) && !pas.SysUtils.CharInSet(S.charAt(i - 1),Delims)) i += 1;
-    Result = pas.System.Copy(S,Pos.get(),i - Pos.get());
-    while ((i <= l) && pas.SysUtils.CharInSet(S.charAt(i - 1),Delims)) i += 1;
-    if (i > 2147483647) {
-      Pos.set(2147483647)}
-     else Pos.set(i);
-    return Result;
-  };
-  this.IsWordPresent = function (W, S, WordDelims) {
-    var Result = false;
-    var i = 0;
-    var Count = 0;
-    Result = false;
-    Count = $mod.WordCount(S,WordDelims);
-    i = 1;
-    while (!Result && (i <= Count)) {
-      Result = $mod.ExtractWord(i,S,WordDelims) === W;
-      i += 1;
-    };
-    return Result;
-  };
-  this.FindPart = function (HelpWilds, InputStr) {
-    var Result = 0;
-    var Diff = 0;
-    var i = 0;
-    var J = 0;
-    Result = 0;
-    i = pas.System.Pos("?",HelpWilds);
-    if (i === 0) {
-      Result = pas.System.Pos(HelpWilds,InputStr)}
-     else {
-      Diff = InputStr.length - HelpWilds.length;
-      for (var $l1 = 0, $end2 = Diff; $l1 <= $end2; $l1++) {
-        i = $l1;
-        for (var $l3 = 1, $end4 = HelpWilds.length; $l3 <= $end4; $l3++) {
-          J = $l3;
-          if ((InputStr.charAt((i + J) - 1) === HelpWilds.charAt(J - 1)) || (HelpWilds.charAt(J - 1) === "?")) {
-            if (J === HelpWilds.length) {
-              Result = i + 1;
-              return Result;
-            };
-          } else break;
-        };
-      };
-    };
-    return Result;
-  };
-  this.IsWild = function (InputStr, Wilds, IgnoreCase) {
-    var Result = false;
-    var i = 0;
-    var MaxinputWord = 0;
-    var MaxWilds = 0;
-    var eos = false;
-    Result = true;
-    if (Wilds === InputStr) return Result;
-    i = pas.System.Pos("**",Wilds);
-    while (i > 0) {
-      pas.System.Delete({get: function () {
-          return Wilds;
-        }, set: function (v) {
-          Wilds = v;
-        }},i,1);
-      i = pas.System.Pos("**",Wilds);
-    };
-    if (Wilds === "*") return Result;
-    MaxinputWord = InputStr.length;
-    MaxWilds = Wilds.length;
-    if ((MaxWilds === 0) || (MaxinputWord === 0)) {
-      Result = false;
-      return Result;
-    };
-    if (IgnoreCase) {
-      InputStr = pas.SysUtils.UpperCase(InputStr);
-      Wilds = pas.SysUtils.UpperCase(Wilds);
-    };
-    Result = $impl.isMatch(1,InputStr,Wilds,1,1,MaxinputWord,MaxWilds,{get: function () {
-        return eos;
-      }, set: function (v) {
-        eos = v;
-      }});
-    return Result;
-  };
-  this.XorString = function (Key, Src) {
-    var Result = "";
-    var i = 0;
-    Result = Src;
-    if (Key.length > 0) for (var $l1 = 1, $end2 = Src.length; $l1 <= $end2; $l1++) {
-      i = $l1;
-      Result = rtl.setCharAt(Result,i - 1,String.fromCharCode(Key.charCodeAt((1 + ((i - 1) % Key.length)) - 1) ^ Src.charCodeAt(i - 1)));
-    };
-    return Result;
-  };
-  this.XorEncode = function (Key, Source) {
-    var Result = "";
-    var i = 0;
-    var C = 0;
-    Result = "";
-    for (var $l1 = 1, $end2 = Source.length; $l1 <= $end2; $l1++) {
-      i = $l1;
-      if (Key.length > 0) {
-        C = Key.charCodeAt((1 + ((i - 1) % Key.length)) - 1) ^ Source.charCodeAt(i - 1)}
-       else C = Source.charCodeAt(i - 1);
-      Result = Result + pas.SysUtils.LowerCase(pas.SysUtils.IntToHex(C,2));
-    };
-    return Result;
-  };
-  this.XorDecode = function (Key, Source) {
-    var Result = "";
-    var i = 0;
-    var C = "";
-    Result = "";
-    for (var $l1 = 0, $end2 = Math.floor(Source.length / 2) - 1; $l1 <= $end2; $l1++) {
-      i = $l1;
-      C = String.fromCharCode(pas.SysUtils.StrToIntDef("$" + pas.System.Copy(Source,(i * 2) + 1,2)," ".charCodeAt()));
-      if (Key.length > 0) C = String.fromCharCode(Key.charCodeAt((1 + (i % Key.length)) - 1) ^ C.charCodeAt());
-      Result = Result + C;
-    };
-    return Result;
-  };
-  this.GetCmdLineArg = function (Switch, SwitchChars) {
-    var Result = "";
-    var i = 0;
-    var S = "";
-    i = 1;
-    Result = "";
-    while ((Result === "") && (i <= pas.System.ParamCount())) {
-      S = pas.System.ParamStr(i);
-      if ((rtl.length(SwitchChars) === 0) || (pas.SysUtils.CharInSet(S.charAt(0),SwitchChars) && (S.length > 1) && (pas.SysUtils.CompareText(pas.System.Copy(S,2,S.length - 1),Switch) === 0))) {
-        i += 1;
-        if (i <= pas.System.ParamCount()) Result = pas.System.ParamStr(i);
-      };
-      i += 1;
-    };
-    return Result;
-  };
-  this.Numb2USA = function (S) {
-    var Result = "";
-    var i = 0;
-    var NA = 0;
-    i = S.length;
-    Result = S;
-    NA = 0;
-    while (i > 0) {
-      if ((((((Result.length - i) + 1) - NA) % 3) === 0) && (i !== 1)) {
-        pas.System.Insert(",",{get: function () {
-            return Result;
-          }, set: function (v) {
-            Result = v;
-          }},i);
-        NA += 1;
-      };
-      i -= 1;
-    };
-    return Result;
-  };
-  this.Hex2Dec = function (S) {
-    var Result = 0;
-    var HexStr = "";
-    if (pas.System.Pos("$",S) === 0) {
-      HexStr = "$" + S}
-     else HexStr = S;
-    Result = pas.SysUtils.StrToInt(HexStr);
-    return Result;
-  };
-  this.Dec2Numb = function (N, Len, Base) {
-    var Result = "";
-    var C = 0;
-    var number = 0;
-    if (N === 0) {
-      Result = "0"}
-     else {
-      number = N;
-      Result = "";
-      while (number > 0) {
-        C = number % Base;
-        if (C > 9) {
-          C = C + 55}
-         else C = C + 48;
-        Result = String.fromCharCode(C) + Result;
-        number = Math.floor(number / Base);
-      };
-    };
-    if (Result !== "") Result = $mod.AddChar("0",Result,Len);
-    return Result;
-  };
-  this.Numb2Dec = function (S, Base) {
-    var Result = 0;
-    var i = 0;
-    var P = 0;
-    i = S.length;
-    Result = 0;
-    S = pas.SysUtils.UpperCase(S);
-    P = 1;
-    while (i >= 1) {
-      if (S.charAt(i - 1) > "@") {
-        Result = Result + ((S.charCodeAt(i - 1) - 55) * P)}
-       else Result = Result + ((S.charCodeAt(i - 1) - 48) * P);
-      i -= 1;
-      P = P * Base;
-    };
-    return Result;
-  };
-  this.IntToBin = function (Value, Digits, Spaces) {
-    var Result = "";
-    var endpos = 0;
-    var p = 0;
-    var p2 = 0;
-    var k = 0;
-    Result = "";
-    if (Digits > 32) Digits = 32;
-    if (Spaces === 0) {
-      Result = $mod.IntToBin$1(Value,Digits);
-      return Result;
-    };
-    endpos = Digits + Math.floor((Digits - 1) / Spaces);
-    Result = rtl.strSetLength(Result,endpos);
-    p = endpos;
-    p2 = 1;
-    k = Spaces;
-    while (p >= p2) {
-      if (k === 0) {
-        Result = rtl.setCharAt(Result,p - 1," ");
-        p -= 1;
-        k = Spaces;
-      };
-      Result = rtl.setCharAt(Result,p - 1,String.fromCharCode(48 + ((Value >>> 0) & 1)));
-      Value = rtl.lw((Value >>> 0) >>> 1);
-      p -= 1;
-      k -= 1;
-    };
-    return Result;
-  };
-  this.IntToBin$1 = function (Value, Digits) {
-    var Result = "";
-    var p = 0;
-    var p2 = 0;
-    Result = "";
-    if (Digits <= 0) return Result;
-    Result = rtl.strSetLength(Result,Digits);
-    p = Digits;
-    p2 = 1;
-    while ((p >= p2) && ((Value >>> 0) > 0)) {
-      Result = rtl.setCharAt(Result,p - 1,String.fromCharCode(48 + ((Value >>> 0) & 1)));
-      Value = rtl.lw((Value >>> 0) >>> 1);
-      p -= 1;
-    };
-    Digits = (p - p2) + 1;
-    while (Digits > 0) {
-      Result = rtl.setCharAt(Result,Digits - 1,String.fromCharCode(48));
-      Digits -= 1;
-    };
-    return Result;
-  };
-  this.IntToBin$2 = function (Value, Digits) {
-    var Result = "";
-    var p = 0;
-    var p2 = 0;
-    Result = "";
-    if (Digits <= 0) return Result;
-    Result = rtl.strSetLength(Result,Digits);
-    p = Digits;
-    p2 = 1;
-    while ((p >= p2) && (Value > 0)) {
-      Result = rtl.setCharAt(Result,p - 1,String.fromCharCode(48 + ((Value >>> 0) & 1)));
-      Value = Math.floor(Value / 2);
-      p -= 1;
-    };
-    Digits = (p - p2) + 1;
-    while (Digits > 0) Result = rtl.setCharAt(Result,Digits - 1,"0");
-    return Result;
-  };
-  var Arabics = [1,4,5,9,10,40,50,90,100,400,500,900,1000];
-  var Romans = ["I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M"];
-  this.IntToRoman = function (Value) {
-    var Result = "";
-    var i = 0;
-    Result = "";
-    for (var $l1 = 13; $l1 >= 1; $l1--) {
-      i = $l1;
-      while (Value >= Arabics[i - 1]) {
-        Value = Value - Arabics[i - 1];
-        Result = Result + Romans[i - 1];
-      };
-    };
-    return Result;
-  };
-  this.TryRomanToInt = function (S, N, Strictness) {
-    var Result = false;
-    var i = 0;
-    var Len = 0;
-    var Terminated = false;
-    Result = false;
-    S = pas.SysUtils.UpperCase(S);
-    Len = S.length;
-    if (Strictness === $mod.TRomanConversionStrictness.rcsDontCare) {
-      N.set($impl.RomanToIntDontCare(S));
-      if (N.get() === 0) {
-        Result = Len === 0;
-      } else Result = true;
-      return Result;
-    };
-    if (Len === 0) return Result;
-    i = 1;
-    N.set(0);
-    Terminated = false;
-    while ((i <= Len) && ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) || (i < 4)) && (S.charAt(i - 1) === "M")) {
-      i += 1;
-      N.set(N.get() + 1000);
-    };
-    if ((i <= Len) && (S.charAt(i - 1) === "D")) {
-      i += 1;
-      N.set(N.get() + 500);
-    } else if (((i + 1) <= Len) && (S.charAt(i - 1) === "C")) {
-      if (S.charAt((i + 1) - 1) === "M") {
-        i += 2;
-        N.set(N.get() + 900);
-      } else if (S.charAt((i + 1) - 1) === "D") {
-        i += 2;
-        N.set(N.get() + 400);
-      };
-    };
-    if ((i <= Len) && (S.charAt(i - 1) === "C")) {
-      i += 1;
-      N.set(N.get() + 100);
-      if ((i <= Len) && (S.charAt(i - 1) === "C")) {
-        i += 1;
-        N.set(N.get() + 100);
-      };
-      if ((i <= Len) && (S.charAt(i - 1) === "C")) {
-        i += 1;
-        N.set(N.get() + 100);
-      };
-      if ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) && (i <= Len) && (S.charAt(i - 1) === "C")) {
-        i += 1;
-        N.set(N.get() + 100);
-      };
-    };
-    if (((i + 1) <= Len) && (S.charAt(i - 1) === "X")) {
-      if (S.charAt((i + 1) - 1) === "C") {
-        i += 2;
-        N.set(N.get() + 90);
-      } else if (S.charAt((i + 1) - 1) === "L") {
-        i += 2;
-        N.set(N.get() + 40);
-      };
-    };
-    if ((i <= Len) && (S.charAt(i - 1) === "L")) {
-      i += 1;
-      N.set(N.get() + 50);
-    };
-    if ((i <= Len) && (S.charAt(i - 1) === "X")) {
-      i += 1;
-      N.set(N.get() + 10);
-      if ((i <= Len) && (S.charAt(i - 1) === "X")) {
-        i += 1;
-        N.set(N.get() + 10);
-      };
-      if ((i <= Len) && (S.charAt(i - 1) === "X")) {
-        i += 1;
-        N.set(N.get() + 10);
-      };
-      if ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) && (i <= Len) && (S.charAt(i - 1) === "X")) {
-        i += 1;
-        N.set(N.get() + 10);
-      };
-    };
-    if (((i + 1) <= Len) && (S.charAt(i - 1) === "I")) {
-      if (S.charAt((i + 1) - 1) === "X") {
-        Terminated = true;
-        i += 2;
-        N.set(N.get() + 9);
-      } else if (S.charAt((i + 1) - 1) === "V") {
-        Terminated = true;
-        i += 2;
-        N.set(N.get() + 4);
-      };
-    };
-    if (!Terminated && (i <= Len) && (S.charAt(i - 1) === "V")) {
-      i += 1;
-      N.set(N.get() + 5);
-    };
-    if (!Terminated && (i <= Len) && (S.charAt(i - 1) === "I")) {
-      Terminated = true;
-      i += 1;
-      N.set(N.get() + 1);
-      if ((i <= Len) && (S.charAt(i - 1) === "I")) {
-        i += 1;
-        N.set(N.get() + 1);
-      };
-      if ((i <= Len) && (S.charAt(i - 1) === "I")) {
-        i += 1;
-        N.set(N.get() + 1);
-      };
-      if ((Strictness !== $mod.TRomanConversionStrictness.rcsStrict) && (i <= Len) && (S.charAt(i - 1) === "I")) {
-        i += 1;
-        N.set(N.get() + 1);
-      };
-    };
-    Result = i > Len;
-    return Result;
-  };
-  this.RomanToInt = function (S, Strictness) {
-    var Result = 0;
-    if (!$mod.TryRomanToInt(S,{get: function () {
-        return Result;
-      }, set: function (v) {
-        Result = v;
-      }},Strictness)) throw pas.SysUtils.EConvertError.$create("CreateFmt",[$mod.SInvalidRomanNumeral,[S]]);
-    return Result;
-  };
-  this.RomanToIntDef = function (S, ADefault, Strictness) {
-    var Result = 0;
-    if (!$mod.TryRomanToInt(S,{get: function () {
-        return Result;
-      }, set: function (v) {
-        Result = v;
-      }},Strictness)) Result = ADefault;
-    return Result;
-  };
-  this.DigitChars = rtl.createSet(null,48,57);
-  this.Brackets = rtl.createSet(40,41,91,93,123,125);
-  this.StdWordDelims = rtl.unionSet(rtl.createSet(null,0,32,44,46,59,47,92,58,39,34,96),$mod.Brackets);
-  this.StdSwitchChars = rtl.createSet(45,47);
-  this.PosSet = function (c, s) {
-    var Result = 0;
-    Result = $mod.PosSetEx(c,s,1);
-    return Result;
-  };
-  this.PosSet$1 = function (c, s) {
-    var Result = 0;
-    Result = $mod.PosSetEx$1(c,s,1);
-    return Result;
-  };
-  this.PosSetEx = function (c, s, count) {
-    var Result = 0;
-    var i = 0;
-    var j = 0;
-    if (s === "") {
-      j = 0}
-     else {
-      i = s.length;
-      j = count;
-      if (j > i) {
-        Result = 0;
-        return Result;
-      };
-      while ((j <= i) && !pas.SysUtils.CharInSet(s.charAt(j - 1),c)) j += 1;
-      if (j > i) j = 0;
-    };
-    Result = j;
-    return Result;
-  };
-  this.PosSetEx$1 = function (c, s, count) {
-    var Result = 0;
-    var cset = [];
-    var i = 0;
-    var l = 0;
-    l = c.length;
-    cset = rtl.arraySetLength(cset,"",l);
-    if (l > 0) for (var $l1 = 1, $end2 = l; $l1 <= $end2; $l1++) {
-      i = $l1;
-      cset[i - 1] = c.charAt(i - 1);
-    };
-    Result = $mod.PosSetEx(cset,s,count);
-    return Result;
-  };
-  this.Removeleadingchars = function (S, CSet) {
-    var I = 0;
-    var J = 0;
-    I = S.get().length;
-    if (I > 0) {
-      J = 1;
-      while ((J <= I) && pas.SysUtils.CharInSet(S.get().charAt(J - 1),CSet)) J += 1;
-      if (J > 1) pas.System.Delete(S,1,J - 1);
-    };
-  };
-  this.RemoveTrailingChars = function (S, CSet) {
-    var i = 0;
-    var j = 0;
-    i = S.get().length;
-    if (i > 0) {
-      j = i;
-      while ((j > 0) && pas.SysUtils.CharInSet(S.get().charAt(j - 1),CSet)) j -= 1;
-      if (j !== i) S.set(rtl.strSetLength(S.get(),j));
-    };
-  };
-  this.RemovePadChars = function (S, CSet) {
-    var I = 0;
-    var J = 0;
-    var K = 0;
-    I = S.get().length;
-    if (I === 0) return;
-    J = I;
-    while ((J > 0) && pas.SysUtils.CharInSet(S.get().charAt(J - 1),CSet)) J -= 1;
-    if (J === 0) {
-      S.set("");
-      return;
-    };
-    S.set(rtl.strSetLength(S.get(),J));
-    I = J;
-    K = 1;
-    while ((K <= I) && pas.SysUtils.CharInSet(S.get().charAt(K - 1),CSet)) K += 1;
-    if (K > 1) pas.System.Delete(S,1,K - 1);
-  };
-  this.TrimLeftSet = function (S, CSet) {
-    var Result = "";
-    Result = S;
-    $mod.Removeleadingchars({get: function () {
-        return Result;
-      }, set: function (v) {
-        Result = v;
-      }},CSet);
-    return Result;
-  };
-  this.TrimRightSet = function (S, CSet) {
-    var Result = "";
-    Result = S;
-    $mod.RemoveTrailingChars({get: function () {
-        return Result;
-      }, set: function (v) {
-        Result = v;
-      }},CSet);
-    return Result;
-  };
-  this.TrimSet = function (S, CSet) {
-    var Result = "";
-    Result = S;
-    $mod.RemovePadChars({get: function () {
-        return Result;
-      }, set: function (v) {
-        Result = v;
-      }},CSet);
-    return Result;
-  };
-  $mod.$rtti.$DynArray("SizeIntArray",{eltype: rtl.nativeint});
-  $mod.$init = function () {
-    $mod.AnsiResemblesProc = $mod.SoundexProc;
-    $mod.ResemblesProc = $mod.SoundexProc;
-  };
-},["JS"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  $impl.SScore = "00000000000000000000000000000000" + "00000000000000000000000000000000" + "0123012i02245501262301i2i2" + "000000" + "0123012i02245501262301i2i2" + "00000000000000000000000000000000" + "00000000000000000000000000000000" + "00000000000000000000000000000000" + "00000000000000000000000000000000" + "00000";
-  $impl.Ord0 = "0".charCodeAt();
-  $impl.OrdA = "A".charCodeAt();
-  $impl.RomanValues = function (C) {
-    var Result = 0;
-    var $tmp1 = C;
-    if ($tmp1 === "C") {
-      Result = 100}
-     else if ($tmp1 === "D") {
-      Result = 500}
-     else if ($tmp1 === "I") {
-      Result = 1}
-     else if ($tmp1 === "L") {
-      Result = 50}
-     else if ($tmp1 === "M") {
-      Result = 1000}
-     else if ($tmp1 === "V") {
-      Result = 5}
-     else if ($tmp1 === "X") {
-      Result = 10}
-     else {
-      Result = 0;
-    };
-    return Result;
-  };
-  var RomanChars = rtl.createSet(67,68,73,76,77,86,88);
-  $impl.RomanToIntDontCare = function (S) {
-    var Result = 0;
-    var index = "";
-    var Next = "";
-    var i = 0;
-    var l = 0;
-    var Negative = false;
-    Result = 0;
-    i = 0;
-    Negative = (S.length > 0) && (S.charAt(0) === "-");
-    if (Negative) i += 1;
-    l = S.length;
-    while (i < l) {
-      i += 1;
-      index = pas.System.upcase(S.charAt(i - 1));
-      if (index.charCodeAt() in RomanChars) {
-        if ((i + 1) <= l) {
-          Next = pas.System.upcase(S.charAt((i + 1) - 1))}
-         else Next = "\x00";
-        if ((Next.charCodeAt() in RomanChars) && ($impl.RomanValues(index) < $impl.RomanValues(Next))) {
-          Result += $impl.RomanValues(Next);
-          Result -= $impl.RomanValues(index);
-          i += 1;
-        } else Result += $impl.RomanValues(index);
-      } else {
-        Result = 0;
-        return Result;
-      };
-    };
-    if (Negative) Result = -Result;
-    return Result;
-  };
-  $impl.isMatch = function (level, inputstr, wilds, CWild, CinputWord, MaxInputword, maxwilds, EOS) {
-    var Result = false;
-    EOS.set(false);
-    Result = true;
-    do {
-      if (wilds.charAt(CWild - 1) === "*") {
-        CWild += 1;
-        while (wilds.charAt(CWild - 1) === "?") {
-          CWild += 1;
-          CinputWord += 1;
-        };
-        do {
-          while ((inputstr.charAt(CinputWord - 1) !== wilds.charAt(CWild - 1)) && (CinputWord <= MaxInputword)) CinputWord += 1;
-          Result = $impl.isMatch(level + 1,inputstr,wilds,CWild,CinputWord,MaxInputword,maxwilds,EOS);
-          if (!Result) CinputWord += 1;
-        } while (!(Result || (CinputWord >= MaxInputword)));
-        if (Result && EOS.get()) return Result;
-        continue;
-      };
-      if (wilds.charAt(CWild - 1) === "?") {
-        CWild += 1;
-        CinputWord += 1;
-        continue;
-      };
-      if (inputstr.charAt(CinputWord - 1) === wilds.charAt(CWild - 1)) {
-        CWild += 1;
-        CinputWord += 1;
-        continue;
-      };
-      Result = false;
-      return Result;
-    } while (!((CinputWord > MaxInputword) || (CWild > maxwilds)));
-    if ((CinputWord <= MaxInputword) || (CWild < maxwilds)) {
-      Result = false}
-     else if (CWild > maxwilds) {
-      EOS.set(false)}
-     else {
-      EOS.set(wilds.charAt(CWild - 1) === "*");
-      if (!EOS.get()) Result = false;
-    };
-    return Result;
-  };
-});
-rtl.module("WEBLib.TMSFNCPersistence",["System","contnrs","Classes","TypInfo","Variants","SysUtils","WEBLib.TMSFNCTypes","WEBLib.TMSFNCJSONReader","WEBLib.TMSFNCJSONWriter"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  rtl.createInterface($mod,"ITMSFNCPersistence","{363F04AF-B8A7-4C47-A2D6-8ED9C44CEFF6}",["SaveSettingsToFile","LoadSettingsFromFile","SaveSettingsToStream","LoadSettingsFromStream","CanSaveProperty","CanLoadProperty"],pas.System.IUnknown,function () {
-    var $r = this.$rtti;
-    $r.addMethod("SaveSettingsToFile",0,[["AFileName",rtl.string]]);
-    $r.addMethod("LoadSettingsFromFile",0,[["AFileName",rtl.string]]);
-    $r.addMethod("SaveSettingsToStream",0,[["AStream",pas["WEBLib.TMSFNCTypes"].$rtti["TStream"]]]);
-    $r.addMethod("LoadSettingsFromStream",0,[["AStream",pas["WEBLib.TMSFNCTypes"].$rtti["TStream"]]]);
-    $r.addMethod("CanSaveProperty",1,[["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyType",pas.TypInfo.$rtti["TTypeKind"]]],rtl.boolean);
-    $r.addMethod("CanLoadProperty",1,[["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyType",pas.TypInfo.$rtti["TTypeKind"]]],rtl.boolean);
-  });
-  rtl.createInterface($mod,"ITMSFNCPersistenceIO","{11B625F8-447A-4AE5-BB88-5ECDEA979AF7}",["CreateObject","NeedsObjectReference","GetObjectReference","FindObject","FixOwners"],pas.System.IUnknown,function () {
-    var $r = this.$rtti;
-    $r.addMethod("CreateObject",1,[["AClassName",rtl.string,2],["ABaseClass",pas.System.$rtti["TClass"],2]],pas.System.$rtti["TObject"]);
-    $r.addMethod("NeedsObjectReference",1,[["AClass",pas.System.$rtti["TClass"],2]],rtl.boolean);
-    $r.addMethod("GetObjectReference",1,[["AObject",pas.System.$rtti["TObject"],2]],rtl.string);
-    $r.addMethod("FindObject",1,[["AReference",rtl.string,2]],pas.System.$rtti["TObject"]);
-    $r.addMethod("FixOwners",0,[["AObject",pas.System.$rtti["TObject"],2],["AObjectList",pas.System.$rtti["TObject"],2]]);
-  });
-  rtl.createClass($mod,"ETMSFNCReaderException",pas.SysUtils.Exception,function () {
-  });
-  rtl.createClass($mod,"TTMSFNCObjectList",pas.contnrs.TObjectList,function () {
-    this.GetItem$1 = function (Index) {
-      var Result = null;
-      Result = this.GetItem(Index);
-      return Result;
-    };
-    this.SetItem$1 = function (Index, Value) {
-      this.SetItem(Index,Value);
-    };
-  });
-  rtl.createClass($mod,"TTMSFNCStringList",pas.Classes.TList,function () {
-    this.GetItem = function (Index) {
-      var Result = "";
-      Result = "" + this.Get(Index);
-      return Result;
-    };
-    this.SetItem = function (Index, Value) {
-      this.Put(Index,Value);
-    };
-  });
-  $mod.$rtti.$DynArray("TTMSFNCObjectArray",{eltype: pas.System.$rtti["TObject"]});
-  $mod.$rtti.$MethodVar("TTMSFNCWriterCustomWritePropertyEvent",{procsig: rtl.newTIProcSig([["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyKind",pas.TypInfo.$rtti["TTypeKind"]],["AWriter",pas["WEBLib.TMSFNCJSONWriter"].$rtti["TTMSFNCJSONWriter"]],["ACanWrite",rtl.boolean,1]]), methodkind: 0});
-  $mod.$rtti.$MethodVar("TTMSFNCWriterCustomIsAssignablePropertyEvent",{procsig: rtl.newTIProcSig([["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["AIsAssignable",rtl.boolean,1]]), methodkind: 0});
-  $mod.$rtti.$DynArray("TTMSFNCExcludePropertyListArray",{eltype: rtl.string});
-  rtl.createClass($mod,"TTMSFNCWriter",pas.System.TObject,function () {
-    this.$init = function () {
-      pas.System.TObject.$init.call(this);
-      this.FWriter = null;
-      this.FIOReference = null;
-      this.FOnCustomWriteProperty = null;
-      this.FRootObject = null;
-      this.FExcludeProperties = [];
-      this.FOnCustomIsAssignableProperty = null;
-    };
-    this.$final = function () {
-      this.FWriter = undefined;
-      this.FIOReference = undefined;
-      this.FOnCustomWriteProperty = undefined;
-      this.FRootObject = undefined;
-      this.FExcludeProperties = undefined;
-      this.FOnCustomIsAssignableProperty = undefined;
-      pas.System.TObject.$final.call(this);
-    };
-    this.SetRootObject = function (Value) {
-      this.FRootObject = Value;
-      $mod.TTMSFNCPersistence.FRootObject = this.FRootObject;
-    };
-    this.SetExcludeProperties = function (Value) {
-      this.FExcludeProperties = Value;
-      $mod.TTMSFNCPersistence.FExcludeProperties = this.FExcludeProperties;
-    };
-    this.WritePropInfoValue = function (AInstance, APropInfo) {
-      var cn = "";
-      var pName = "";
-      var en = "";
-      var k = 0;
-      var p = null;
-      var o = null;
-      var v = pas.System.TMethod.$new();
-      if ($mod.TTMSFNCPersistence.IsWriteOnly(APropInfo)) {
-        this.FWriter.WriteNull();
-        return;
-      };
-      o = AInstance;
-      p = APropInfo;
-      k = $mod.TTMSFNCPersistence.GetPropInfoType(p);
-      pName = $mod.TTMSFNCPersistence.GetPropInfoName(p);
-      var $tmp1 = k;
-      if ($tmp1 === pas.TypInfo.TTypeKind.tkInteger) {
-        cn = $mod.TTMSFNCPersistence.GetPropInfoTypeName(p);
-        if ((cn === "TAlphaColor") || (cn === "TColor") || (cn === "TGraphicsColor")) {
-          if (pas.TypInfo.GetOrdProp$1(o,p) === -1) {
-            this.FWriter.WriteString("gcNull")}
-           else this.FWriter.WriteString($impl.ColorToHTMLEx(pas.TypInfo.GetOrdProp$1(o,p)));
-        } else this.FWriter.WriteInteger(pas.TypInfo.GetOrdProp$1(o,p));
-      } else if (($tmp1 === pas.TypInfo.TTypeKind.tkChar) || ($tmp1 === pas.TypInfo.TTypeKind.tkString)) {
-        this.FWriter.WriteString(pas.TypInfo.GetStrProp$1(o,p))}
-       else if ($tmp1 === pas.TypInfo.TTypeKind.tkEnumeration) {
-        if ($mod.TTMSFNCPersistence.GetPropInfoDataTypeInfo(p) === rtl.boolean) {
-          this.FWriter.WriteBoolean(pas.TypInfo.GetOrdProp$1(o,p) != 0)}
-         else this.FWriter.WriteInteger(pas.TypInfo.GetOrdProp$1(o,p))}
-       else if ($tmp1 === pas.TypInfo.TTypeKind.tkBool) {
-        this.FWriter.WriteBoolean(pas.TypInfo.GetOrdProp$1(o,p) != 0)}
-       else if ($tmp1 === pas.TypInfo.TTypeKind.tkDouble) {
-        this.FWriter.WriteDouble(pas.TypInfo.GetFloatProp$1(o,p))}
-       else if ($tmp1 === pas.TypInfo.TTypeKind.tkSet) {
-        this.FWriter.WriteInteger(pas.TypInfo.GetOrdProp$1(o,p))}
-       else if ($tmp1 === pas.TypInfo.TTypeKind.tkMethod) {
-        v.$assign(pas.TypInfo.GetMethodProp(o,p));
-        if (v.Code === null) {
-          this.FWriter.WriteNull()}
-         else {
-          if ($mod.TTMSFNCPersistence.FRootObject != null) {
-            this.FWriter.WriteString($mod.TTMSFNCPersistence.FRootObject.$class.MethodName(v.Code))}
-           else this.FWriter.WriteNull();
-        };
-      } else {
-        en = $mod.TTMSFNCPersistence.GetEnumName(pas.TypInfo.$rtti["TTypeKind"],k);
-        this.FWriter.WriteNull();
-      };
-    };
-    this.WriteProperties = function (AObject) {
-      var ci = null;
-      var p = null;
-      var a = [];
-      var I = 0;
-      if (AObject != null) {
-        ci = AObject.$rtti;
-        try {
-          a = pas.TypInfo.GetPropList(ci,pas.TypInfo.tkAny,true);
-          for (var $l1 = 0, $end2 = rtl.length(a) - 1; $l1 <= $end2; $l1++) {
-            I = $l1;
-            this.WriteProperty(AObject,a[I]);
-          };
-        } finally {
-        };
-      };
-    };
-    this.WriteProperty = function (AObject, AProp) {
-      var pName = "";
-      var k = 0;
-      var b = false;
-      var a = false;
-      var ap = false;
-      var p = null;
-      var o = null;
-      try {
-        if (!(AProp != null)) return;
-        pName = $mod.TTMSFNCPersistence.GetPropInfoName(AProp);
-        k = $mod.TTMSFNCPersistence.GetPropInfoType(AProp);
-        b = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(pName,$mod.TTMSFNCPersistence.FExcludeProperties) === -1;
-        if (pas.SysUtils.Supports$3(AObject,$mod.ITMSFNCPersistence.$guid,{get: function () {
-            return p;
-          }, set: function (v) {
-            p = v;
-          }})) b = p.CanSaveProperty(AObject,pName,k);
-        if (b) {
-          a = true;
-          if (this.FOnCustomWriteProperty != null) this.FOnCustomWriteProperty(AObject,pName,k,this.FWriter,{get: function () {
-              return a;
-            }, set: function (v) {
-              a = v;
-            }});
-          if (a) {
-            this.FWriter.WriteName(pName);
-            if (k in rtl.createSet(pas.TypInfo.TTypeKind.tkClass)) {
-              o = pas.TypInfo.GetObjectProp(AObject,pName);
-              ap = $mod.TTMSFNCPersistence.IsAssignableProperty(AObject,AProp);
-              if (this.FOnCustomIsAssignableProperty != null) this.FOnCustomIsAssignableProperty(AObject,pName,{get: function () {
-                  return ap;
-                }, set: function (v) {
-                  ap = v;
-                }});
-              if (ap) {
-                if (pas.Classes.TComponent.isPrototypeOf(o)) {
-                  this.FWriter.WriteString(rtl.as(o,pas.Classes.TComponent).FName)}
-                 else this.FWriter.WriteString("");
-              } else this.WriteObject(o);
-            } else this.WritePropInfoValue(AObject,AProp);
-          };
-        };
-      } finally {
-        rtl._Release(p);
-      };
-    };
-    this.WriteGenericObjectList = function (AList) {
-      var I = 0;
-      this.FWriter.WriteBeginArray();
-      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
-        I = $l1;
-        this.WriteSingleObject(AList.GetItem$1(I));
-      };
-      this.FWriter.WriteEndArray();
-    };
-    this.WriteGenericStringList = function (AList) {
-      var I = 0;
-      this.FWriter.WriteBeginArray();
-      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
-        I = $l1;
-        this.FWriter.WriteString(AList.GetItem(I));
-      };
-      this.FWriter.WriteEndArray();
-    };
-    this.WriteStrings = function (AList) {
-      var I = 0;
-      this.FWriter.WriteBeginArray();
-      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
-        I = $l1;
-        this.FWriter.WriteString(AList.Get(I));
-      };
-      this.FWriter.WriteEndArray();
-    };
-    this.WriteCollection = function (ACollection) {
-      var I = 0;
-      this.FWriter.WriteBeginArray();
-      for (var $l1 = 0, $end2 = ACollection.GetCount() - 1; $l1 <= $end2; $l1++) {
-        I = $l1;
-        this.WriteSingleObject(ACollection.GetItem(I));
-      };
-      this.FWriter.WriteEndArray();
-    };
-    this.WriteList = function (AList) {
-      var I = 0;
-      this.FWriter.WriteBeginArray();
-      for (var $l1 = 0, $end2 = AList.GetCount() - 1; $l1 <= $end2; $l1++) {
-        I = $l1;
-        this.WriteSingleObject(rtl.getObject(AList.Get(I)));
-      };
-      this.FWriter.WriteEndArray();
-    };
-    this.WriteBitmap = function (ABitmap) {
-      var ms = null;
-      if (pas["WEBLib.TMSFNCTypes"].IsBitmapEmpty(ABitmap)) {
-        this.FWriter.WriteString("");
-        return;
-      };
-      ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
-      try {
-        throw pas.SysUtils.Exception.$create("Create$1",["Implement SaveToStream on TTMSFNCBitmap"]);
-        ms.FPosition = 0;
-        this.FWriter.WriteString(pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.SaveStreamToHexStr(ms));
-      } finally {
-        ms = rtl.freeLoc(ms);
-      };
-    };
-    this.WriteSingleObject = function (AObject) {
-      this.FWriter.WriteBeginObject();
-      this.FWriter.WriteName($mod.TTMSFNCPersistence.ClassTypeVariable);
-      this.FWriter.WriteString(AObject.$classname);
-      this.WriteProperties(AObject);
-      this.FWriter.WriteEndObject();
-    };
-    this.WriteObject = function (AObject) {
-      var b = null;
-      try {
-        if (AObject === null) {
-          this.FWriter.WriteNull()}
-         else {
-          if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"String")) {
-            this.WriteGenericStringList(AObject)}
-           else if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"")) {
-            this.WriteGenericObjectList(AObject)}
-           else if ($mod.TTMSFNCPersistence.IsList(AObject.$class.ClassType())) {
-            this.WriteList(AObject)}
-           else if ($mod.TTMSFNCPersistence.IsCollection(AObject.$class.ClassType())) {
-            this.WriteCollection(AObject)}
-           else if ($mod.TTMSFNCPersistence.IsBitmap(AObject.$class.ClassType())) {
-            this.WriteBitmap(AObject)}
-           else if ($mod.TTMSFNCPersistence.IsDescendingClass(AObject.$class.ClassType(),["TStrings"])) {
-            this.WriteStrings(AObject)}
-           else {
-            if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
-                return b;
-              }, set: function (v) {
-                b = v;
-              }})) {
-              if (b.NeedsObjectReference(AObject.$class.ClassType())) {
-                this.FWriter.WriteString(b.GetObjectReference(AObject))}
-               else this.WriteSingleObject(AObject);
-            } else this.WriteSingleObject(AObject);
-          };
-        };
-      } finally {
-        rtl._Release(b);
-      };
-    };
-    this.Create$1 = function (AStream) {
-      this.FWriter = pas["WEBLib.TMSFNCJSONWriter"].TTMSFNCJSONWriter.$create("Create$1",[AStream]);
-      return this;
-    };
-    this.Destroy = function () {
-      rtl.free(this,"FWriter");
-      pas.System.TObject.Destroy.call(this);
-    };
-    this.Write = function (AObject) {
-      this.WriteObject(AObject);
-    };
-    this.WriteArray = function (AName, AArray) {
-      var I = 0;
-      this.FWriter.WriteBeginObject();
-      this.FWriter.WriteName(AName);
-      this.FWriter.WriteBeginArray();
-      for (var $l1 = 0, $end2 = rtl.length(AArray) - 1; $l1 <= $end2; $l1++) {
-        I = $l1;
-        this.WriteSingleObject(AArray[I]);
-      };
-      this.FWriter.WriteEndArray();
-      this.FWriter.WriteEndObject();
-    };
-  });
-  $mod.$rtti.$MethodVar("TTMSFNCReaderCustomReadPropertyEvent",{procsig: rtl.newTIProcSig([["AObject",pas.System.$rtti["TObject"]],["APropertyName",rtl.string],["APropertyKind",pas.TypInfo.$rtti["TTypeKind"]],["AReader",pas["WEBLib.TMSFNCJSONReader"].$rtti["TTMSFNCJSONReader"]],["ACanRead",rtl.boolean,1]]), methodkind: 0});
-  rtl.createClass($mod,"TTMSFNCReader",pas.System.TObject,function () {
-    rtl.createClass(this,"TTMSFNCObjectReference",pas.System.TObject,function () {
-      this.$init = function () {
-        pas.System.TObject.$init.call(this);
-        this.Instance = null;
-        this.Prop = null;
-        this.Id = "";
-      };
-      this.$final = function () {
-        this.Instance = undefined;
-        this.Prop = undefined;
-        pas.System.TObject.$final.call(this);
-      };
-      this.Create$1 = function (AInstance, AProp, AId) {
-        this.Instance = AInstance;
-        this.Prop = AProp;
-        this.Id = AId;
-        return this;
-      };
-    });
-    rtl.createClass(this,"TTMSFNCObjectReferences",pas.contnrs.TObjectList,function () {
-      this.GetItem$1 = function (Index) {
-        var Result = null;
-        Result = this.GetItem(Index);
-        return Result;
-      };
-      this.SetItem$1 = function (Index, Value) {
-        this.SetItem(Index,Value);
-      };
-    });
-    this.$init = function () {
-      pas.System.TObject.$init.call(this);
-      this.FReferences = null;
-      this.FReader = null;
-      this.FIOReference = null;
-      this.FOnCustomReadProperty = null;
-      this.FRootObject = null;
-      this.FExcludeProperties = [];
-      this.FOnCustomIsAssignableProperty = null;
-    };
-    this.$final = function () {
-      this.FReferences = undefined;
-      this.FReader = undefined;
-      this.FIOReference = undefined;
-      this.FOnCustomReadProperty = undefined;
-      this.FRootObject = undefined;
-      this.FExcludeProperties = undefined;
-      this.FOnCustomIsAssignableProperty = undefined;
-      pas.System.TObject.$final.call(this);
-    };
-    this.ReadSingleObject = function (ABaseClass) {
-      var Result = null;
-      var cn = "";
-      var b = null;
-      try {
-        this.FReader.ReadBeginObject();
-        if (!this.FReader.HasNext() || (this.FReader.ReadName() !== $mod.TTMSFNCPersistence.ClassTypeVariable)) throw $mod.ETMSFNCReaderException.$create("Create$1",['"' + $mod.TTMSFNCPersistence.ClassTypeVariable + '" property not found in Object descriptor.']);
-        cn = this.FReader.ReadString();
-        if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
-            return b;
-          }, set: function (v) {
-            b = v;
-          }})) {
-          Result = b.CreateObject(cn,ABaseClass)}
-         else Result = $mod.TTMSFNCPersistence.CreateObject(cn,ABaseClass);
-        try {
-          this.ReadProperties(Result);
-          this.FReader.ReadEndObject();
-        } catch ($e) {
-          Result = rtl.freeLoc(Result);
-          throw $e;
-        };
-      } finally {
-        rtl._Release(b);
-      };
-      return Result;
-    };
-    this.SetRootObject = function (Value) {
-      this.FRootObject = Value;
-      $mod.TTMSFNCPersistence.FRootObject = this.FRootObject;
-    };
-    this.SetExcludeProperties = function (Value) {
-      this.FExcludeProperties = Value;
-      $mod.TTMSFNCPersistence.FExcludeProperties = this.FExcludeProperties;
-    };
-    this.ReadSingleObject$1 = function (AObject) {
-      this.FReader.ReadBeginObject();
-      if (!this.FReader.HasNext() || (this.FReader.ReadName() !== $mod.TTMSFNCPersistence.ClassTypeVariable)) throw $mod.ETMSFNCReaderException.$create("Create$1",['"' + $mod.TTMSFNCPersistence.ClassTypeVariable + '" property not found in Object descriptor.']);
-      this.FReader.ReadString();
-      try {
-        this.ReadProperties(AObject);
-        this.FReader.ReadEndObject();
-      } catch ($e) {
-        throw $e;
-      };
-    };
-    this.ReadProperties = function (AObject) {
-      var Prop = null;
-      while (this.FReader.HasNext()) {
-        Prop = pas.TypInfo.GetPropInfo$2(AObject,this.FReader.ReadName());
-        if (Prop != null) {
-          this.ReadProperty(AObject,Prop)}
-         else this.FReader.SkipValue();
-      };
-    };
-    this.ReadProperty = function (AObject, AProp) {
-      var pName = "";
-      var ct = null;
-      var b = false;
-      var p = null;
-      var pio = null;
-      var k = 0;
-      var a = false;
-      var ap = false;
-      var o = null;
-      var n = "";
-      try {
-        if (!(AProp != null)) return;
-        k = $mod.TTMSFNCPersistence.GetPropInfoType(AProp);
-        pName = $mod.TTMSFNCPersistence.GetPropInfoName(AProp);
-        b = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(pName,$mod.TTMSFNCPersistence.FExcludeProperties) === -1;
-        if (pas.SysUtils.Supports$3(AObject,$mod.ITMSFNCPersistence.$guid,{get: function () {
-            return p;
-          }, set: function (v) {
-            p = v;
-          }})) b = p.CanLoadProperty(AObject,pName,k);
-        if (b) {
-          a = true;
-          if (this.FOnCustomReadProperty != null) this.FOnCustomReadProperty(AObject,pName,k,this.FReader,{get: function () {
-              return a;
-            }, set: function (v) {
-              a = v;
-            }});
-          if (a) {
-            if (k in rtl.createSet(pas.TypInfo.TTypeKind.tkClass)) {
-              ct = $mod.TTMSFNCPersistence.GetPropInfoDataTypeInfoClassType(AProp);
-              if ($mod.TTMSFNCPersistence.IsGenericList(ct,"String")) {
-                this.ReadGenericStringList(pas.TypInfo.GetObjectProp(AObject,pName))}
-               else if ($mod.TTMSFNCPersistence.IsGenericList(ct,"")) {
-                this.ReadGenericObjectList(pas.TypInfo.GetObjectProp(AObject,pName))}
-               else if ($mod.TTMSFNCPersistence.IsList(ct)) {
-                this.ReadList(pas.TypInfo.GetObjectProp(AObject,pName))}
-               else if ($mod.TTMSFNCPersistence.IsCollection(ct)) {
-                this.ReadCollection(pas.TypInfo.GetObjectProp(AObject,pName))}
-               else if ($mod.TTMSFNCPersistence.IsBitmap(ct)) {
-                this.ReadBitmap(pas.TypInfo.GetObjectProp(AObject,pName))}
-               else if ($mod.TTMSFNCPersistence.IsDescendingClass(ct,["TStrings"])) {
-                this.ReadStrings(pas.TypInfo.GetObjectProp(AObject,pName))}
-               else {
-                a = false;
-                if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
-                    return pio;
-                  }, set: function (v) {
-                    pio = v;
-                  }})) a = pio.NeedsObjectReference(ct);
-                if (a) {
-                  if (this.FReader.IsNull()) {
-                    this.FReader.ReadNull();
-                    pas.TypInfo.SetObjectProp(AObject,pName,null);
-                  } else this.FReferences.Add$1(this.TTMSFNCObjectReference.$create("Create$1",[AObject,AProp,this.FReader.ReadString()]));
-                } else {
-                  o = pas.TypInfo.GetObjectProp(AObject,pName);
-                  ap = $mod.TTMSFNCPersistence.IsAssignableProperty(AObject,AProp);
-                  if (this.FOnCustomIsAssignableProperty != null) this.FOnCustomIsAssignableProperty(AObject,pName,{get: function () {
-                      return ap;
-                    }, set: function (v) {
-                      ap = v;
-                    }});
-                  if (ap) {
-                    n = this.FReader.ReadString();
-                    if ((this.FRootObject != null) && pas.Classes.TComponent.isPrototypeOf(this.FRootObject)) pas.TypInfo.SetObjectProp(AObject,pName,rtl.as(this.FRootObject,pas.Classes.TComponent).FindComponent(n));
-                  } else this.ReadExistingObject(o);
-                };
-              };
-            } else this.ReadPropInfoValue(AObject,AProp);
-          };
-        };
-      } finally {
-        rtl._Release(p);
-        rtl._Release(pio);
-      };
-    };
-    this.ReadPropInfoValue = function (AInstance, APropInfo) {
-      var pName = "";
-      var cn = "";
-      var cnv = "";
-      var en = "";
-      var k = 0;
-      var p = null;
-      var o = null;
-      var i = 0;
-      var s = "";
-      var b = false;
-      var d = 0.0;
-      var ii = 0;
-      var v = "";
-      var m = pas.System.TMethod.$new();
-      if ($mod.TTMSFNCPersistence.IsWriteOnly(APropInfo)) {
-        this.FReader.ReadNull();
-        return;
-      };
-      o = AInstance;
-      p = APropInfo;
-      pName = $mod.TTMSFNCPersistence.GetPropInfoName(p);
-      k = $mod.TTMSFNCPersistence.GetPropInfoType(p);
-      var $tmp1 = k;
-      if ($tmp1 === pas.TypInfo.TTypeKind.tkInteger) {
-        cn = $mod.TTMSFNCPersistence.GetPropInfoTypeName(p);
-        if ((cn === "TAlphaColor") || (cn === "TColor") || (cn === "TGraphicsColor")) {
-          cnv = this.FReader.ReadString();
-          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) {
-            if (cnv === "gcNull") {
-              pas.TypInfo.SetOrdProp(o,pName,-1)}
-             else pas.TypInfo.SetOrdProp(o,pName,$impl.HTMLToColorEx(cnv));
-          };
-        } else {
-          i = this.FReader.ReadInteger();
-          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,i);
-        };
-      } else if (($tmp1 === pas.TypInfo.TTypeKind.tkChar) || ($tmp1 === pas.TypInfo.TTypeKind.tkString)) {
-        s = this.FReader.ReadString();
-        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetStrProp$1(o,p,s);
-      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkEnumeration) {
-        if ($mod.TTMSFNCPersistence.GetPropInfoDataTypeInfo(p) === rtl.boolean) {
-          b = this.FReader.ReadBoolean();
-          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,(b ? 1 : 0));
-        } else {
-          i = this.FReader.ReadInteger();
-          if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,i);
-        }}
-       else if ($tmp1 === pas.TypInfo.TTypeKind.tkBool) {
-        b = this.FReader.ReadBoolean();
-        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,(b ? 1 : 0));
-      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkDouble) {
-        d = this.FReader.ReadDouble();
-        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetFloatProp$1(o,p,d);
-      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkSet) {
-        i = this.FReader.ReadInteger();
-        if (!$mod.TTMSFNCPersistence.IsReadOnly(p)) pas.TypInfo.SetOrdProp$1(o,p,i);
-      } else if ($tmp1 === pas.TypInfo.TTypeKind.tkMethod) {
-        m.Data = null;
-        m.Code = null;
-        if (this.FReader.IsNull()) {
-          this.FReader.ReadNull()}
-         else {
-          if ($mod.TTMSFNCPersistence.FRootObject != null) {
-            v = this.FReader.ReadString();
-            m.Code = $mod.TTMSFNCPersistence.FRootObject.$class.MethodAddress(v);
-            if (m.Code !== null) m.Data = $mod.TTMSFNCPersistence.FRootObject;
-          } else this.FReader.ReadNull();
-        };
-        pas.TypInfo.SetMethodProp(o,p,m);
-      } else {
-        en = $mod.TTMSFNCPersistence.GetEnumName(pas.TypInfo.$rtti["TTypeKind"],k);
-        this.FReader.ReadNull();
-      };
-    };
-    this.ReadExistingObject = function (AObject) {
-      if (AObject != null) {
-        this.FReader.ReadBeginObject();
-        if (!this.FReader.HasNext() || (this.FReader.ReadName() !== $mod.TTMSFNCPersistence.ClassTypeVariable)) throw $mod.ETMSFNCReaderException.$create("Create$1",['"' + $mod.TTMSFNCPersistence.ClassTypeVariable + '" property not found in Object descriptor.']);
-        this.FReader.ReadString();
-        this.ReadProperties(AObject);
-        this.FReader.ReadEndObject();
-      } else this.FReader.ReadNull();
-    };
-    this.ReadGenericStringList = function (AList) {
-      var obj = "";
-      AList.Clear();
-      this.FReader.ReadBeginArray();
-      while (this.FReader.HasNext()) {
-        obj = this.FReader.ReadString();
-        AList.Add(obj);
-      };
-      this.FReader.ReadEndArray();
-    };
-    this.ReadStrings = function (AList) {
-      var obj = "";
-      AList.Clear();
-      this.FReader.ReadBeginArray();
-      while (this.FReader.HasNext()) {
-        obj = this.FReader.ReadString();
-        AList.Add(obj);
-      };
-      this.FReader.ReadEndArray();
-    };
-    this.ReadGenericObjectList = function (AList) {
-      var obj = null;
-      var b = null;
-      try {
-        AList.Clear();
-        this.FReader.ReadBeginArray();
-        while (this.FReader.HasNext()) {
-          obj = this.ReadSingleObject(pas.System.TObject);
-          if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
-              return b;
-            }, set: function (v) {
-              b = v;
-            }})) b.FixOwners(obj,AList);
-          AList.Add$1(obj);
-        };
-        this.FReader.ReadEndArray();
-      } finally {
-        rtl._Release(b);
-      };
-    };
-    this.ReadCollection = function (ACollection) {
-      var obj = null;
-      ACollection.Clear();
-      this.FReader.ReadBeginArray();
-      while (this.FReader.HasNext()) {
-        obj = this.ReadSingleObject(pas.System.TObject);
-        if (obj != null) {
-          try {
-            if (pas.Classes.TPersistent.isPrototypeOf(obj)) ACollection.Add().Assign(rtl.as(obj,pas.Classes.TPersistent));
-          } finally {
-            obj = rtl.freeLoc(obj);
-          };
-        };
-      };
-      this.FReader.ReadEndArray();
-    };
-    this.ReadList = function (AList) {
-      var obj = null;
-      var b = null;
-      try {
-        AList.Clear();
-        this.FReader.ReadBeginArray();
-        while (this.FReader.HasNext()) {
-          obj = this.ReadSingleObject(pas.System.TObject);
-          if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
-              return b;
-            }, set: function (v) {
-              b = v;
-            }})) b.FixOwners(obj,AList);
-          AList.Add(obj);
-        };
-        this.FReader.ReadEndArray();
-      } finally {
-        rtl._Release(b);
-      };
-    };
-    this.ReadBitmap = function (ABitmap) {
-      var s = "";
-      var ms = null;
-      s = this.FReader.ReadString();
-      if (s !== "") {
-        ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
-        try {
-          pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.LoadStreamFromHexStr(s,ms);
-          ms.FPosition = 0;
-          ABitmap.LoadFromStream(ms);
-        } finally {
-          ms = rtl.freeLoc(ms);
-        };
-      };
-    };
-    this.ReadObject = function (AObject) {
-      if (AObject === null) {
-        this.FReader.ReadNull()}
-       else {
-        if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"String")) {
-          this.ReadGenericStringList(AObject)}
-         else if ($mod.TTMSFNCPersistence.IsGenericList(AObject.$class.ClassType(),"")) {
-          this.ReadGenericObjectList(AObject)}
-         else if ($mod.TTMSFNCPersistence.IsList(AObject.$class.ClassType())) {
-          this.ReadList(AObject)}
-         else if ($mod.TTMSFNCPersistence.IsCollection(AObject.$class.ClassType())) {
-          this.ReadCollection(AObject)}
-         else if ($mod.TTMSFNCPersistence.IsBitmap(AObject.$class.ClassType())) {
-          this.ReadBitmap(AObject)}
-         else if ($mod.TTMSFNCPersistence.IsDescendingClass(AObject.$class.ClassType(),["TStrings"])) {
-          this.ReadStrings(AObject)}
-         else this.ReadSingleObject$1(AObject);
-      };
-    };
-    this.Create$1 = function (AStream) {
-      this.FReader = pas["WEBLib.TMSFNCJSONReader"].TTMSFNCJSONReader.$create("Create$1",[AStream]);
-      this.FReferences = this.TTMSFNCObjectReferences.$create("Create$3",[true]);
-      return this;
-    };
-    this.Destroy = function () {
-      rtl.free(this,"FReader");
-      rtl.free(this,"FReferences");
-      pas.System.TObject.Destroy.call(this);
-    };
-    this.Read = function (AClass) {
-      var Result = null;
-      Result = this.ReadSingleObject(AClass);
-      return Result;
-    };
-    this.Read$1 = function (AObject) {
-      this.ReadObject(AObject);
-    };
-    this.ReadArray = function (AName) {
-      var Result = [];
-      var Name = "";
-      this.FReader.ReadBeginObject();
-      while (this.FReader.HasNext()) {
-        Name = this.FReader.ReadName();
-        if (Name === AName) {
-          this.FReader.ReadBeginArray();
-          while (this.FReader.HasNext()) {
-            Result = rtl.arraySetLength(Result,null,rtl.length(Result) + 1);
-            Result[rtl.length(Result) - 1] = this.ReadSingleObject(pas.System.TObject);
-          };
-          this.FReader.ReadEndArray();
-        };
-      };
-      return Result;
-    };
-    this.SolveReferences = function () {
-      var b = null;
-      var r = 0;
-      var rf = null;
-      var o = null;
-      try {
-        if ((this.FIOReference != null) && pas.SysUtils.Supports$3(this.FIOReference,$mod.ITMSFNCPersistenceIO.$guid,{get: function () {
-            return b;
-          }, set: function (v) {
-            b = v;
-          }})) {
-          for (var $l1 = 0, $end2 = this.FReferences.GetCount() - 1; $l1 <= $end2; $l1++) {
-            r = $l1;
-            rf = this.FReferences.GetItem$1(r);
-            o = b.FindObject(rf.Id);
-            pas.TypInfo.SetObjectProp$1(rf.Instance,rf.Prop,o);
-          };
-        };
-      } finally {
-        rtl._Release(b);
-      };
-    };
-  });
-  rtl.createClass($mod,"TTMSFNCObjectPersistence",pas.System.TObject,function () {
-    this.SaveObjectToString = function (AObject) {
-      var Result = "";
-      var ss = null;
-      ss = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[""]);
-      try {
-        $mod.TTMSFNCPersistence.SaveSettingsToStream(AObject,ss);
-        ss.FPosition = 0;
-        Result = ss.GetDataString();
-      } finally {
-        ss = rtl.freeLoc(ss);
-      };
-      return Result;
-    };
-    this.LoadObjectFromString = function (AObject, AString) {
-      var ms = null;
-      ms = pas["WEBLib.TMSFNCTypes"].TStringStream.$create("Create$1",[AString]);
-      try {
-        $mod.TTMSFNCPersistence.LoadSettingsFromStream(AObject,ms);
-      } finally {
-        ms = rtl.freeLoc(ms);
-      };
-    };
-  });
-  rtl.createClass($mod,"TTMSFNCPersistence",pas.System.TObject,function () {
-    this.ClassTypeVariable = "";
-    this.FOnCustomReadProperty = null;
-    this.FOnCustomWriteProperty = null;
-    this.FRootObject = null;
-    this.FExcludeProperties = [];
-    this.DoCustomReadProperty = function (AObject, APropertyName, APropertyKind, AReader, ACanRead) {
-      if (this.FOnCustomReadProperty != null) this.FOnCustomReadProperty(AObject,APropertyName,APropertyKind,AReader,ACanRead);
-    };
-    this.DoCustomWriteProperty = function (AObject, APropertyName, APropertyKind, AWriter, ACanWrite) {
-      if (this.FOnCustomWriteProperty != null) this.FOnCustomWriteProperty(AObject,APropertyName,APropertyKind,AWriter,ACanWrite);
-    };
-    this.SaveSettingsToFile = function (AObject, AFileName) {
-      var ms = null;
-      ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
-      try {
-        this.SaveSettingsToStream(AObject,ms);
-        ms.SaveToFile(AFileName);
-      } finally {
-        ms = rtl.freeLoc(ms);
-      };
-    };
-    this.LoadSettingsFromFile = function (AObject, AFileName) {
-      var ms = null;
-      ms = pas["WEBLib.TMSFNCTypes"].TMemoryStream.$create("Create");
-      try {
-        this.LoadSettingsFromStream(AObject,ms);
-      } finally {
-        ms = rtl.freeLoc(ms);
-      };
-    };
-    this.SaveSettingsToStream = function (AObject, AStream) {
-      var Writer = null;
-      var d = "";
-      var t = "";
-      Writer = $mod.TTMSFNCWriter.$create("Create$1",[AStream]);
-      try {
-        Writer.SetRootObject($mod.TTMSFNCPersistence.FRootObject);
-        Writer.FOnCustomWriteProperty = rtl.createCallback(this,"DoCustomWriteProperty");
-        t = pas.SysUtils.FormatSettings.GetThousandSeparator();
-        d = pas.SysUtils.FormatSettings.GetDecimalSeparator();
-        pas.SysUtils.FormatSettings.SetDecimalSeparator(".");
-        pas.SysUtils.FormatSettings.SetThousandSeparator(",");
-        Writer.Write(AObject);
-        pas.SysUtils.FormatSettings.SetDecimalSeparator(d);
-        pas.SysUtils.FormatSettings.SetThousandSeparator(t);
-      } finally {
-        Writer = rtl.freeLoc(Writer);
-      };
-    };
-    this.LoadSettingsFromStream = function (AObject, AStream) {
-      var Reader = null;
-      var d = "";
-      var t = "";
-      AStream.FPosition = 0;
-      Reader = $mod.TTMSFNCReader.$create("Create$1",[AStream]);
-      try {
-        Reader.SetRootObject($mod.TTMSFNCPersistence.FRootObject);
-        Reader.FOnCustomReadProperty = rtl.createCallback(this,"DoCustomReadProperty");
-        t = pas.SysUtils.FormatSettings.GetThousandSeparator();
-        d = pas.SysUtils.FormatSettings.GetDecimalSeparator();
-        pas.SysUtils.FormatSettings.SetDecimalSeparator(".");
-        pas.SysUtils.FormatSettings.SetThousandSeparator(",");
-        Reader.Read$1(AObject);
-        pas.SysUtils.FormatSettings.SetDecimalSeparator(d);
-        pas.SysUtils.FormatSettings.SetThousandSeparator(t);
-      } finally {
-        Reader = rtl.freeLoc(Reader);
-      };
-    };
-    this.GetEnumValues = function (AValues, APropInfo) {
-      var p = null;
-      var pi = null;
-      var ps = null;
-      var I = 0;
-      var k = 0;
-      p = $impl.GetTypeInfoEx(APropInfo);
-      if ((p != null) && rtl.isExt(p,rtl.tTypeInfoSet)) p = p.comptype;
-      if ((p != null) && rtl.isExt(p,rtl.tTypeInfoInteger)) {
-        pi = p;
-        for (var $l1 = pi.minvalue, $end2 = pi.maxvalue; $l1 <= $end2; $l1++) {
-          I = $l1;
-          AValues.Add($mod.TTMSFNCPersistence.GetEnumName(p,I));
-        };
-      };
-    };
-    this.CreateObject = function (AClassName, BaseClass) {
-      var Result = null;
-      var ObjType = null;
-      ObjType = pas.Classes.GetClass(AClassName);
-      if (ObjType === null) throw $mod.ETMSFNCReaderException.$create("CreateFmt",['Type "%s" not found',[AClassName]]);
-      if (!ObjType.InheritsFrom(pas.System.TObject)) throw $mod.ETMSFNCReaderException.$create("Create$1",['Type "%s" is not an class type']);
-      if (BaseClass !== null) if (!ObjType.InheritsFrom(BaseClass)) throw $mod.ETMSFNCReaderException.$create("CreateFmt",['Type "%s" does not inherit from %s',[AClassName,BaseClass.$classname]]);
-      if (ObjType.InheritsFrom(pas["WEBLib.Controls"].TCustomControl)) {
-        Result = ObjType.$create("Create$1",[null])}
-       else if (ObjType.InheritsFrom(pas.Classes.TComponent)) {
-        Result = ObjType.$create("Create$1",[null])}
-       else if (ObjType.InheritsFrom(pas.Classes.TCollectionItem)) {
-        Result = ObjType.$create("Create$1",[null])}
-       else if (ObjType.InheritsFrom(pas.Classes.TPersistent)) {
-        Result = ObjType.$create("Create")}
-       else throw $mod.ETMSFNCReaderException.$create("CreateFmt",['Type "%s" not supported',[AClassName]]);
-      return Result;
-    };
-    this.GetPropInfoDataTypeInfo = function (APropInfo) {
-      var Result = null;
-      Result = null;
-      if (APropInfo != null) Result = APropInfo.typeinfo;
-      return Result;
-    };
-    this.GetPropInfoDataTypeInfoClassType = function (APropInfo) {
-      var Result = null;
-      var t = null;
-      Result = null;
-      if ((APropInfo != null) && (APropInfo.typeinfo != null)) {
-        t = APropInfo.typeinfo;
-        if (t.class){
-          return t.class.ClassType();
-        };
-      };
-      return Result;
-    };
-    this.GetPropInfoType = function (APropInfo) {
-      var Result = 0;
-      if (APropInfo.typeinfo != null) {
-        Result = APropInfo.typeinfo.kind}
-       else Result = pas.TypInfo.TTypeKind.tkUnknown;
-      return Result;
-    };
-    this.GetPropInfoName = function (APropInfo) {
-      var Result = "";
-      Result = APropInfo.name;
-      return Result;
-    };
-    this.GetPropInfoTypeName = function (APropInfo) {
-      var Result = "";
-      Result = "";
-      if (APropInfo.typeinfo != null) Result = APropInfo.typeinfo.name;
-      return Result;
-    };
-    this.GetEnumName = function (ATypeInfo, AValue) {
-      var Result = "";
-      Result = ATypeInfo.enumtype[AValue];
-      return Result;
-    };
-    this.IsWriteOnly = function (APropInfo) {
-      var Result = false;
-      Result = APropInfo.getter === "";
-      return Result;
-    };
-    this.IsReadOnly = function (APropInfo) {
-      var Result = false;
-      Result = APropInfo.setter === "";
-      return Result;
-    };
-    this.IsAssignableProperty = function (AObject, APropInfo) {
-      var Result = false;
-      var oProp = null;
-      var k = 0;
-      var pName = "";
-      Result = false;
-      k = this.GetPropInfoType(APropInfo);
-      if (k in rtl.createSet(pas.TypInfo.TTypeKind.tkClass)) {
-        pName = this.GetPropInfoName(APropInfo);
-        oProp = pas.TypInfo.GetObjectProp(AObject,pName);
-        Result = ((oProp != null) && this.IsComponent(oProp.$class.ClassType())) || !(oProp != null);
-      };
-      return Result;
-    };
-    this.IsColor = function (APropertyName) {
-      var Result = false;
-      Result = (APropertyName === "TAlphaColor") || (APropertyName === "TColor") || (APropertyName === "TGraphicsColor");
-      return Result;
-    };
-    this.IsStrokeKind = function (APropertyName) {
-      var Result = false;
-      Result = APropertyName === "TTMSFNCGraphicsStrokeKind";
-      return Result;
-    };
-    this.IsFillKind = function (APropertyName) {
-      var Result = false;
-      Result = APropertyName === "TTMSFNCGraphicsFillKind";
-      return Result;
-    };
-    this.IsDate = function (APropertyName) {
-      var Result = false;
-      Result = APropertyName === "TDate";
-      return Result;
-    };
-    this.IsDateTime = function (APropertyName) {
-      var Result = false;
-      Result = APropertyName === "TDateTime";
-      return Result;
-    };
-    this.IsTime = function (APropertyName) {
-      var Result = false;
-      Result = APropertyName === "TTime";
-      return Result;
-    };
-    this.IsGenericList = function (AClass, AType) {
-      var Result = false;
-      var cn = "";
-      if (!(AClass != null)) return false;
-      do {
-        cn = AClass.$classname;
-        if (pas.strutils.AnsiStartsStr("TList<",cn) || pas.strutils.AnsiStartsStr("TObjectList<",cn)) {
-          if ((AType === "") || ((AType !== "") && (pas.System.Pos(pas.SysUtils.LowerCase(AType),pas.SysUtils.LowerCase(cn)) > 0)) || (pas.System.Pos(pas.SysUtils.LowerCase(AType),pas.SysUtils.LowerCase(cn)) > 0)) return true;
-        };
-        AClass = AClass.$ancestor;
-      } while (AClass != null);
-      Result = false;
-      return Result;
-    };
-    this.IsCollection = function (AClass) {
-      var Result = false;
-      Result = this.IsDescendingClass(AClass,["TCollection"]);
-      return Result;
-    };
-    this.IsComponent = function (AClass) {
-      var Result = false;
-      Result = this.IsDescendingClass(AClass,["TComponent","TTMSFNCCustomComponent"]);
-      return Result;
-    };
-    this.IsControl = function (AClass) {
-      var Result = false;
-      Result = this.IsDescendingClass(AClass,["TControl"]);
-      return Result;
-    };
-    this.IsList = function (AClass) {
-      var Result = false;
-      Result = this.IsDescendingClass(AClass,["TList"]);
-      return Result;
-    };
-    this.IsDescendingClass = function (AClass, AClassParentList) {
-      var Result = false;
-      var cn = "";
-      var I = 0;
-      if (!(AClass != null)) return false;
-      do {
-        cn = AClass.$classname;
-        for (var $l1 = 0, $end2 = rtl.length(AClassParentList) - 1; $l1 <= $end2; $l1++) {
-          I = $l1;
-          if (cn === AClassParentList[I]) return true;
-        };
-        AClass = AClass.$ancestor;
-      } while (AClass != null);
-      Result = false;
-      return Result;
-    };
-    this.IsBitmap = function (AClass) {
-      var Result = false;
-      Result = this.IsDescendingClass(AClass,["TBitmap","TPicture","TTMSFNCBitmap"]);
-      return Result;
-    };
-    this.IsStrings = function (AClass) {
-      var Result = false;
-      Result = this.IsDescendingClass(AClass,["TStrings"]);
-      return Result;
-    };
-  });
-  this.ExcludePropertyList = ["Align","AllowFocus","Anchors","BevelEdges","BevelInner","BevelKind","BevelOuter","BevelWidth","BiDiMode","BitmapContainer","BorderSpacing","CanParentFocus","ClipChildren","ClipParent","Constraints","Ctl3D","DisableFocusEffect","DoubleBuffered","DragCursor","DragKind","DragMode","Enabled","EnableDragHighLight","Height","Hint","HitTest","Locked","Margins","Name","Opacity","Padding","ParentBiDiMode","ParentColor","ParentCtl3D","ParentDoubleBuffered","ParentFont","ParentShowHint","PopupMenu","Position","RotationAngle","RotationCenter","Scale","ShowHint","Size","StyleElements","StyleName","TabOrder","TabStop","Tag","Touch","TouchTargetExpansion","Visible","Width"];
-  $mod.$init = function () {
-    $mod.TTMSFNCPersistence.ClassTypeVariable = "$type";
-  };
-},["strutils","WEBLib.Controls","WEBLib.Graphics","WEBLib.TMSFNCUtils"],function () {
-  "use strict";
-  var $mod = this;
-  var $impl = $mod.$impl;
-  $impl.gcNull = -1;
-  $mod.$rtti.$ClassRef("TCustomControlClass",{instancetype: pas["WEBLib.Controls"].$rtti["TCustomControl"]});
-  $impl.GetTypeInfoEx = function (APropInfo) {
-    var Result = null;
-    Result = APropInfo.typeinfo;
-    return Result;
-  };
-  $impl.GetColorRed = function (AColor) {
-    var Result = 0;
-    AColor = pas["WEBLib.Graphics"].ColorToRGB(AColor);
-    Result = pas["WEBLib.Graphics"].GetRValue(AColor);
-    return Result;
-  };
-  $impl.GetColorGreen = function (AColor) {
-    var Result = 0;
-    AColor = pas["WEBLib.Graphics"].ColorToRGB(AColor);
-    Result = pas["WEBLib.Graphics"].GetGValue(AColor);
-    return Result;
-  };
-  $impl.GetColorBlue = function (AColor) {
-    var Result = 0;
-    AColor = pas["WEBLib.Graphics"].ColorToRGB(AColor);
-    Result = pas["WEBLib.Graphics"].GetBValue(AColor);
-    return Result;
-  };
-  $impl.HTMLToColorEx = function (AHTML) {
-    var Result = 0;
-    function HexVal(s) {
-      var Result = 0;
-      var i = 0;
-      var j = 0;
-      var i1 = 0;
-      var i2 = 0;
-      if (s.length < 2) {
-        Result = 0;
-        return Result;
-      };
-      i1 = 1;
-      i2 = 2;
-      if (s.charAt(i1 - 1) >= "A") {
-        i = (s.charCodeAt(i1 - 1) - "A".charCodeAt()) + 10}
-       else i = s.charCodeAt(i1 - 1) - "0".charCodeAt();
-      if (s.charAt(i2 - 1) >= "A") {
-        j = (s.charCodeAt(i2 - 1) - "A".charCodeAt()) + 10}
-       else j = s.charCodeAt(i2 - 1) - "0".charCodeAt();
-      Result = (i << 4) + j;
-      return Result;
-    };
-    var r = 0;
-    var g = 0;
-    var b = 0;
-    r = HexVal(pas.System.Copy(AHTML,2,2));
-    g = HexVal(pas.System.Copy(AHTML,4,2)) << 8;
-    b = HexVal(pas.System.Copy(AHTML,6,2)) << 16;
-    Result = b + g + r;
-    return Result;
-  };
-  var HTMLHexColor = "#RRGGBB";
-  var HexDigit = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
-  $impl.ColorToHTMLEx = function (AColor) {
-    var Result = "";
-    var c = 0;
-    var i = 0;
-    i = 1;
-    c = pas["WEBLib.Graphics"].ColorToRGB(AColor);
-    Result = HTMLHexColor;
-    Result = rtl.setCharAt(Result,(1 + i) - 1,HexDigit[$impl.GetColorRed(c) >>> 4]);
-    Result = rtl.setCharAt(Result,(2 + i) - 1,HexDigit[$impl.GetColorRed(c) & 0xF]);
-    Result = rtl.setCharAt(Result,(3 + i) - 1,HexDigit[$impl.GetColorGreen(c) >>> 4]);
-    Result = rtl.setCharAt(Result,(4 + i) - 1,HexDigit[$impl.GetColorGreen(c) & 0xF]);
-    Result = rtl.setCharAt(Result,(5 + i) - 1,HexDigit[$impl.GetColorBlue(c) >>> 4]);
-    Result = rtl.setCharAt(Result,(6 + i) - 1,HexDigit[$impl.GetColorBlue(c) & 0xF]);
-    return Result;
-  };
-});
 rtl.module("WEBLib.TMSFNCTypes",["System","Types","Classes","WEBLib.Graphics","SysUtils","WEBLib.Controls","Math"],function () {
   "use strict";
   var $mod = this;
@@ -51162,7 +51663,7 @@ rtl.module("WEBLib.TMSFNCTypes",["System","Types","Classes","WEBLib.Graphics","S
     $r.addMethod("GetTipsURL",1,null,rtl.string);
   });
   this.TTMSFNCBaseDocURL = "http:\/\/www.tmssoftware.biz\/Download\/Manuals\/TMSFNCUIPackDevGuide.pdf";
-  this.TTMSFNCBaseTipsURL = "http:\/\/www.tmssoftware.com\/site\/tmsfncuipack.asp?s=faq";
+  this.TTMSFNCBaseTipsURL = "http:\/\/www.tmssoftware.com\/site\/tmsfnccore.asp?s=faq";
   this.pidWeb = 0x1000;
   this.ssCommand = pas["WEBLib.Controls"].TShiftState$a.ssCtrl;
   this.TMSPlatformsDesktop = 0;
@@ -51652,9 +52153,17 @@ rtl.module("WEBLib.TMSFNCTypes",["System","Types","Classes","WEBLib.Graphics","S
     };
     this.FromJSON = function (Value) {
       var s = null;
+      var cs = "";
+      var obj = null;
       s = $mod.TStringStream.$create("Create$1",[Value]);
       try {
+        obj = pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.FIOReference;
+        cs = pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.ClassTypeVariable;
+        pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.ClassTypeVariable = "";
+        pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.FIOReference = this;
         pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.LoadSettingsFromStream(this,s);
+        pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.ClassTypeVariable = cs;
+        pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.FIOReference = obj;
       } finally {
         s = rtl.freeLoc(s);
       };
@@ -52964,7 +53473,7 @@ rtl.module("WEBLib.TMSFNCUndo",["System","Classes","WEBLib.TMSFNCTypes"],functio
           }, set: function (v) {
             p = v;
           }})) {
-          p.SaveSettingsToStream($with1.FState)}
+          p.SaveSettingsToStream($with1.FState,false)}
          else pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.SaveSettingsToStream(this.FObject,$with1.FState);
         this.FCurrent += 1;
         if (this.GetCount() > this.FMaxStackCount) {
@@ -53401,6 +53910,7 @@ rtl.module("WEBLib.TMSFNCCustomControl",["System","Classes","WEBLib.Controls","W
     this.FBlockPersistenceInterface = false;
     this.$init = function () {
       $mod.TTMSFNCCustomControlBase.$init.call(this);
+      this.FAppearancePersisting = false;
       this.FExporting = false;
       this.FExportRect = pas["WEBLib.TMSFNCTypes"].TRectF.$new();
       this.FBlockInvalidate = false;
@@ -53482,11 +53992,26 @@ rtl.module("WEBLib.TMSFNCCustomControl",["System","Classes","WEBLib.Controls","W
       Result = "";
       return Result;
     };
+    this.IsAppearanceProperty = function (AObject, APropertyName, APropertyType) {
+      var Result = false;
+      var Prop = null;
+      var pName = "";
+      var cn = "";
+      Result = false;
+      Prop = pas.TypInfo.GetPropInfo$2(AObject,APropertyName);
+      if (Prop != null) {
+        pName = pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.GetPropInfoName(Prop);
+        cn = pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.GetPropInfoTypeName(Prop);
+        Result = (cn === "TAlphaColor") || (cn === "TColor") || (cn === "TGraphicsColor") || (cn === "TTMSFNCGraphicsFill") || (cn === "TTMSFNCGraphicsStroke") || (pas.System.Pos("Appearance",pName) > 0);
+      };
+      return Result;
+    };
     this.CanSaveProperty = function (AObject, APropertyName, APropertyType) {
       var Result = false;
       if ((AObject === this) && !this.FBlockPersistenceInterface) {
         Result = pas["WEBLib.TMSFNCUtils"].TTMSFNCUtils.IndexOfTextInArray(APropertyName,pas["WEBLib.TMSFNCPersistence"].ExcludePropertyList) === -1}
        else Result = true;
+      if (this.FAppearancePersisting) Result = Result && this.IsAppearanceProperty(AObject,APropertyName,APropertyType);
       this.DoCanSaveProperty(AObject,APropertyName,APropertyType,{get: function () {
           return Result;
         }, set: function (v) {
@@ -54207,14 +54732,18 @@ rtl.module("WEBLib.TMSFNCCustomControl",["System","Classes","WEBLib.Controls","W
       Result = pas.Classes.TComponentStateItem.csDestroying in this.FComponentState;
       return Result;
     };
-    this.SaveSettingsToFile = function (AFileName) {
+    this.SaveSettingsToFile = function (AFileName, AAppearanceOnly) {
+      this.FAppearancePersisting = AAppearanceOnly;
       pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.SaveSettingsToFile(this,AFileName);
+      this.FAppearancePersisting = false;
     };
     this.LoadSettingsFromFile = function (AFileName) {
       pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.LoadSettingsFromFile(this,AFileName);
     };
-    this.SaveSettingsToStream = function (AStream) {
+    this.SaveSettingsToStream = function (AStream, AAppearanceOnly) {
+      this.FAppearancePersisting = AAppearanceOnly;
       pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.SaveSettingsToStream(this,AStream);
+      this.FAppearancePersisting = false;
     };
     this.LoadSettingsFromStream = function (AStream) {
       pas["WEBLib.TMSFNCPersistence"].TTMSFNCPersistence.LoadSettingsFromStream(this,AStream);
@@ -56848,6 +57377,7 @@ rtl.module("WEBLib.TMSFNCPopup",["System","Classes","WEBLib.Controls","WEBLib.TM
       return Result;
     };
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
   });
   rtl.createClass($mod,"TTMSFNCPopup",$mod.TTMSFNCCustomPopup,function () {
@@ -56876,6 +57406,7 @@ rtl.module("WEBLib.TMSFNCPopup",["System","Classes","WEBLib.Controls","WEBLib.TM
       this.DoCreatePopup(AShowModal);
     };
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
     $r.addProperty("StaysOpen",0,rtl.boolean,"FStaysOpen","FStaysOpen",{Default: false});
@@ -56921,6 +57452,7 @@ rtl.module("WEBLib.TMSFNCPopup",["System","Classes","WEBLib.Controls","WEBLib.TM
       $mod.TTMSFNCCustomPopup.Destroy.call(this);
     };
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
   });
   rtl.createClass($mod,"TTMSFNCNonFocusablePopup",$mod.TTMSFNCCustomNonFocusablePopup,function () {
@@ -56931,6 +57463,7 @@ rtl.module("WEBLib.TMSFNCPopup",["System","Classes","WEBLib.Controls","WEBLib.TM
       this.DoCreatePopup(false);
     };
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
     $r.addProperty("ContentControl",2,pas["WEBLib.Controls"].$rtti["TControl"],"FContentControl","SetContentControl");
@@ -58378,7 +58911,6 @@ rtl.module("WEBLib.Menus",["System","Classes","SysUtils","WEBLib.Controls","WEBL
       if (pm != null) pm.UpdateElement();
     };
     this.SetEnabled = function (Value) {
-      var MenuOwner = null;
       if (this.FEnabled !== Value) {
         this.FEnabled = Value;
         this.GetParentMenu().UpdateElement();
@@ -58835,7 +59367,7 @@ rtl.module("WEBLib.Menus",["System","Classes","SysUtils","WEBLib.Controls","WEBL
       ElHandle.innerHTML = "";
       ElHandle.style.setProperty("overflow","visible");
       if (this.FAppearance.FHamburgerMenu.FVisible !== $mod.TMainMenuHamburgerMenuVisible.hmAlways) {
-        MenuResponsiveStyle = "  #" + this.FName + "menu .main-menu {\r" + "    display: block;\r" + "  }\r" + "  #toggle-menu {\r" + "    display: none;\r" + "  }\r" + "  #" + this.FName + "menu ul span.drop-label {\r" + "    display: inline-block;\r" + "  }\r" + "  #" + this.FName + "menu li {\r" + "    float: left;\r" + "    border-width: 0 1px 0 0;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu li {\r" + "    float: none;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu {\r" + "    border-width: 0;\r" + "    margin: 0;\r" + "    position: absolute;\r" + "    top: 100%;\r" + "    left: 0;\r" + "    min-width: 12em;\r" + "    z-index: 3000;\r" + "\t   white-space: nowrap;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu,\r" + "  #" + this.FName + 'menu input[type="checkbox"]:checked + .sub-menu {\r' + "    display: none;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu li {\r" + "    border-width: 1px;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu .sub-menu {\r" + "    top: 0;\r" + "    left: 100%;\r" + "  }\r" + "  #" + this.FName + 'menu li:hover > input[type="checkbox"] + .sub-menu {\r' + "    display: block;\r" + "  }\r";
+        MenuResponsiveStyle = "  #" + this.FName + "menu .main-menu {\r" + "    display: block;\r" + "  }\r" + "  #toggle-menu {\r" + "    display: none;\r" + "  }\r" + "  #" + this.FName + "menu ul span.drop-label {\r" + "    display: inline-block;\r" + "  }\r" + "  #" + this.FName + "menu li {\r" + "    float: left;\r" + "    border-width: 0 1px 0 0;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu li {\r" + "    float: none;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu {\r" + "    border-width: 0;\r" + "    margin: 0;\r" + "    position: absolute;\r" + "    top: 100%;\r" + "    left: 0;\r" + "    min-width: 12em;\r" + "    z-index: 9999999;\r" + "\t   white-space: nowrap;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu,\r" + "  #" + this.FName + 'menu input[type="checkbox"]:checked + .sub-menu {\r' + "    display: none;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu li {\r" + "    border-width: 1px;\r" + "  }\r" + "  #" + this.FName + "menu .sub-menu .sub-menu {\r" + "    top: 0;\r" + "    left: 100%;\r" + "  }\r" + "  #" + this.FName + 'menu li:hover > input[type="checkbox"] + .sub-menu {\r' + "    display: block;\r" + "  }\r";
         if (this.FAppearance.FHamburgerMenu.FVisible === $mod.TMainMenuHamburgerMenuVisible.hmResponsive) {
           MenuResponsiveStyle = "@media only screen and (min-width: " + pas.SysUtils.IntToStr(this.FAppearance.FHamburgerMenu.FResponsiveMaxWidth) + "px) {\r" + MenuResponsiveStyle + "}";
         };
@@ -61673,6 +62205,7 @@ rtl.module("WEBLib.TMSFNCToolBar",["System","Classes","WEBLib.TMSFNCGraphics","W
   $mod.$rtti.$MethodVar("TTMSFNCToolBarDragGripMovingEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["DeltaX",rtl.double],["DeltaY",rtl.double]]), methodkind: 0});
   rtl.createClass($mod,"TTMSFNCToolBarPopup",pas["WEBLib.TMSFNCPopup"].TTMSFNCNonFocusablePopup,function () {
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
   });
   rtl.createClass($mod,"TTMSFNCCustomToolBar",pas["WEBLib.TMSFNCCustomControl"].TTMSFNCCustomControl,function () {
@@ -62318,7 +62851,7 @@ rtl.module("WEBLib.TMSFNCToolBar",["System","Classes","WEBLib.TMSFNCGraphics","W
           if (pas["WEBLib.TMSFNCTypes"].PtInRectEx(r,pas["WEBLib.TMSFNCTypes"].PointF(X,Y))) {
             if (!this.FInsideDrag) {
               this.FInsideDrag = true;
-              this.SetControlCursor(22);
+              this.SetControlCursor(5);
             };
           } else if (this.FInsideDrag) {
             this.FInsideDrag = false;
@@ -63617,7 +64150,7 @@ rtl.module("WEBLib.TMSFNCToolBar",["System","Classes","WEBLib.TMSFNCGraphics","W
     pas.Classes.RegisterClass($mod.TTMSFNCToolBarButton);
   };
 },["Math","SysUtils","WEBLib.TMSFNCUtils","WEBLib.Graphics","strutils","WEBLib.TMSFNCStyles"]);
-rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLib.TMSFNCToolBarRes","WEBLib.TMSFNCCustomControl","WEBLib.TMSFNCTypes","WEBLib.TMSFNCPopup","WEBLib.ExtCtrls","WEBLib.StdCtrls","WEBLib.Graphics","WEBLib.Controls","WEBLib.TMSFNCGraphicsTypes"],function () {
+rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLib.TMSFNCToolBarRes","WEBLib.TMSFNCCustomControl","WEBLib.TMSFNCTypes","WEBLib.TMSFNCPopup","WEBLib.ExtCtrls","WEBLib.StdCtrls","WEBLib.Graphics","WEBLib.Controls","WEBLib.TMSFNCGraphicsTypes","WEBLib.TMSFNCBitmapContainer"],function () {
   "use strict";
   var $mod = this;
   var $impl = $mod.$impl;
@@ -64729,6 +65262,7 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
     $r.addProperty("AutoSelect",2,rtl.boolean,"FAutoSelect","SetAutoSelect");
     $r.addProperty("AutoSize",2,rtl.boolean,"FAutoSize","SetAutoSize");
     $r.addProperty("Hint",2,rtl.string,"FHint","SetHint");
+    $r.addProperty("TextHint",2,rtl.string,"FTextHint","SetTextHint");
     $r.addProperty("BorderStyle",2,pas["WEBLib.Controls"].$rtti["TBorderStyle"],"FBorderStyle","SetBorderStyle",{Default: pas["WEBLib.Controls"].TBorderStyle.bsSingle});
     $r.addProperty("Color",2,pas["WEBLib.Graphics"].$rtti["TColor"],"FColor","SetColor");
     $r.addProperty("DoubleBuffered",0,rtl.boolean,"FDoubleBuffered","FDoubleBuffered",{Default: false});
@@ -64737,7 +65271,7 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
     $r.addProperty("HideSelection",2,rtl.boolean,"FHideSelection","SetHideSelection");
     $r.addProperty("MaxLength",2,rtl.longint,"FMaxLength","SetMaxLength");
     $r.addProperty("PasswordChar",2,rtl.char,"FPasswordChar","SetPasswordChar",{Default: "\x00"});
-    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly");
+    $r.addProperty("ReadOnly",2,rtl.boolean,"FReadOnly","SetReadOnly",{Default: false});
     $r.addProperty("ShowHint",2,rtl.boolean,"FShowHint","SetShowHint",{Default: false});
     $r.addProperty("TabOrder",2,rtl.longint,"FTabOrder","SetTabOrder");
     $r.addProperty("TabStop",2,rtl.boolean,"FTabStop","SetTabStop",{Default: true});
@@ -64781,6 +65315,10 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
       this.FPopupControl = null;
       this.FOnButtonClick = null;
       this.FModalPopup = false;
+      this.FBitmap = null;
+      this.FBitmapName = "";
+      this.FButtonSize = 0;
+      this.FBitmapContainer = null;
     };
     this.$final = function () {
       this.FPopup = undefined;
@@ -64788,6 +65326,8 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
       this.FButton = undefined;
       this.FPopupControl = undefined;
       this.FOnButtonClick = undefined;
+      this.FBitmap = undefined;
+      this.FBitmapContainer = undefined;
       pas["WEBLib.TMSFNCCustomControl"].TTMSFNCCustomControl.$final.call(this);
     };
     this.SetPopupControl = function (Value) {
@@ -64802,11 +65342,45 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
     this.SetText = function (Value) {
       this.FEdit.SetT(Value);
     };
+    this.GetBitmapContainer = function () {
+      var Result = null;
+      Result = this.FBitmapContainer;
+      return Result;
+    };
+    this.SetBitmap = function (Value) {
+      this.FBitmap = Value;
+      if (this.FButton != null) {
+        this.FButton.FBitmaps.Clear();
+        this.FButton.FBitmaps.AddBitmap(Value,1.0);
+      };
+    };
+    this.SetBitmapContainer = function (Value) {
+      this.FBitmapContainer = Value;
+      if (this.FButton != null) this.FButton.SetBitmapContainer(Value);
+    };
+    this.SetBitmapName = function (Value) {
+      this.FBitmapName = Value;
+      if (this.FButton != null) {
+        this.FButton.FBitmaps.Clear();
+        this.FButton.FBitmaps.AddBitmapName(Value,1.0);
+      };
+    };
+    this.SetButtonSize = function (Value) {
+      this.FButtonSize = Value;
+      if (this.FButton != null) this.FButton.SetWidth(Value);
+    };
     this.SetAdaptToStyle = function (Value) {
       pas["WEBLib.TMSFNCCustomControl"].TTMSFNCCustomControlBaseCommon.SetAdaptToStyle.apply(this,arguments);
       if (this.FButton != null) this.FButton.SetAdaptToStyle(this.GetAdaptToStyle());
     };
     this.BeforeDropDown = function () {
+    };
+    this.Loaded = function () {
+      pas["WEBLib.Controls"].TCustomControl.Loaded.call(this);
+      if ((this.FButton != null) && (this.FBitmapContainer != null) && (this.FBitmapName !== "")) {
+        this.FButton.FBitmaps.Clear();
+        this.FButton.FBitmaps.AddBitmapName(this.FBitmapName,1.0);
+      };
     };
     this.KeyDown = function (Key, Shift) {
       pas["WEBLib.TMSFNCCustomControl"].TTMSFNCCustomControlBase.KeyDown.apply(this,arguments);
@@ -64823,6 +65397,7 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
     };
     this.Notification = function (AComponent, Operation) {
       if ((Operation === pas.Classes.TOperation.opRemove) && (AComponent === this.FPopupControl)) this.FPopupControl = null;
+      if ((Operation === pas.Classes.TOperation.opRemove) && (AComponent === this.FBitmapContainer)) this.FBitmapContainer = null;
       pas.Classes.TComponent.Notification.apply(this,arguments);
     };
     this.ButtonClick = function (Sender) {
@@ -64832,6 +65407,12 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
     };
     this.ButtonDblClick = function (Sender) {
       this.FBlockDropDown = true;
+    };
+    this.BitmapChanged = function (Sender) {
+      if (this.FButton != null) {
+        this.FButton.FBitmaps.Clear();
+        this.FButton.FBitmaps.AddBitmap(this.FBitmap,1.0);
+      };
     };
     this.Create$1 = function (AOwner) {
       pas["WEBLib.TMSFNCCustomControl"].TTMSFNCCustomControl.Create$1.apply(this,arguments);
@@ -64860,6 +65441,9 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
       this.FPopup.SetDragWithParent(true);
       this.FPopup.SetWidth(240);
       this.FPopup.SetHeight(160);
+      this.FButtonSize = 18;
+      this.FBitmap = pas["WEBLib.TMSFNCTypes"].TTMSFNCBitmap.$create("Create$3");
+      this.FBitmap.FOnChange = rtl.createCallback(this,"BitmapChanged");
       this.SetWidth(118);
       this.SetHeight(22);
       return this;
@@ -64867,6 +65451,7 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
     this.Destroy = function () {
       rtl.free(this,"FButton");
       rtl.free(this,"FPopup");
+      rtl.free(this,"FBitmap");
       pas["WEBLib.TMSFNCCustomControl"].TTMSFNCCustomControl.Destroy.call(this);
     };
     this.DropDown = function () {
@@ -64877,12 +65462,17 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
         } else this.FPopup.SetIsOpen(false);
       };
     };
+    rtl.addIntf(this,pas["WEBLib.TMSFNCBitmapContainer"].ITMSFNCBitmapContainer);
     rtl.addIntf(this,pas["WEBLib.TMSFNCGraphics"].ITMSFNCGraphicsExport);
     rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas["WEBLib.TMSFNCStyles"].ITMSFNCAdaptToStyle);
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
+    $r.addProperty("BitmapContainer",3,pas["WEBLib.TMSFNCBitmapContainer"].$rtti["TTMSFNCBitmapContainer"],"GetBitmapContainer","SetBitmapContainer");
+    $r.addProperty("Bitmap",2,pas["WEBLib.TMSFNCTypes"].$rtti["TTMSFNCBitmap"],"FBitmap","SetBitmap");
+    $r.addProperty("BitmapName",2,rtl.string,"FBitmapName","SetBitmapName");
+    $r.addProperty("ButtonSize",2,rtl.longint,"FButtonSize","SetButtonSize",{Default: 18});
     $r.addProperty("PopupControl",2,pas["WEBLib.Controls"].$rtti["TControl"],"FPopupControl","SetPopupControl");
     $r.addProperty("OnButtonClick",0,pas["WEBLib.Controls"].$rtti["TNotifyEvent"],"FOnButtonClick","FOnButtonClick");
     $r.addProperty("Text",3,rtl.string,"GetText","SetText");
@@ -64898,6 +65488,7 @@ rtl.module("WEBLib.TMSFNCEdit",["System","Classes","WEBLib.TMSFNCToolBar","WEBLi
   $mod.$rtti.$Enum("TTMSFNCEditAutoType",{minvalue: 0, maxvalue: 5, ordtype: 1, enumtype: $impl.TTMSFNCEditAutoType});
   rtl.createClass($impl,"TTMSFNCPopupOpen",pas["WEBLib.TMSFNCPopup"].TTMSFNCPopup,function () {
     rtl.addIntf(this,pas["WEBLib.TMSFNCTypes"].ITMSFNCProductInfo);
+    rtl.addIntf(this,pas["WEBLib.TMSFNCPersistence"].ITMSFNCPersistence);
     rtl.addIntf(this,pas.System.IUnknown);
   });
   $impl.CheckTerminator = function (ch) {
@@ -67504,6 +68095,7 @@ rtl.module("forms.creategameform",["System","SysUtils","Variants","Classes","WEB
         this.SpinMinUsers.FSpinAppearance.FValueFont.SetName("Tahoma");
         this.SpinMinUsers.FSpinAppearance.FValueFont.SetStyle(rtl.createSet(pas["WEBLib.Graphics"].TFontStyle.fsBold));
         this.SpinMinUsers.FSpinInteraction.SetRepeatClick(true);
+        this.SpinMinUsers.SetEditFieldPrecision(2);
         this.SpinMinUsers.FFill.SetKind(pas["WEBLib.TMSFNCGraphicsTypes"].TTMSFNCGraphicsFillKind.gfkNone);
         this.SpinMinUsers.FStroke.SetKind(pas["WEBLib.TMSFNCGraphicsTypes"].TTMSFNCGraphicsStrokeKind.gskNone);
         this.SpinMinUsers.FStroke.SetColor(14524677);
@@ -67539,6 +68131,7 @@ rtl.module("forms.creategameform",["System","SysUtils","Variants","Classes","WEB
         this.SpinMaxUsers.FSpinAppearance.FValueFont.SetName("Tahoma");
         this.SpinMaxUsers.FSpinAppearance.FValueFont.SetStyle(rtl.createSet(pas["WEBLib.Graphics"].TFontStyle.fsBold));
         this.SpinMaxUsers.FSpinInteraction.SetRepeatClick(true);
+        this.SpinMaxUsers.SetEditFieldPrecision(2);
         this.SpinMaxUsers.FFill.SetKind(pas["WEBLib.TMSFNCGraphicsTypes"].TTMSFNCGraphicsFillKind.gfkNone);
         this.SpinMaxUsers.FStroke.SetKind(pas["WEBLib.TMSFNCGraphicsTypes"].TTMSFNCGraphicsStrokeKind.gskNone);
         this.SpinMaxUsers.FStroke.SetColor(14524677);
@@ -67648,12 +68241,12 @@ rtl.module("WEBLib.Storage",["System","Web"],function () {
     };
     this.GetKey = function (AIndex) {
       var Result = "";
-      Result = window.localStorage.key(AIndex);
+      Result = window.sessionStorage.key(AIndex);
       return Result;
     };
     this.GetCount = function () {
       var Result = 0;
-      Result = window.localStorage.length;
+      Result = window.sessionStorage.length;
       return Result;
     };
     this.SetValue = function (AKey, AValue) {
@@ -67676,9 +68269,34 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
   "use strict";
   var $mod = this;
   var $impl = $mod.$impl;
+  rtl.recNewT($mod,"TJSXMLHttpRequestRecord",function () {
+    this.req = null;
+    this.$eq = function (b) {
+      return this.req === b.req;
+    };
+    this.$assign = function (s) {
+      this.req = s.req;
+      return this;
+    };
+    var $r = $mod.$rtti.$Record("TJSXMLHttpRequestRecord",{});
+    $r.addField("req",pas.Web.$rtti["TJSXMLHttpRequest"]);
+  });
+  rtl.recNewT($mod,"TJSEventRecord",function () {
+    this.event = null;
+    this.$eq = function (b) {
+      return this.event === b.event;
+    };
+    this.$assign = function (s) {
+      this.event = s.event;
+      return this;
+    };
+    var $r = $mod.$rtti.$Record("TJSEventRecord",{});
+    $r.addField("event",pas.Web.$rtti["TEventListenerEvent"]);
+  });
   $mod.$rtti.$MethodVar("THTTPResponseEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["AResponse",rtl.string]]), methodkind: 0});
   $mod.$rtti.$MethodVar("THTTPRequestResponseEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["ARequest",pas.Web.$rtti["TJSXMLHttpRequest"]],["AResponse",rtl.string]]), methodkind: 0});
   $mod.$rtti.$MethodVar("THTTPAbortEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]]]), methodkind: 0});
+  $mod.$rtti.$MethodVar("THTTPErrorEvent",{procsig: rtl.newTIProcSig([["Sender",pas.System.$rtti["TObject"]],["ARequest",pas.Web.$rtti["TJSXMLHttpRequest"]],["Event",pas.Web.$rtti["TEventListenerEvent"]],["Handled",rtl.boolean,1]]), methodkind: 0});
   this.THTTPCommand = {"0": "httpGET", httpGET: 0, "1": "httpPOST", httpPOST: 1, "2": "httpPUT", httpPUT: 2, "3": "httpDELETE", httpDELETE: 3, "4": "httpHEAD", httpHEAD: 4, "5": "httpPATCH", httpPATCH: 5, "6": "httpCUSTOM", httpCUSTOM: 6};
   $mod.$rtti.$Enum("THTTPCommand",{minvalue: 0, maxvalue: 6, ordtype: 1, enumtype: this.THTTPCommand});
   rtl.createClass($mod,"THttpRequest",pas.Classes.TComponent,function () {
@@ -67696,6 +68314,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
       this.FUser = "";
       this.FTimeout = 0;
       this.FOnTimeout = null;
+      this.FOnError = null;
     };
     this.$final = function () {
       this.FOnResponse = undefined;
@@ -67703,6 +68322,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
       this.FHeaders = undefined;
       this.FOnRequestResponse = undefined;
       this.FOnTimeout = undefined;
+      this.FOnError = undefined;
       pas.Classes.TComponent.$final.call(this);
     };
     this.HandleResponse = function (Event) {
@@ -67726,6 +68346,19 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
       var Result = false;
       if (this.FOnTimeout != null) this.FOnTimeout(this);
       Result = true;
+      return Result;
+    };
+    this.HandleError = function (Event) {
+      var Result = false;
+      var Handled = false;
+      Result = true;
+      Handled = false;
+      if (this.FOnError != null) this.FOnError(this,Event.target,Event,{get: function () {
+          return Handled;
+        }, set: function (v) {
+          Handled = v;
+        }});
+      if (!Handled) throw pas.SysUtils.Exception.$create("Create$1",["HTTP request error @" + this.FURL]);
       return Result;
     };
     this.SetHeaders = function (AValue) {
@@ -67752,6 +68385,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
       req.addEventListener("load",rtl.createCallback(this,"HandleResponse"));
       req.addEventListener("abort",rtl.createCallback(this,"HandleAbort"));
       req.addEventListener("timeout",rtl.createCallback(this,"HandleTimeout"));
+      req.addEventListener("error",rtl.createCallback(this,"HandleError"));
       var $tmp1 = this.FCommand;
       if ($tmp1 === $mod.THTTPCommand.httpGET) {
         cmd = "GET"}
@@ -67798,6 +68432,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
     $r.addProperty("Timeout",0,rtl.longint,"FTimeout","FTimeout",{Default: 0});
     $r.addProperty("URL",0,rtl.string,"FURL","FURL");
     $r.addProperty("User",0,rtl.string,"FUser","FUser");
+    $r.addProperty("OnError",0,$mod.$rtti["THTTPErrorEvent"],"FOnError","FOnError");
     $r.addProperty("OnAbort",0,$mod.$rtti["THTTPAbortEvent"],"FOnAbort","FOnAbort");
     $r.addProperty("OnRequestResponse",0,$mod.$rtti["THTTPRequestResponseEvent"],"FOnRequestResponse","FOnRequestResponse");
     $r.addProperty("OnResponse",0,$mod.$rtti["THTTPResponseEvent"],"FOnResponse","FOnResponse");
@@ -67877,6 +68512,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
       this.FScopes = null;
       this.FLocale = 0;
       this.FOnRequestResponse = null;
+      this.FOnError = null;
     };
     this.$final = function () {
       this.FOnAccessToken = undefined;
@@ -67886,6 +68522,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
       this.FApp = undefined;
       this.FScopes = undefined;
       this.FOnRequestResponse = undefined;
+      this.FOnError = undefined;
       pas.Classes.TComponent.$final.call(this);
     };
     this.SetPersistTokens = function (Value) {
@@ -68050,11 +68687,25 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
         Result = true;
         return Result;
       };
+      function ErrorHandler(Event) {
+        var Result = false;
+        var Handled = false;
+        Handled = false;
+        if ($Self.FOnError != null) $Self.FOnError($Self,Event.target,Event,{get: function () {
+            return Handled;
+          }, set: function (v) {
+            Handled = v;
+          }});
+        if (!Handled) throw pas.SysUtils.Exception.$create("Create$1",["HTTP request error @" + URL]);
+        Result = true;
+        return Result;
+      };
       FRequestResponse = $Self.FOnRequestResponse;
       FResponse = $Self.FOnResponse;
       FHttpResponse = $Self.FOnHttpResponse;
       req = new XMLHttpRequest();
       req.addEventListener("load",ResponseHandler);
+      req.addEventListener("error",ErrorHandler);
       req.open(Command,URL,true);
       if (ContentType !== "") req.setRequestHeader("Content-Type",ContentType);
       if ($Self.FAccessToken !== "") req.setRequestHeader("Authorization","Bearer " + $Self.FAccessToken);
@@ -68418,6 +69069,7 @@ rtl.module("WEBLib.REST",["System","Classes","Web","JS","SysUtils","WEBLib.JSON"
     $r.addProperty("OnAccessToken",0,pas.Classes.$rtti["TNotifyEvent"],"FOnAccessToken","FOnAccessToken");
     $r.addProperty("OnRequestResponse",0,$mod.$rtti["THTTPRequestResponseEvent"],"FOnRequestResponse","FOnRequestResponse");
     $r.addProperty("OnResponse",0,$mod.$rtti["THttpResponse"],"FOnResponse","FOnResponse");
+    $r.addProperty("OnError",0,$mod.$rtti["THTTPErrorEvent"],"FOnError","FOnError");
   });
   rtl.createClass($mod,"TWebRESTClient",$mod.TRESTClient,function () {
     rtl.addIntf(this,pas.System.IUnknown);
@@ -68511,7 +69163,7 @@ rtl.module("modules.datamodule",["System","SysUtils","Classes","JS","Web","WEBLi
   });
   this.mainDataModule = null;
 },["modules.clientconstants","WEBLib.WebTools"]);
-rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Graphics","WEBLib.Controls","WEBLib.Forms","WEBLib.Dialogs","forms.baseform","WEBLib.ExtCtrls","WEBLib.StdCtrls"],function () {
+rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Graphics","WEBLib.Controls","WEBLib.Forms","WEBLib.Dialogs","forms.baseform","WEBLib.ExtCtrls","WEBLib.StdCtrls","WEBLib.Imaging.jpeg"],function () {
   "use strict";
   var $mod = this;
   rtl.createClass($mod,"TWelcomeForm",pas["forms.baseform"].TBaseForm,function () {
@@ -68519,10 +69171,20 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
       pas["forms.baseform"].TBaseForm.$init.call(this);
       this.StartButton = null;
       this.JoinGameButton = null;
+      this.WebImageControl1 = null;
+      this.WebPanel1 = null;
+      this.WebLabel5 = null;
+      this.YourNameEdit = null;
+      this.bgPanel = null;
     };
     this.$final = function () {
       this.StartButton = undefined;
       this.JoinGameButton = undefined;
+      this.WebImageControl1 = undefined;
+      this.WebPanel1 = undefined;
+      this.WebLabel5 = undefined;
+      this.YourNameEdit = undefined;
+      this.bgPanel = undefined;
       pas["forms.baseform"].TBaseForm.$final.call(this);
     };
     this.StartButtonClick = function (Sender) {
@@ -68542,24 +69204,103 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
       pas["WEBLib.Dialogs"].ShowMessage("Not yet implemented");
       pas["modules.datamodule"].mainDataModule.GetGames();
     };
+    this.WebFormResize = function (Sender) {
+      this.BaseCenterPanel.SetLeft(Math.floor((this.GetWidth() - this.BaseCenterPanel.GetWidth()) / 2));
+    };
     this.LoadDFMValues = function () {
       pas["forms.baseform"].TBaseForm.LoadDFMValues.call(this);
-      this.StartButton = pas["WEBLib.StdCtrls"].TButton.$create("Create$1",[this]);
+      this.WebImageControl1 = pas["WEBLib.ExtCtrls"].TImageControl.$create("Create$1",[this]);
+      this.WebPanel1 = pas["WEBLib.ExtCtrls"].TPanel.$create("Create$1",[this]);
+      this.bgPanel = pas["WEBLib.ExtCtrls"].TPanel.$create("Create$1",[this]);
+      this.WebLabel5 = pas["WEBLib.StdCtrls"].TLabel.$create("Create$1",[this]);
       this.JoinGameButton = pas["WEBLib.StdCtrls"].TButton.$create("Create$1",[this]);
+      this.StartButton = pas["WEBLib.StdCtrls"].TButton.$create("Create$1",[this]);
+      this.YourNameEdit = pas["WEBLib.StdCtrls"].TEdit.$create("Create$1",[this]);
       this.BaseCenterPanel.BeforeLoadDFMValues();
-      this.StartButton.BeforeLoadDFMValues();
+      this.WebImageControl1.BeforeLoadDFMValues();
+      this.WebPanel1.BeforeLoadDFMValues();
+      this.bgPanel.BeforeLoadDFMValues();
+      this.WebLabel5.BeforeLoadDFMValues();
       this.JoinGameButton.BeforeLoadDFMValues();
+      this.StartButton.BeforeLoadDFMValues();
+      this.YourNameEdit.BeforeLoadDFMValues();
       try {
         this.SetCaption("WelcomeForm");
+        this.SetColor(4210688);
+        this.SetEvent(this,this,"OnResize","WebFormResize");
         this.BaseCenterPanel.SetBorderStyle(pas["WEBLib.Controls"].TBorderStyle.bsNone);
         this.BaseCenterPanel.SetChildOrderEx(2);
         this.BaseCenterPanel.SetColor(16772810);
-        this.StartButton.SetParentComponent(this.BaseCenterPanel);
+        this.WebImageControl1.SetParentComponent(this.BaseCenterPanel);
+        this.WebImageControl1.SetName("WebImageControl1");
+        this.WebImageControl1.SetLeft(0);
+        this.WebImageControl1.SetTop(42);
+        this.WebImageControl1.SetWidth(577);
+        this.WebImageControl1.SetHeight(367);
+        this.WebImageControl1.SetAlign(pas["WEBLib.Controls"].TAlign.alClient);
+        this.WebImageControl1.SetChildOrderEx(3);
+        this.WebImageControl1.FPicture.LoadFromFile("forms.welcome.BaseCenterPanel.WebImageControl1.Picture.jpg");
+        this.WebPanel1.SetParentComponent(this.BaseCenterPanel);
+        this.WebPanel1.SetName("WebPanel1");
+        this.WebPanel1.SetLeft(0);
+        this.WebPanel1.SetTop(0);
+        this.WebPanel1.SetWidth(577);
+        this.WebPanel1.SetHeight(42);
+        this.WebPanel1.SetElementClassName("bg-warning font-weight-bold");
+        this.WebPanel1.SetAlign(pas["WEBLib.Controls"].TAlign.alTop);
+        this.WebPanel1.SetBorderColor(12632256);
+        this.WebPanel1.SetBorderStyle(pas["WEBLib.Controls"].TBorderStyle.bsNone);
+        this.WebPanel1.SetCaption("<h5>Apocalypse Coding Group<\/h5>");
+        this.WebPanel1.SetChildOrderEx(3);
+        this.WebPanel1.SetElementFont(pas["WEBLib.Controls"].TElementFont.efCSS);
+        this.bgPanel.SetParentComponent(this.BaseCenterPanel);
+        this.bgPanel.SetName("bgPanel");
+        this.bgPanel.SetLeft(143);
+        this.bgPanel.SetTop(88);
+        this.bgPanel.SetWidth(292);
+        this.bgPanel.SetHeight(234);
+        this.bgPanel.SetElementClassName("bg-dark");
+        this.bgPanel.SetBorderColor(12632256);
+        this.bgPanel.SetBorderStyle(pas["WEBLib.Controls"].TBorderStyle.bsSingle);
+        this.bgPanel.SetChildOrderEx(6);
+        this.WebLabel5.SetParentComponent(this.bgPanel);
+        this.WebLabel5.SetName("WebLabel5");
+        this.WebLabel5.SetLeft(11);
+        this.WebLabel5.SetTop(12);
+        this.WebLabel5.SetWidth(59);
+        this.WebLabel5.SetHeight(14);
+        this.WebLabel5.SetAutoSize(false);
+        this.WebLabel5.SetCaption("Your Name");
+        this.WebLabel5.SetElementClassName("font-weight-bold text-light bg-dark");
+        this.WebLabel5.SetElementFont(pas["WEBLib.Controls"].TElementFont.efCSS);
+        this.WebLabel5.FFont.FCharset = 1;
+        this.WebLabel5.FFont.SetColor(65793);
+        this.WebLabel5.FFont.SetHeight(-11);
+        this.WebLabel5.FFont.SetName("Arial");
+        this.WebLabel5.FFont.SetStyle(rtl.createSet(pas["WEBLib.Graphics"].TFontStyle.fsBold));
+        this.WebLabel5.SetParentFont(false);
+        this.JoinGameButton.SetParentComponent(this.bgPanel);
+        this.JoinGameButton.SetName("JoinGameButton");
+        this.JoinGameButton.SetLeft(11);
+        this.JoinGameButton.SetTop(143);
+        this.JoinGameButton.SetWidth(268);
+        this.JoinGameButton.SetHeight(69);
+        this.JoinGameButton.SetCaption("Join a game");
+        this.JoinGameButton.SetChildOrderEx(1);
+        this.JoinGameButton.SetElementClassName("btn-info");
+        this.JoinGameButton.FFont.FCharset = 1;
+        this.JoinGameButton.FFont.SetColor(65793);
+        this.JoinGameButton.FFont.SetHeight(-21);
+        this.JoinGameButton.FFont.SetName("Tahoma");
+        this.JoinGameButton.FFont.SetStyle({});
+        this.JoinGameButton.SetParentFont(false);
+        this.SetEvent(this.JoinGameButton,this,"OnClick","JoinGameButtonClick");
+        this.StartButton.SetParentComponent(this.bgPanel);
         this.StartButton.SetName("StartButton");
-        this.StartButton.SetLeft(136);
-        this.StartButton.SetTop(40);
-        this.StartButton.SetWidth(329);
-        this.StartButton.SetHeight(106);
+        this.StartButton.SetLeft(10);
+        this.StartButton.SetTop(62);
+        this.StartButton.SetWidth(268);
+        this.StartButton.SetHeight(69);
         this.StartButton.SetCaption("Start a game");
         this.StartButton.SetElementClassName("btn-primary");
         this.StartButton.FFont.FCharset = 1;
@@ -68569,33 +69310,36 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
         this.StartButton.FFont.SetStyle({});
         this.StartButton.SetParentFont(false);
         this.SetEvent(this.StartButton,this,"OnClick","StartButtonClick");
-        this.JoinGameButton.SetParentComponent(this.BaseCenterPanel);
-        this.JoinGameButton.SetName("JoinGameButton");
-        this.JoinGameButton.SetLeft(136);
-        this.JoinGameButton.SetTop(207);
-        this.JoinGameButton.SetWidth(329);
-        this.JoinGameButton.SetHeight(106);
-        this.JoinGameButton.SetCaption("Join a game");
-        this.JoinGameButton.SetChildOrderEx(1);
-        this.JoinGameButton.FFont.FCharset = 1;
-        this.JoinGameButton.FFont.SetColor(65793);
-        this.JoinGameButton.FFont.SetHeight(-21);
-        this.JoinGameButton.FFont.SetName("Tahoma");
-        this.JoinGameButton.FFont.SetStyle({});
-        this.JoinGameButton.SetParentFont(false);
-        this.SetEvent(this.JoinGameButton,this,"OnClick","JoinGameButtonClick");
+        this.YourNameEdit.SetParentComponent(this.bgPanel);
+        this.YourNameEdit.SetName("YourNameEdit");
+        this.YourNameEdit.SetLeft(11);
+        this.YourNameEdit.SetTop(30);
+        this.YourNameEdit.SetWidth(267);
+        this.YourNameEdit.SetHeight(22);
+        this.YourNameEdit.SetChildOrderEx(3);
       } finally {
         this.BaseCenterPanel.AfterLoadDFMValues();
-        this.StartButton.AfterLoadDFMValues();
+        this.WebImageControl1.AfterLoadDFMValues();
+        this.WebPanel1.AfterLoadDFMValues();
+        this.bgPanel.AfterLoadDFMValues();
+        this.WebLabel5.AfterLoadDFMValues();
         this.JoinGameButton.AfterLoadDFMValues();
+        this.StartButton.AfterLoadDFMValues();
+        this.YourNameEdit.AfterLoadDFMValues();
       };
     };
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
     $r.addField("StartButton",pas["WEBLib.StdCtrls"].$rtti["TButton"]);
     $r.addField("JoinGameButton",pas["WEBLib.StdCtrls"].$rtti["TButton"]);
+    $r.addField("WebImageControl1",pas["WEBLib.ExtCtrls"].$rtti["TImageControl"]);
+    $r.addField("WebPanel1",pas["WEBLib.ExtCtrls"].$rtti["TPanel"]);
+    $r.addField("WebLabel5",pas["WEBLib.StdCtrls"].$rtti["TLabel"]);
+    $r.addField("YourNameEdit",pas["WEBLib.StdCtrls"].$rtti["TEdit"]);
+    $r.addField("bgPanel",pas["WEBLib.ExtCtrls"].$rtti["TPanel"]);
     $r.addMethod("StartButtonClick",0,[["Sender",pas.System.$rtti["TObject"]]]);
     $r.addMethod("JoinGameButtonClick",0,[["Sender",pas.System.$rtti["TObject"]]]);
+    $r.addMethod("WebFormResize",0,[["Sender",pas.System.$rtti["TObject"]]]);
   });
   this.WelcomeForm = null;
 },["WEBLib.WebTools","forms.creategameform","modules.datamodule"]);

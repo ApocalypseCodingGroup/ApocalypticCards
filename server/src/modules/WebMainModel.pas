@@ -100,13 +100,14 @@ Const
   cScriptURL  = '';
   cIMGURL     = 'https://www.delphiprofi.de/game/';
 {$ELSE}
-  DebugLayout = true;
+  DebugLayout = false;
   {$IFDEF MSWINDOWS}
     cURL        = 'https://delphiprofi.com/'
     cIMGURL     = 'https://www.delphiprofi.de/game/';
     cScriptURL  = '/cgi-bin/Cardgame.dll';
   {$ELSE}
-    cURL        = 'https://apocalypse.chapmanworld.com'
+    cURL        = 'https://apocalypse.chapmanworld.com';
+    cIMGURL     = 'https://apocalypse.chapmanworld.com/broker/img/';
     cScriptURL  = '/api';
   {$ENDIF}
 {$ENDIF}

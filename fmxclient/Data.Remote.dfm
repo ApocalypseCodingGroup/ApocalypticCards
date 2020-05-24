@@ -2,7 +2,7 @@ object RemoteData: TRemoteData
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   Height = 399
-  Width = 759
+  Width = 886
   object RESTClient1: TRESTClient
     Accept = 'application/json, text/plain; q=0.9, text/html;q=0.8,'
     AcceptCharset = 'utf-8, *;q=0.8'
@@ -89,5 +89,40 @@ object RemoteData: TRemoteData
     OnTimer = PollingForGamesTimerTimer
     Left = 488
     Top = 144
+  end
+  object StartGameResponse: TRESTResponse
+    Left = 616
+    Top = 80
+  end
+  object StartGameRequest: TRESTRequest
+    Client = RESTClient1
+    Method = rmPUT
+    Params = <
+      item
+        Kind = pkHTTPHEADER
+        Name = 'authentication-string'
+      end>
+    Resource = 'games'
+    Response = StartGameResponse
+    SynchronizedEvents = False
+    Left = 616
+    Top = 24
+  end
+  object TurnResponse: TRESTResponse
+    Left = 752
+    Top = 80
+  end
+  object TurnRequest: TRESTRequest
+    Client = RESTClient1
+    Params = <
+      item
+        Kind = pkHTTPHEADER
+        Name = 'authentication-string'
+      end>
+    Resource = 'turn'
+    Response = TurnResponse
+    SynchronizedEvents = False
+    Left = 752
+    Top = 24
   end
 end

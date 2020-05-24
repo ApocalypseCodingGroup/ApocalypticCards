@@ -1,0 +1,22 @@
+object SubmittingFrame: TSubmittingFrame
+  Align = Client
+  Size.Width = 320.000000000000000000
+  Size.Height = 240.000000000000000000
+  Size.PlatformDefault = False
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 16.000000000000000000
+    Text = 'Submitting'
+    TabOrder = 0
+  end
+  object Label2: TLabel
+    Anchors = [akLeft, akTop, akRight]
+    Position.X = 8.000000000000000000
+    Position.Y = 40.000000000000000000
+    Size.Width = 305.000000000000000000
+    Size.Height = 57.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Label2'
+    TabOrder = 1
+  end
+end

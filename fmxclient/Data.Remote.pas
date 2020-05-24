@@ -23,6 +23,10 @@ type
     PollingForGamesRequest: TRESTRequest;
     PollingForGamesResponse: TRESTResponse;
     PollingForGamesTimer: TTimer;
+    StartGameResponse: TRESTResponse;
+    StartGameRequest: TRESTRequest;
+    TurnResponse: TRESTResponse;
+    TurnRequest: TRESTRequest;
     procedure PollingForUsersTimerTimer(Sender: TObject);
     procedure PollingForGamesTimerTimer(Sender: TObject);
     procedure DataModuleCreate(Sender: TObject);
@@ -30,6 +34,8 @@ type
     FPollingForUsers: Boolean;
     FPollingForGames: Boolean;
   protected
+    procedure EndorseAuthentication(const AReq: TRESTRequest);
+
     procedure PollForUsers();
     procedure PollForGames();
     function ParseGames(const AJSONResponse: string): IList<IGameData>;
@@ -41,6 +47,10 @@ type
 
     procedure JoinGame(const AUserName: string; const ASessionID: string;
       const AOnSuccess: TProc; const AOnError: TErrorProc);
+
+    procedure StartGame(const AOnSuccess: TProc; const AOnError: TErrorProc);
+
+    procedure RetrieveTurnData(const AOnSuccess: TProc; const AOnError: TErrorProc);
 
     procedure StartPollingForUsers();
     procedure StopPollingForUsers();
@@ -66,6 +76,7 @@ uses
   Generics.Collections, System.JSON, REST.JSON
 , datamodel.standard, cwCollections.standard
 , Data.Main, Utils.Messages
+, CodeSiteLogging
 ;
 
 { TRemoteData }
@@ -78,11 +89,11 @@ begin
   Result := TList<IGameData>.Create;
   JSONArray := TJSONObject.ParseJSONValue(
     TEncoding.ASCII.GetBytes(AJSONResponse),0) as TJSONArray;
-  if JSONArray.Size=0 then begin
+  if JSONArray.Count = 0 then begin
     exit;
   end;
   for idx := 0 to pred(JSONArray.Count) do begin
-    Result.Add(TJSON.JsonToObject<TGameData>(JSONArray.Get(idx).ToJSON));
+    Result.Add(TJSON.JsonToObject<TGameData>(JSONArray.Items[idx].ToJSON));
   end;
 end;
 
@@ -94,11 +105,11 @@ begin
   Result := TList<IUserData>.Create;
   JSONArray := TJSONObject.ParseJSONValue(
     TEncoding.ASCII.GetBytes(AJSONResponse),0) as TJSONArray;
-  if JSONArray.Size=0 then begin
+  if JSONArray.Count = 0 then begin
     exit;
   end;
   for idx := 0 to pred(JSONArray.Count) do begin
-    Result.Add(TJSON.JsonToObject<TUserData>(JSONArray.Get(idx).ToJSON));
+    Result.Add(TJSON.JsonToObject<TUserData>(JSONArray.Items[idx].ToJSON));
   end;
 end;
 
@@ -134,6 +145,24 @@ begin
   if paramstr(1)='debug' then begin
     RESTClient1.BaseURL := 'http://localhost:8080';
   end;
+end;
+
+procedure TRemoteData.EndorseAuthentication(const AReq: TRESTRequest);
+const AUTH_PARAM_NAME: string = 'authentication-string';
+var
+  LParam: TRESTRequestParameter;
+begin
+  if not Assigned(MainData.UserData) then
+    raise Exception.Create('No userdata available to endorse authentication');
+
+  if not AReq.Params.ContainsParameter(AUTH_PARAM_NAME) then
+  begin
+    LParam := AReq.Params.AddItem;
+    LParam.Kind := TRESTRequestParameterKind.pkHTTPHEADER;
+    LParam.Name := AUTH_PARAM_NAME;
+  end;
+
+  AReq.Params.ParameterByName(AUTH_PARAM_NAME).Value := MainData.UserData.UserID;
 end;
 
 procedure TRemoteData.JoinGame(const AUserName, ASessionID: string;
@@ -176,8 +205,6 @@ end;
 
 procedure TRemoteData.PollForGames;
 begin
-//  PollingForGamesRequest.Params.ParameterByName('authentication-string').Value :=
-//    MainData.UserData.UserID;
   PollingForGamesRequest.ExecuteAsync(
     procedure
     begin
@@ -194,8 +221,8 @@ end;
 
 procedure TRemoteData.PollForUsers;
 begin
-  PollingForUsersRequest.Params.ParameterByName('authentication-string').Value :=
-    MainData.UserData.UserID;
+  EndorseAuthentication(PollingForUsersRequest);
+
   PollingForUsersRequest.ExecuteAsync(
     procedure
     begin
@@ -227,6 +254,70 @@ begin
   finally
     PollingForUsersTimer.Enabled := FPollingForUsers;
   end;
+end;
+
+procedure TRemoteData.RetrieveTurnData(const AOnSuccess: TProc;
+  const AOnError: TErrorProc);
+begin
+  EndorseAuthentication(TurnRequest);
+
+  TurnRequest.ExecuteAsync(
+    procedure
+    var
+      LTurnData: ITurnData;
+    begin
+      CodeSite.SendMsg('RetrieveTurnData: ' + TurnResponse.Content);
+
+//      LTurnData := TJSON.JsonToObject<TTurnData>(TurnResponse.Content);
+      LTurnData := TTurnData.FromJSON(TurnResponse.Content);
+      MainData.TurnData := LTurnData;
+
+      if Assigned(AOnSuccess) then
+        AOnSuccess();
+    end
+  , True, True
+  , procedure(AObj: TObject)
+    begin
+      if Assigned(AOnError) then
+        AOnError(AObj.ToString)
+      else
+        raise Exception.Create(AObj.ToString);
+    end
+  );
+end;
+
+procedure TRemoteData.StartGame(const AOnSuccess: TProc;
+  const AOnError: TErrorProc);
+var
+  LGame: IGameData;
+begin
+  Assert(Assigned(MainData.CurrentGame));
+
+  LGame := MainData.CurrentGame;
+  LGame.GameState := TGameState.gsRunning;
+  EndorseAuthentication(StartGameRequest);
+  StartGameRequest.Body.Add(LGame.ToJSON, ctAPPLICATION_JSON);
+
+  StartGameRequest.ExecuteAsync(
+    procedure
+    begin
+      LGame := TJSON.JsonToObject<TGameData>(StartGameResponse.Content);
+//      if not LGame.GameState = TGameState.gsRunning then
+//        ShowMessage('Game did not start - Number of required users not met.'); //AM
+      MainData.CurrentGame := LGame;
+
+      if Assigned(AOnSuccess) then
+        AOnSuccess();
+    end
+  , True, True
+  , procedure(AObj: TObject)
+    begin
+      if Assigned(AOnError) then
+        AOnError(AObj.ToString)
+      else
+        raise Exception.Create(AObj.ToString);
+    end
+  );
 end;
 
 procedure TRemoteData.StartPollingForGames;
