@@ -127,6 +127,9 @@
             <DesignClass>TWebDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="modules.clientconstants.pas"/>
+        <DCCReference Include="interfaces.callbacks.pas"/>
+        <DCCReference Include="classes.gamedata.pas"/>
+        <DCCReference Include="models.gamedata.pas"/>
         <None Include="webclient.html"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -161,13 +164,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\vms_share\ApocalypticCards\webclient\webclient.html" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="webclient.html" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="webclient.html" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="C:\vms_share\ApocalypticCards\webclient\webclient.html" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

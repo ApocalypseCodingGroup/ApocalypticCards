@@ -30,10 +30,15 @@ uses WEBLib.WebTools, forms.creategameform, modules.datamodule;
 {$R *.dfm}
 
 procedure TWelcomeForm.JoinGameButtonClick(Sender: TObject);
+
+  procedure GetGamesCallbackClient(const GamesFound: boolean);
+  begin
+    //
+  end;
+
 begin
   inherited;
-  ShowMessage('Not yet implemented');
-  mainDataModule.GetGames;
+  mainDataModule.GetGames(@GetGamesCallbackClient);
 end;
 
 procedure TWelcomeForm.StartButtonClick(Sender: TObject);

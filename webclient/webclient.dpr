@@ -7,7 +7,10 @@ uses
   forms.welcome in 'forms.welcome.pas' {WelcomeForm: TWebForm},
   forms.creategameform in 'forms.creategameform.pas' {CreateGameForm: TWebForm},
   modules.datamodule in 'modules.datamodule.pas' {mainDataModule: TWebDataModule},
-  modules.clientconstants in 'modules.clientconstants.pas';
+  modules.clientconstants in 'modules.clientconstants.pas',
+  interfaces.callbacks in 'interfaces.callbacks.pas',
+  classes.gamedata in 'classes.gamedata.pas',
+  models.gamedata in 'models.gamedata.pas';
 
 {$R *.res}
 

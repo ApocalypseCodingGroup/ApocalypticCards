@@ -14,7 +14,7 @@ type
     WebLabel1: TWebLabel;
     GameNameEdit: TWebEdit;
     WebLabel2: TWebLabel;
-    WebComboBox1: TWebComboBox;
+    cbLanguages: TWebComboBox;
     WebLabel3: TWebLabel;
     WebLabel4: TWebLabel;
     PrivateGameCheckbox: TWebCheckBox;
@@ -30,6 +30,7 @@ type
     procedure GameNameEditExit(Sender: TObject);
     procedure YourNameEditChange(Sender: TObject);
     procedure YourNameEditExit(Sender: TObject);
+    procedure CreateButtonClick(Sender: TObject);
   private
     procedure CheckButtons;
   end;
@@ -40,6 +41,8 @@ var
 implementation
 
 {$R *.dfm}
+
+uses modules.datamodule, classes.gamedata;
 
 { TCreateGameForm }
 
@@ -53,6 +56,36 @@ end;
 procedure TCreateGameForm.CheckButtons;
 begin
   CreateButton.Visible := (Length(GameNameEdit.Text) > 0);
+end;
+
+procedure TCreateGameForm.CreateButtonClick(Sender: TObject);
+var
+  OurGame: TGameData;
+
+  procedure NewGameCallback(const CreatedGame: boolean);
+  begin
+    if CreatedGame then
+      begin
+        // show the next screen
+        ShowMessage('Game created');
+//        mainDataModule.CreateUser('user name');
+      end
+    else
+      ShowMessage('Game not created');
+  end;
+
+begin
+  inherited;
+  OurGame.CurrentQuestion := '';
+  OurGame.SessionPassword := '';
+  OurGame.SessionName     := GameNameEdit.Text;
+  OurGame.LangID          := cbLanguages.Items[cbLanguages.ItemIndex];
+  OurGame.MinUser         := Trunc(SpinMinUsers.Value);
+  OurGame.MaxUser         := Trunc(SpinMaxUsers.Value);
+  OurGame.SessionID       := '';
+  OurGame.GameState       := gsGreenRoom;
+  OurGame.UserCount       := 0;
+  mainDataModule.CreateGame(OurGame, @NewGameCallback);
 end;
 
 procedure TCreateGameForm.GameNameEditChange(Sender: TObject);

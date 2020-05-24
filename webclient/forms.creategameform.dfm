@@ -1,5 +1,5 @@
 inherited CreateGameForm: TCreateGameForm
-  Caption = 'CreateGameForm'
+  Caption = 'Create new game'
   OnCreate = WebFormCreate
   inherited BaseCenterPanel: TWebPanel
     Top = 28
@@ -65,7 +65,7 @@ inherited CreateGameForm: TCreateGameForm
       OnChange = GameNameEditChange
       OnExit = GameNameEditExit
     end
-    object WebComboBox1: TWebComboBox
+    object cbLanguages: TWebComboBox
       Left = 414
       Top = 44
       Width = 145
@@ -113,6 +113,7 @@ inherited CreateGameForm: TCreateGameForm
       ChildOrder = 11
       ElementClassName = 'btn-success'
       Visible = False
+      OnClick = CreateButtonClick
     end
     object SpinMinUsers: TTMSFNCSpinEdit
       AlignWithMargins = True
