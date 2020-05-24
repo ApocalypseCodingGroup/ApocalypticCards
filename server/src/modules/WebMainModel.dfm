@@ -394,9 +394,9 @@ object WebModule4: TWebModule4
         'spacing="1" class="Tablesetting">'
       #9'<tr>'
       
-        #9#9'<td style="height: 72px" class="MarkColor"><h1 class="divCente' +
-        'r">Apocalypse Coding Group</h1></td>'
-      #9#9'<td rowspan="3" style="width: 247px" class="divCenter">'
+        #9#9'<td style="height: 72px" class="MarkColor"><h1 class="Center">' +
+        'Apocalypse Coding Group</h1></td>'
+      #9#9'<td rowspan="3" style="width: 247px" class="Center">'
       
         #9#9'<a href="https://www.youtube.com/watch?v=dbgaHNrDdBs&amp;list=' +
         'PL-oEujJyp0deGinpcUgiZwoa_rPnmgCwN" target="_blank">'
@@ -459,8 +459,12 @@ object WebModule4: TWebModule4
       '.noBorder {'
       #9'border-width: 0px;'
       '}'
+      '.Center {'
+      #9'text-align: center;'
+      '}'
       '.divCenter {'
       #9'text-align: center;'
+      #9'background-color:#CCCCCC80;'
       '}'
       '.LabelInput {'
       '    color: #FF0000;'

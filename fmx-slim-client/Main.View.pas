@@ -44,6 +44,7 @@ type
     ListBoxItem3: TListBoxItem;
     ListBoxItem4: TListBoxItem;
     Button4: TButton;
+    Turn: TTabItem;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -77,6 +78,7 @@ type
     Procedure JoinGameClick(Sender : TObject);
     procedure AddRequestAuthentication;
     procedure CreateGreen;
+    procedure TurnGame;
     procedure StartGame(Sender : TObject);
   public
     { Public-Deklarationen }
@@ -392,11 +394,14 @@ begin
 
   TTask.Run(Procedure
               var
-                idx: integer;
-                JSONArray: TJSONArray;
+                idx       : integer;
+                JSONArray : TJSONArray;
+                lUser     : IUserData;
+                lStart    : boolean;
               begin
                 try
                   fUserList.Clear;
+                  lStart := false;
 
                   ClearRequest;
                   req.Resource := 'users';
@@ -409,23 +414,66 @@ begin
                     exit;
                   end;
 
-                  for idx := 0 to pred(JSONArray.Count) do begin
-                    fUserList.Add(TJSON.JsonToObject<TUserData>(JSONArray.Get(idx).ToJSON));
-                  end;
-                finally
-                  TThread.Synchronize(NIL,Procedure
+                  for idx := 0 to pred(JSONArray.Count) do
                     begin
-                      SyncUserList;
-                      button4.Visible := false;
-                      PollUser.Enabled := True;
-                    end);
+                      lUser := TJSON.JsonToObject<TUserData>(JSONArray.Get(idx).ToJSON);
+                      if (lUser.UserID = fUser.UserID) and (lUser.PlayerState <> psInGreenRoom) then
+                        begin
+                          lStart := true;
+                          exit;
+                        end;
+
+                      fUserList.Add(lUser);
+                  end;
+
+                finally
+                  if lStart
+                    then begin
+                           TThread.Synchronize(NIL,Procedure
+                             begin
+                               TabControl1.SetActiveTabWithTransitionAsync(Turn,TTabTransition.Slide,TTabTransitionDirection.Normal,TurnGame);
+                             end);
+                         end
+                    else begin
+                           TThread.Synchronize(NIL,Procedure
+                             begin
+                               SyncUserList;
+                               button4.Visible := false;
+                               PollUser.Enabled := True;
+                             end);
+                         end;
                 end;
               end);
 end;
 
 procedure TMainView.StartGame;
 begin
-  //
+  PollUsers.Enabled := False;
+
+  TTask.Run(Procedure
+    begin
+      fGame.GameState := TGameState.gsRunning;
+      // Create user request.
+      ClearRequest;
+      AddRequestAuthentication;
+      req.Resource := '/games';
+      req.Method := TRestRequestMethod.rmPUT;
+      req.Body.Add(fGame.ToJSON,TRestContentType.ctAPPLICATION_JSON);
+      ExecuteRequest;
+
+      fGame := TJSON.JsonToObject<TGameData>(resp.Content);
+
+      TThread.Synchronize(NIL,Procedure
+        begin
+          TabControl1.SetActiveTabWithTransitionAsync(Turn,TTabTransition.Slide,TTabTransitionDirection.Normal,TurnGame);
+        end);
+
+    end;
+  if fGame.GameState=TGameState.gsRunning then begin
+    UpdateGreenRoomPlayers;
+  end else begin
+    ShowMessage('Game did not start - Number of required users not met.');
+  end;
 end;
 
 procedure TMainView.SyncGameList;
@@ -508,8 +556,14 @@ begin
           BackButton.Visible := false;
           NoPoll;
         end;
-    2 : NoPoll;
+    2,
+    4 : NoPoll;
   end; // of case
+end;
+
+procedure TMainView.TurnGame;
+begin
+//
 end;
 
 procedure TMainView.YourNameChangeTracking(Sender: TObject);
