@@ -15,11 +15,13 @@ object MainView: TMainView
     Size.Width = 320.000000000000000000
     Size.Height = 567.000000000000000000
     Size.PlatformDefault = False
-    TabIndex = 2
+    TabIndex = 3
     TabOrder = 0
     TabPosition = PlatformDefault
     OnChange = TabControl1Change
     Sizes = (
+      320s
+      541s
       320s
       541s
       320s
@@ -147,7 +149,7 @@ object MainView: TMainView
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 45.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -270,7 +272,7 @@ object MainView: TMainView
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 52.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -301,6 +303,18 @@ object MainView: TMainView
           Text = 'ListBoxItem4'
         end
       end
+    end
+    object Turn: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 45.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Turn'
     end
   end
   object ToolBar1: TToolBar
