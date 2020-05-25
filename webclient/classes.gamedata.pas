@@ -2,44 +2,46 @@ unit classes.gamedata;
 
 interface
 
-type TGameState = (
+type
+
+  TGameState = (
     gsGreenRoom,  //- Waiting for players to join
     gsRunning,    //- Game has started
     gsNextTurn,   //- (Not to database, just triggers state change)
     gsGameOver    //- We're done here.
   );
 
-type TGameData = record
-  CurrentQuestion: string;
-  SessionPassword: string;
-  SessionName: string;
-  LangID: string;
-  MinUser: integer;
-  MaxUser: integer;
-  SessionID: string;
-  GameState: TGameState;
-  UserCount: integer;
-  function ToJSON: string;
-  class function FromJSON(const JSONString: string): TGameData; static;
-end;
+  TGameData = record
+    CurrentQuestion: string;
+    SessionPassword: string;
+    SessionName: string;
+    LangID: string;
+    MinUser: integer;
+    MaxUser: integer;
+    SessionID: string;
+    GameState: TGameState;
+    UserCount: integer;
+    function ToJSON: string;
+    class function FromJSON(const JSONString: string): TGameData; static;
+  end;
 
-type TPlayerState = (
+  TPlayerState = (
     psInGreenRoom,            //- Waiting in green room for game to begin.
     psJudgeWaitingForSubmit,  //- Waiting for other players to submit cards
     psPlayerSubmitting,       //- I should submit a card from my hand
     psGameEnded               //- Game is over, display scores
   );
 
-type TGameUser = record
-  UserName:      string;
-  PlayerState:   TPlayerState;
-  Score:         integer;
-  Deleted:       boolean;
-  IsCurrentUser: boolean;
-  UserID:        string;
-  Name:          string;
-  GameID:        string;
-end;
+  TGameUser = record
+    UserName:      string;
+    PlayerState:   TPlayerState;
+    Score:         integer;
+    Deleted:       boolean;
+    IsCurrentUser: boolean;
+    UserID:        string;
+    Name:          string;
+    GameID:        string;
+  end;
 
 (* This is what comes down from the API call
 

@@ -1,11 +1,8 @@
 inherited WelcomeForm: TWelcomeForm
   Caption = 'WelcomeForm'
-  Color = 4210688
-  OnResize = WebFormResize
   inherited BaseCenterPanel: TWebPanel
     BorderStyle = bsNone
     ChildOrder = 2
-    Color = 16772810
     object WebImageControl1: TWebImageControl
       Left = 0
       Top = 42

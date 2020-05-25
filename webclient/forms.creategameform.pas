@@ -66,9 +66,11 @@ var
   begin
     if CreatedGame then
       begin
-        // show the next screen
+
         ShowMessage('Game created');
-//        mainDataModule.CreateUser('user name');
+{ TODO : Create the user here and then show the next screen if successful }
+        //        mainDataModule.CreateUser('user name');
+
       end
     else
       ShowMessage('Game not created');
@@ -104,18 +106,14 @@ procedure TCreateGameForm.SpinMaxUsersValueChanged(Sender: TObject; AValue: Sing
 begin
   inherited;
   if (SpinMaxUsers.Value < SpinMinUsers.Value) then
-  begin
     SpinMinUsers.Value := SpinMaxUsers.Value;
-  end;
 end;
 
 procedure TCreateGameForm.SpinMinUsersValueChanged(Sender: TObject; AValue: Single);
 begin
   inherited;
   if (SpinMinUsers.Value > SpinMaxUsers.Value) then
-  begin
     SpinMaxUsers.Value := SpinMinUsers.Value;
-  end;
 end;
 
 procedure TCreateGameForm.WebFormCreate(Sender: TObject);

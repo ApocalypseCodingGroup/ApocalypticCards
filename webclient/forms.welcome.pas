@@ -18,7 +18,6 @@ type
     bgPanel: TWebPanel;
     procedure StartButtonClick(Sender: TObject);
     procedure JoinGameButtonClick(Sender: TObject);
-    procedure WebFormResize(Sender: TObject);
   end;
 
 var
@@ -63,12 +62,6 @@ begin
   inherited;
   TheForm := TCreateGameForm.CreateNew(@AfterCreate);
   TheForm.ShowModal(@AfterShowModal);
-end;
-
-procedure TWelcomeForm.WebFormResize(Sender: TObject);
-begin
-  inherited;
-  BaseCenterPanel.Left := (Width - BaseCenterPanel.Width) div 2;
 end;
 
 end.

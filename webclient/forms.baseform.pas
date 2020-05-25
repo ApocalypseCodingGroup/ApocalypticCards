@@ -9,6 +9,7 @@ uses
 type
   TBaseForm = class(TWebForm)
     BaseCenterPanel: TWebPanel;
+    procedure WebFormResize(Sender: TObject);
   private
     { Private declarations }
   public
@@ -21,5 +22,10 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TBaseForm.WebFormResize(Sender: TObject);
+begin
+  BaseCenterPanel.Left := (Width - BaseCenterPanel.Width) div 2;
+end;
 
 end.

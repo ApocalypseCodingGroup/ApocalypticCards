@@ -3,12 +3,14 @@ object BaseForm: TBaseForm
   Top = 0
   Width = 640
   Height = 480
+  Color = 4210688
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Arial'
   Font.Style = []
   TabOrder = 1
+  OnResize = WebFormResize
   object BaseCenterPanel: TWebPanel
     Left = 32
     Top = 36

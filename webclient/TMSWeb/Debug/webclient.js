@@ -33967,6 +33967,9 @@ rtl.module("forms.baseform",["System","SysUtils","Classes","JS","Web","WEBLib.Gr
       this.BaseCenterPanel = undefined;
       pas["WEBLib.Forms"].TForm.$final.call(this);
     };
+    this.WebFormResize = function (Sender) {
+      this.BaseCenterPanel.SetLeft(Math.floor((this.GetWidth() - this.BaseCenterPanel.GetWidth()) / 2));
+    };
     this.LoadDFMValues = function () {
       pas["WEBLib.Forms"].TCustomForm.LoadDFMValues.call(this);
       this.BaseCenterPanel = pas["WEBLib.ExtCtrls"].TPanel.$create("Create$1",[this]);
@@ -33977,12 +33980,14 @@ rtl.module("forms.baseform",["System","SysUtils","Classes","JS","Web","WEBLib.Gr
         this.SetTop(0);
         this.SetWidth(640);
         this.SetHeight(480);
+        this.SetColor(4210688);
         this.FFont.FCharset = 1;
         this.FFont.SetColor(65793);
         this.FFont.SetHeight(-11);
         this.FFont.SetName("Arial");
         this.FFont.SetStyle({});
         this.SetTabOrder(1);
+        this.SetEvent(this,this,"OnResize","WebFormResize");
         this.BaseCenterPanel.SetParentComponent(this);
         this.BaseCenterPanel.SetName("BaseCenterPanel");
         this.BaseCenterPanel.SetLeft(32);
@@ -33998,6 +34003,7 @@ rtl.module("forms.baseform",["System","SysUtils","Classes","JS","Web","WEBLib.Gr
     rtl.addIntf(this,pas.System.IUnknown);
     var $r = this.$rtti;
     $r.addField("BaseCenterPanel",pas["WEBLib.ExtCtrls"].$rtti["TPanel"]);
+    $r.addMethod("WebFormResize",0,[["Sender",pas.System.$rtti["TObject"]]]);
   });
   this.BaseForm = null;
 });
@@ -69055,14 +69061,10 @@ rtl.module("forms.creategameform",["System","SysUtils","Variants","Classes","WEB
       this.Close();
     };
     this.SpinMinUsersValueChanged = function (Sender, AValue) {
-      if (this.SpinMinUsers.GetValue() > this.SpinMaxUsers.GetValue()) {
-        this.SpinMaxUsers.SetValue(this.SpinMinUsers.GetValue());
-      };
+      if (this.SpinMinUsers.GetValue() > this.SpinMaxUsers.GetValue()) this.SpinMaxUsers.SetValue(this.SpinMinUsers.GetValue());
     };
     this.SpinMaxUsersValueChanged = function (Sender, AValue) {
-      if (this.SpinMaxUsers.GetValue() < this.SpinMinUsers.GetValue()) {
-        this.SpinMinUsers.SetValue(this.SpinMaxUsers.GetValue());
-      };
+      if (this.SpinMaxUsers.GetValue() < this.SpinMinUsers.GetValue()) this.SpinMinUsers.SetValue(this.SpinMaxUsers.GetValue());
     };
     this.WebFormCreate = function (Sender) {
       this.SpinMinUsers.SetValue(3);
@@ -69402,9 +69404,6 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
       };
       pas["modules.datamodule"].mainDataModule.GetGames(GetGamesCallbackClient);
     };
-    this.WebFormResize = function (Sender) {
-      this.BaseCenterPanel.SetLeft(Math.floor((this.GetWidth() - this.BaseCenterPanel.GetWidth()) / 2));
-    };
     this.LoadDFMValues = function () {
       pas["forms.baseform"].TBaseForm.LoadDFMValues.call(this);
       this.WebImageControl1 = pas["WEBLib.ExtCtrls"].TImageControl.$create("Create$1",[this]);
@@ -69424,11 +69423,8 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
       this.YourNameEdit.BeforeLoadDFMValues();
       try {
         this.SetCaption("WelcomeForm");
-        this.SetColor(4210688);
-        this.SetEvent(this,this,"OnResize","WebFormResize");
         this.BaseCenterPanel.SetBorderStyle(pas["WEBLib.Controls"].TBorderStyle.bsNone);
         this.BaseCenterPanel.SetChildOrderEx(2);
-        this.BaseCenterPanel.SetColor(16772810);
         this.WebImageControl1.SetParentComponent(this.BaseCenterPanel);
         this.WebImageControl1.SetName("WebImageControl1");
         this.WebImageControl1.SetLeft(0);
@@ -69537,7 +69533,6 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
     $r.addField("bgPanel",pas["WEBLib.ExtCtrls"].$rtti["TPanel"]);
     $r.addMethod("StartButtonClick",0,[["Sender",pas.System.$rtti["TObject"]]]);
     $r.addMethod("JoinGameButtonClick",0,[["Sender",pas.System.$rtti["TObject"]]]);
-    $r.addMethod("WebFormResize",0,[["Sender",pas.System.$rtti["TObject"]]]);
   });
   this.WelcomeForm = null;
 },["WEBLib.WebTools","forms.creategameform","modules.datamodule"]);

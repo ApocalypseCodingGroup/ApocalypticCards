@@ -4,13 +4,15 @@ interface
 
 uses classes.gamedata;
 
-type TGameGuid = string;
-type TUserGuid = string;
+// IanB - Specially removed the repeated "type" keywords to make Gus happy :)
+type
+  TGameGuid = string;
+  TUserGuid = string;
 
-type TCreateGameCallback      = reference to procedure(const CreatedGame: boolean);
-type TGetGamesCallback        = reference to procedure(const GamesFound: boolean);
-type TGetSpecificGameCallback = reference to procedure(const GamesFound: boolean; const GameGUID: TGameGuid);
-type TGetUserCallback         = reference to procedure(const UserFound: boolean; const UserName: TUserGuid);
+  TCreateGameCallback      = reference to procedure(const CreatedGame: boolean);
+  TGetGamesCallback        = reference to procedure(const GamesFound: boolean);
+  TGetSpecificGameCallback = reference to procedure(const GamesFound: boolean; const GameGUID: TGameGuid);
+  TGetUserCallback         = reference to procedure(const UserFound: boolean; const UserName: TUserGuid);
 
 implementation
 
