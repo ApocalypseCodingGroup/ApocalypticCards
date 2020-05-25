@@ -68891,11 +68891,6 @@ rtl.module("modules.clientconstants",["System"],function () {
   this.cServerURL = "https:\/\/apocalypse.chapmanworld.com\/api\/";
   this.cAPI_Games = "games";
 });
-rtl.module("models.gamedata",["System","classes.gamedata"],function () {
-  "use strict";
-  var $mod = this;
-  this.CurrentGame = pas["classes.gamedata"].TGameData.$new();
-});
 rtl.module("modules.datamodule",["System","SysUtils","Classes","JS","Web","WEBLib.Modules","WEBLib.REST","interfaces.callbacks","classes.gamedata"],function () {
   "use strict";
   var $mod = this;
@@ -68907,6 +68902,7 @@ rtl.module("modules.datamodule",["System","SysUtils","Classes","JS","Web","WEBLi
       this.httpCreateGame = null;
       this.FGameGuid = "";
       this.FUserGuid = "";
+      this.FCurrentGame = pas["classes.gamedata"].TGameData.$new();
       this.FCreateGameCallback = null;
       this.FGetGamesCallback = null;
       this.FGetSpecificGameCallback = null;
@@ -68916,6 +68912,7 @@ rtl.module("modules.datamodule",["System","SysUtils","Classes","JS","Web","WEBLi
       this.httpGetGames = undefined;
       this.BasicRequest = undefined;
       this.httpCreateGame = undefined;
+      this.FCurrentGame = undefined;
       this.FCreateGameCallback = undefined;
       this.FGetGamesCallback = undefined;
       this.FGetSpecificGameCallback = undefined;
@@ -68932,7 +68929,7 @@ rtl.module("modules.datamodule",["System","SysUtils","Classes","JS","Web","WEBLi
     this.httpCreateGameRequestResponse = function (Sender, ARequest, AResponse) {
       var bSuccess = false;
       if (ARequest.status === 200) {
-        pas["models.gamedata"].CurrentGame.$assign(pas["classes.gamedata"].TGameData.FromJSON(AResponse));
+        this.FCurrentGame.$assign(pas["classes.gamedata"].TGameData.FromJSON(AResponse));
         bSuccess = true;
       } else {
         pas["WEBLib.WebTools"].OutputDebugString('TmainDataModule.httpCreateGameRequestResponse: Error "' + AResponse + '"');
@@ -69020,7 +69017,7 @@ rtl.module("modules.datamodule",["System","SysUtils","Classes","JS","Web","WEBLi
     $r.addMethod("httpCreateGameRequestResponse",0,[["Sender",pas.System.$rtti["TObject"]],["ARequest",pas.Web.$rtti["TJSXMLHttpRequest"]],["AResponse",rtl.string]]);
   });
   this.mainDataModule = null;
-},["modules.clientconstants","WEBLib.WebTools","models.gamedata"]);
+},["modules.clientconstants","WEBLib.WebTools"]);
 rtl.module("forms.creategameform",["System","SysUtils","Variants","Classes","WEBLib.Graphics","WEBLib.Controls","WEBLib.Forms","WEBLib.Dialogs","forms.baseform","WEBLib.ExtCtrls","WEBLib.StdCtrls","WEBLib.TMSFNCTypes","WEBLib.TMSFNCUtils","WEBLib.TMSFNCGraphics","WEBLib.TMSFNCGraphicsTypes","WEBLib.TMSFNCCustomControl","WEBLib.TMSFNCTrackBar","WEBLib.TMSFNCSpinEdit"],function () {
   "use strict";
   var $mod = this;
@@ -69544,7 +69541,7 @@ rtl.module("forms.welcome",["System","SysUtils","Variants","Classes","WEBLib.Gra
   });
   this.WelcomeForm = null;
 },["WEBLib.WebTools","forms.creategameform","modules.datamodule"]);
-rtl.module("program",["System","WEBLib.Forms","forms.baseform","forms.welcome","forms.creategameform","modules.datamodule","modules.clientconstants","interfaces.callbacks","classes.gamedata","models.gamedata"],function () {
+rtl.module("program",["System","WEBLib.Forms","forms.baseform","forms.welcome","forms.creategameform","modules.datamodule","modules.clientconstants","interfaces.callbacks","classes.gamedata"],function () {
   "use strict";
   var $mod = this;
   $mod.$main = function () {

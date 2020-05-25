@@ -129,7 +129,6 @@
         <DCCReference Include="modules.clientconstants.pas"/>
         <DCCReference Include="interfaces.callbacks.pas"/>
         <DCCReference Include="classes.gamedata.pas"/>
-        <DCCReference Include="models.gamedata.pas"/>
         <None Include="webclient.html"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

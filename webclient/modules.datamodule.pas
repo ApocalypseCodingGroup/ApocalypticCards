@@ -17,6 +17,7 @@ type
   private
     FGameGuid:                TGameGuid;
     FUserGuid:                TUserGuid;
+    FCurrentGame:             TGameData;
     FCreateGameCallback:      TCreateGameCallback;
     FGetGamesCallback:        TGetGamesCallback;
     FGetSpecificGameCallback: TGetSpecificGameCallback;
@@ -33,7 +34,7 @@ implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
-uses modules.clientconstants, WEBLib.WebTools, models.gamedata;
+uses modules.clientconstants, WEBLib.WebTools;
 
 {$R *.dfm}
 
@@ -65,7 +66,7 @@ var
 begin
   if ARequest.Status = 200 then
     begin
-      CurrentGame := TGameData.FromJSON(AResponse);
+      FCurrentGame := TGameData.FromJSON(AResponse);
       bSuccess := True;
     end
   else

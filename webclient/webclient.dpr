@@ -9,8 +9,7 @@ uses
   modules.datamodule in 'modules.datamodule.pas' {mainDataModule: TWebDataModule},
   modules.clientconstants in 'modules.clientconstants.pas',
   interfaces.callbacks in 'interfaces.callbacks.pas',
-  classes.gamedata in 'classes.gamedata.pas',
-  models.gamedata in 'models.gamedata.pas';
+  classes.gamedata in 'classes.gamedata.pas';
 
 {$R *.res}
 
