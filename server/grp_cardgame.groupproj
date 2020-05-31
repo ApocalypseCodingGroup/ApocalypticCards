@@ -9,9 +9,6 @@
         <Projects Include="src\mod_cardgame.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\vclTestClient\vclTestClient.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="..\fmxclient\FMXClientProject.dproj">
             <Dependencies/>
         </Projects>
@@ -44,15 +41,6 @@
     <Target Name="mod_cardgame:Make">
         <MSBuild Projects="src\mod_cardgame.dproj" Targets="Make"/>
     </Target>
-    <Target Name="vclTestClient">
-        <MSBuild Projects="..\vclTestClient\vclTestClient.dproj"/>
-    </Target>
-    <Target Name="vclTestClient:Clean">
-        <MSBuild Projects="..\vclTestClient\vclTestClient.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="vclTestClient:Make">
-        <MSBuild Projects="..\vclTestClient\vclTestClient.dproj" Targets="Make"/>
-    </Target>
     <Target Name="FMXClientProject">
         <MSBuild Projects="..\fmxclient\FMXClientProject.dproj"/>
     </Target>
@@ -72,13 +60,13 @@
         <MSBuild Projects="..\fmx-slim-client\ApoCards.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="CardDebug;mod_cardgame;vclTestClient;FMXClientProject;ApoCards"/>
+        <CallTarget Targets="CardDebug;mod_cardgame;FMXClientProject;ApoCards"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;vclTestClient:Clean;FMXClientProject:Clean;ApoCards:Clean"/>
+        <CallTarget Targets="CardDebug:Clean;mod_cardgame:Clean;FMXClientProject:Clean;ApoCards:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;vclTestClient:Make;FMXClientProject:Make;ApoCards:Make"/>
+        <CallTarget Targets="CardDebug:Make;mod_cardgame:Make;FMXClientProject:Make;ApoCards:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
